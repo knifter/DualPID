@@ -24,7 +24,6 @@ LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
 void setup()
 {
-  Serial.begin(9600);
   lcd.begin(16, 2);
 
   windowStartTime = millis();
@@ -61,11 +60,13 @@ void loop()
   }
   if(Output > now - windowStartTime)
   {
+    // Increase
     digitalWrite(RELAY_INCREASE, HIGH);
     digitalWrite(RELAY_DECREASE, LOW);
   }
   else
   {
+    // Decrease
     digitalWrite(RELAY_INCREASE, LOW);
     digitalWrite(RELAY_DECREASE, HIGH);
   }
@@ -75,9 +76,6 @@ void loop()
    ************************************************/
   float MeasRH  = analogRead(ANALOG_SENSOR) / 1023. * 100;
 
-  Serial.println(MeasRH);
-
-  //         ----------------
   lcd.setCursor(0, 0);
   lcd.print("RH=    % (Meas.)");
   lcd.setCursor(3, 0);
