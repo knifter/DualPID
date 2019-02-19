@@ -1,8 +1,8 @@
 #include <PID_v1.h>
 #include <LiquidCrystal.h>
 
-#define RELAY_INCREASE 6
-#define RELAY_DECREASE 5
+#define RELAY_INCREASE 5
+#define RELAY_DECREASE 4
 #define ANALOG_SENSOR 0
 #define ANALOG_HUM_ADJUST 1
 
