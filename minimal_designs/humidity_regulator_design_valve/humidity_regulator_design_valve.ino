@@ -2,7 +2,7 @@
 #include <LiquidCrystal.h>
 
 #define PIN_TIP120 7
-#define ANALOG_SENSOR 0
+#define ANALOG_SENSOR_RH 0
 #define ANALOG_HUM_ADJUST 1
 
 // Define Variables for the PID controler
@@ -30,17 +30,23 @@ void setup()
 
 void loop()
 {
-  // Manually write the setpoint:
-  // Convert the analog reading (which goes from 0 - 1023) to RH (between 0 and 100%)
-  float RH = 50 / 1023. * 100;
+  // Read the Setpoint on ANALOG_HUM_ADJUST:
+  // Convert the analog reading (which goes from 0 - 1023) to voltage (between 0 and 5V)
+  float measVoltageSetPoint = analogRead(ANALOG_HUM_ADJUST) / 1023. * 5;
   // Apply the manufacturer's calibration
   // This has to be changed when the sensor is replaced
-  float setpoint_volt = RH * 0.0307 + 0.958;
-  // Compute the Setpoint
-  Setpoint = setpoint_volt / 5 * 1023;
+  float measRHSetPoint = (measVoltageSetPoint - 0.826) / 0.0315;
+
+  // Setpoint for the PID
+  Setpoint = measRHSetPoint;
+
 
   // Read the humidity sensor value
-  Input = analogRead(ANALOG_SENSOR);
+  float measVoltageSensor = analogRead(ANALOG_SENSOR_RH) / 1023. * 5;
+  float measRHSensor = (measVoltageSensor - 0.826) / 0.0315;
+
+  // Input for the PID
+  Input = measRHSensor;
   myPID.Compute();
 
   /************************************************
