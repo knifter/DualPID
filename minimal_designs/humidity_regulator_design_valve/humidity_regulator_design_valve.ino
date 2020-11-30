@@ -1,5 +1,5 @@
 #include <PID_v1.h>
-#include <LiquidCrystal.h>
+#include <Arduino.h>
 
 #define PIN_TIP120 7
 #define ANALOG_SENSOR_RH 0

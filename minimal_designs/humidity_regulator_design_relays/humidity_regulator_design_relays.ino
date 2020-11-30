@@ -1,5 +1,5 @@
 #include <PID_v1.h>
-#include <LiquidCrystal.h>
+#include <Arduino.h>
 
 #define RELAY_INCREASE 5
 #define RELAY_DECREASE 4
