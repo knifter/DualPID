@@ -2,7 +2,6 @@
 #include <Wire.h>
 
 #include <PID_v1.h>
-#include <LiquidCrystal.h>
 
 #define PIN_VALVE           11
 #define ANALOG_SENSOR_RH    1
