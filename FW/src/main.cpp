@@ -1,6 +1,6 @@
 #include <M5Stack.h>
 #include <PID_v1.h>
-//#include <EEPROM.h>
+#include <EEPROM.h>
 
 void ShowHelp();
 void DisplayMenuItem(String txt, int place, int selected);
@@ -44,7 +44,7 @@ unsigned long windowStartTime;
 int Selected_Parameter = KSETPOINT ;
 
 // P I D parameters
-double para[] = {50.0, 2., 5., 1.};
+double para[] = {50.0, 2., 5., 1., -1.0};
 
 // Menuitems
 String item[5] = {"S", "P", "I", "D", "X"};
@@ -55,6 +55,42 @@ uint16_t Para_Cusor_Y[5];
 
 //define PID
 PID myPID(&Input, &Output, &Setpoint, para[Kp], para[Ki], para[Kd], DIRECT);
+
+void write_flash(double *para)
+{
+
+  int eeAddress = 0;   //Location we want the data to be put.
+
+  for (int i = 0; i < 5; i++)
+  {
+    EEPROM.writeDouble(eeAddress, para[i]);
+    Serial.println(para[i]);
+    eeAddress += sizeof(double);
+  }
+
+  EEPROM.commit();
+}
+
+void read_flash(double *para)
+{
+  double test = 0;
+  
+  test = EEPROM.readDouble(3 *sizeof(double));
+  Serial.println(test);
+  if ( test != 0.0)
+  {
+    Serial.println("test");
+    int eeAddress = 0;   //Location we want the data to be put.
+
+    for (int i = 0; i < 4; i++)
+    {
+      para[i] = EEPROM.readDouble(eeAddress);
+      Serial.println(para[i]);
+      eeAddress += sizeof(double);
+    }
+  }
+}
+
 
 // Sohow an menu item with current value
 void DisplayMenuItem(String txt, int place, int selected)
@@ -98,10 +134,10 @@ void ShowMenu(int it )
 void ShowHelp()
 {
   M5.Lcd.setTextColor(WHITE, BLUE);
-  M5.Lcd.setCursor(40,225);
+  M5.Lcd.setCursor(40, 225);
   M5.Lcd.setTextSize(2);
   M5.Lcd.print("<<<    Select    >>>");
- 
+
 }
 
 // Parameter to change will be red colored
@@ -115,7 +151,7 @@ void Change_Parameter(int item)
 void PID_Setup()
 {
   digitalWrite(PIN_VALVE, HIGH);
-  
+
   windowStartTime = millis();
   Output = WINDOWSIZE / 2;
 
@@ -129,14 +165,17 @@ void PID_Setup()
 void setup()
 {
   M5.begin();
+  EEPROM.begin(4 * sizeof(double));
   M5.Lcd.fillScreen(BLACK);
 
   pinMode(PIN_VALVE, OUTPUT);
-  pinMode(ANALOG_SENSOR_RH,INPUT);
+  pinMode(ANALOG_SENSOR_RH, INPUT);
 
-  dacWrite (25,0); // Voorkomt knullige tyfus herrie uit de m5stack.... Werkelijk waardeloos.
+  dacWrite (25, 0); // Voorkomt knullige tyfus herrie uit de m5stack.... Werkelijk waardeloos.
 
   analogSetWidth(10);
+
+  read_flash(para);
 
   PID_Setup();
 
@@ -198,6 +237,7 @@ void select_parameter()
     else
     {
       M5.Lcd.fillScreen(BLACK);
+      write_flash(para);
       myPID.SetTunings( para[Kp], para[Ki], para[Kd]);
       stts = MEASURE;
     }
@@ -222,7 +262,7 @@ void PID_Controller()
 
   // Read the humidity sensor value
   float measVoltageSensor = analogRead(ANALOG_SENSOR_RH) / 1023. * 5;
- 
+
   float measRHSensor = (measVoltageSensor - 0.826) / 0.0315;
 
   unsigned long now = millis();
@@ -297,7 +337,7 @@ void loop()
   }
   else if (stts == MEASURE)
   {
-    if (M5.BtnA.wasPressed()|| M5.BtnB.wasPressed() ||M5.BtnC.wasPressed())
+    if (M5.BtnA.wasPressed() || M5.BtnB.wasPressed() || M5.BtnC.wasPressed())
     {
       stts = SELECT_P;
       M5.Lcd.fillScreen(BLACK);
