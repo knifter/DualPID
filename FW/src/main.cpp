@@ -1,6 +1,10 @@
 #include <M5Stack.h>
 #include <PID_v1.h>
 #include <EEPROM.h>
+#include <SHT3X.h>
+
+#include "config.h"
+#include <tools-log.h>
 
 void ShowHelp();
 void DisplayMenuItem(String txt, int place, int selected);
@@ -14,7 +18,7 @@ void DisplayMenuItem(String txt, int place, int selected);
 float key_step = KEY_STEP_SLOW;
 int key_delay = KEY_SLOW;
 
-#define PIN_VALVE           11
+// #define PIN_VALVE           11
 #define ANALOG_SENSOR_RH    35
 //#define ANALOG_HUM_ADJUST   2
 #define PID_LOOPTIME_MS     2000            // PID delta-T: 2 seconds as it was
@@ -55,6 +59,7 @@ uint16_t Para_Cusor_Y[5];
 
 //define PID
 PID myPID(&Input, &Output, &Setpoint, para[Kp], para[Ki], para[Kd], DIRECT);
+SHT3X sht;
 
 void write_flash(double *para)
 {
@@ -164,22 +169,30 @@ void PID_Setup()
 
 void setup()
 {
-  M5.begin();
-  EEPROM.begin(4 * sizeof(double));
-  M5.Lcd.fillScreen(BLACK);
+	Serial.begin(115200);
 
-  pinMode(PIN_VALVE, OUTPUT);
-  pinMode(ANALOG_SENSOR_RH, INPUT);
+  	M5.begin();
+  	EEPROM.begin(4 * sizeof(double));
+  	M5.Lcd.fillScreen(BLACK);
 
-  dacWrite (25, 0); // Voorkomt knullige tyfus herrie uit de m5stack.... Werkelijk waardeloos.
+  	pinMode(PIN_VALVE, OUTPUT);
+  	pinMode(ANALOG_SENSOR_RH, INPUT);
 
-  analogSetWidth(10);
+	Wire.begin(PIN_SDA, PIN_SCL);
+	if(!sht.begin())
+	{
+		DBG("ERROR: SHT31 false");
+		while(1);
+	};
 
-  read_flash(para);
+  	dacWrite (25, 0); // Voorkomt knullige tyfus herrie uit de m5stack.... Werkelijk waardeloos.
 
-  PID_Setup();
+	analogSetWidth(10);
 
-}
+  	// read_flash(para);
+
+  	PID_Setup();
+};
 
 void parameter_change()
 {
@@ -302,13 +315,21 @@ void PID_Controller()
   static unsigned long lastDisplay = 0;
   if (stts == MEASURE && now - lastDisplay > DISPLAY_LOOPTIME_MS)
   {
-    float MeasRH  = analogRead(ANALOG_SENSOR_RH) / 1023. * 100;
+    float MeasRH  = sht.getHumidity();
+	float MeasT = sht.getTemperature();
     M5.Lcd.setTextSize(4);
     M5.Lcd.setTextColor(WHITE, BLACK);
+
     M5.Lcd.setCursor(10, 50);
     M5.Lcd.print("RH =  ");
     M5.Lcd.print(MeasRH, 1);
     M5.Lcd.print(" %  ");
+
+    M5.Lcd.setCursor(10, 100);
+    M5.Lcd.print("T =  ");
+    M5.Lcd.print(MeasT, 1);
+    M5.Lcd.print(" C  ");
+
     M5.Lcd.setCursor(10, 150);
     M5.Lcd.print("Set = ");
     M5.Lcd.print(para[0], 1);

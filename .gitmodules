@@ -10,3 +10,6 @@
 [submodule "FW/lib/lib-tools"]
 	path = FW/lib/lib-tools
 	url = https://github.com/knifter/lib-tools.git
+[submodule "FW/lib/lib-sht3x\\"]
+	path = FW/lib/lib-sht3x\\
+	url = https://github.com/knifter/lib-sht3x
