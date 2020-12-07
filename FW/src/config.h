@@ -4,7 +4,7 @@
 #define DEBUG
 #define TOOLS_LOG_DEBUG
 
-#define VERSION					1
+#define VERSION					20201207
 
 #define NVS_NAMESPACE			"PidSettings"
 #define NVS_SETTINGS_IDENT		"EPIDSET"
@@ -17,7 +17,7 @@
 // #define PIN_VALVE           11
 // #define ANALOG_SENSOR_RH    35
 //#define ANALOG_HUM_ADJUST   2
-#define PID_LOOPTIME_MS     	2000            // PID delta-T: 2 seconds as it was
+#define PID_LOOPTIME_MS     	1000            // PID delta-T: 2 seconds as it was
 #define DISPLAY_LOOPTIME_MS 	500             // Display update rate: every half a second
 #define WINDOWSIZE          	5000      		// time-windows size in ms
 

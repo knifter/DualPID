@@ -21,6 +21,8 @@ bool pid_begin()
 	digitalWrite(PIN_VALVE, HIGH);
 
 	windowStartTime = millis();
+	Input = 50;
+	Setpoint = DEFAULT_SETPOINT;
 	Output = WINDOWSIZE / 2;
 
 	// Set the range between 0 and the full window size
@@ -53,11 +55,14 @@ void pid_set_tuning(settings_t& s)
 	return;
 };
 
+double pid_get_output()
+{
+	return Output;
+}
+
 void pid_loop()
 {
-  	float RH_actual = sht_sensor.getHumidity();
-
-	// See if its time yet
+	// See if its time to do another PID iteration
 	time_t now = millis();
 	static time_t pid_next = 0;
 	if(now > pid_next)
@@ -66,13 +71,16 @@ void pid_loop()
     	// Setpoint = RH_setpoint;
 
     	// Input for the PID
-    	Input = RH_actual;
+    	Input = sht_sensor.getHumidity();
     	myPID.Compute();
+
+		DBG("Output: %.0f", Output);
 
 		// Queue next iteration
 		pid_next += PID_LOOPTIME_MS;
 	};
 
+	// Process timewindow valve depending on PID Output
 	if (now - windowStartTime > WINDOWSIZE)
   	{ //time to shift the Relay Window
 	    windowStartTime += WINDOWSIZE;

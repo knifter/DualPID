@@ -8,5 +8,6 @@ void pid_set_tuning(double, double, double);
 void pid_set_tuning(settings_t&);
 void pid_set_setpoint(double);
 void pid_loop();
+double pid_get_output();
 
 #endif // __PID_H

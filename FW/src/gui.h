@@ -44,7 +44,8 @@ class GUI
 		void parameter_change();
 		void select_parameter();
 		void draw_highlight_param();
-	
+		void draw_outputbar(const int x, const int y, const int w, const int h, const float percent);
+
 	private:
 		// typedef enum : int
 		// {
@@ -57,6 +58,7 @@ class GUI
 		// 	_PARAM_MAX
 		// } param_t;
 
+
 		const char* ParamNames[_PARAM_MAX+1] = {
 			"S",
 			"P",
@@ -65,17 +67,18 @@ class GUI
 			"<Back"
 		};	
 
-		enum class state_t
+		typedef enum
 		{
 			BOOT,
+			BOOT_WAIT,
 			MAIN,
 			CHANGE_PARAM,
 			SELECT_PARAM
-		};
+		} state_t;
 
 		param_t _selected_parameter = PARAM_SETPOINT;
 		double* _settingptr = nullptr;
-		time_t _main_holdoff = 0;
+		time_t _holdoff = 0;
 		state_t _state = state_t::BOOT;
 		// int Selected_Parameter = KSETPOINT;
 

@@ -6,6 +6,10 @@
 #include "globals.h"
 #include "pid.h"
 #include "config.h"
+#include "tools-log.h"
+
+#define SCREEN_WIDTH	320
+#define SCREEN_HEIGHT	240
 
 param_t& operator++(param_t& orig)
 {
@@ -39,9 +43,7 @@ param_t& operator--(param_t& orig)
 
 bool GUI::begin()
 {
-	_state = state_t::MAIN;
-	draw_boot();
-	_main_holdoff = millis() + 1500;
+	_state = state_t::BOOT;
 	return true;
 };
 
@@ -50,6 +52,13 @@ void GUI::loop()
 	switch(_state)
 	{
 		case state_t::BOOT:
+			draw_boot();
+			_holdoff = millis() + 1500;
+			_state = state_t::BOOT_WAIT;
+			break;
+		case BOOT_WAIT:
+			if(millis() > _holdoff)
+				_state = state_t::MAIN;
 			break;
 		case state_t::MAIN:
 			if (M5.BtnA.wasPressed() || M5.BtnB.wasPressed() || M5.BtnC.wasPressed())
@@ -85,9 +94,6 @@ void GUI::draw_boot()
 
 void GUI::draw_main()
 {
-	if(_main_holdoff > millis()) // FIXME
-		return;
-
 	// M5.Lcd.fillScreen(BLACK);
 
 	// See if its time yet
@@ -121,6 +127,31 @@ void GUI::draw_main()
     // lcd.print(Output, 1);
 
 	display_next += DISPLAY_LOOPTIME_MS;
+
+	// float outpercent = ( (pid_get_output()-WINDOWSIZE)/WINDOWSIZE);
+	float outpercent = -1 + pid_get_output()/WINDOWSIZE*2;
+	draw_outputbar(0, 100, SCREEN_WIDTH, 12, outpercent);
+};
+
+void GUI::draw_outputbar(const int x, const int y, const int w, const int h, const float percent)
+{
+	const int y_mid = y+h/2;
+	const int x_mid = x+w/2;
+	const int bw = abs(percent*w/2);	// Width of bar
+	// DBG("Out = %.0f, p = %.2f, bw=%d", pid_get_output(), percent, bw);
+
+	// Clear previous
+	M5.Lcd.fillRect(x, y, w, h, BLACK);
+
+	// HZ Centerline with vertical mid-marker
+	M5.Lcd.drawLine(x, y_mid, x+w, y_mid, LIGHTGREY);
+	M5.Lcd.drawLine(x_mid, y, x_mid, y+h, RED);
+
+	// Filled bar, starting mid going left or right
+	if(percent > 0)
+		M5.Lcd.fillRect(x_mid+1, y+1, bw, h-2, WHITE);
+	else
+		M5.Lcd.fillRect(x_mid-bw, y+1, bw, h-2, WHITE);
 };
 
 // show every menu item with current values
