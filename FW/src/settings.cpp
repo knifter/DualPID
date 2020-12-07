@@ -107,11 +107,11 @@ bool SettingsManager::read_flash()
 		ERROR("NVS blobsize(%u) != my wrapper size(%u).", blobsize, sizeof(settingswrapper_t));
 		return false;
 	};
-	if(wrapper.version != VERSION)
-	{
-		INFO("NVS Settings wrong version.");
-		return false;
-	};
+	// if(wrapper.version != VERSION)
+	// {
+	// 	INFO("NVS Settings wrong version.");
+	// 	return false;
+	// };
 
 	// settings were read from flash
 	memcpy(&settings, &(wrapper.data), sizeof(settings_t));
