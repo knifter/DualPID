@@ -7,8 +7,41 @@
 #include "pid.h"
 #include "config.h"
 
+param_t& operator++(param_t& orig)
+{
+	if(orig < _PARAM_MAX)
+		orig = static_cast<param_t>(orig + 1);
+	else
+		orig = static_cast<param_t>(0);
+	return orig;
+};
+param_t& operator--(param_t& orig)
+{
+	if(orig == 0)
+		orig = static_cast<param_t>(_PARAM_MAX - 1);
+	else
+	    orig = static_cast<param_t>(orig - 1);
+	return orig;
+};
+
+// param_t operator++(param_t& orig, int)
+// {
+// 	param_t rVal = orig;
+// 	++orig;
+// 	return rVal;
+// };
+// param_t operator--(param_t& orig, int)
+// {
+// 	param_t rVal = orig;
+// 	--orig;
+// 	return rVal;
+// };
+
 bool GUI::begin()
 {
+	_state = state_t::MAIN;
+	draw_boot();
+	_main_holdoff = millis() + 1500;
 	return true;
 };
 
@@ -16,60 +49,90 @@ void GUI::loop()
 {
 	switch(_state)
 	{
-		case CHANGE_P:
-			parameter_change();
+		case state_t::BOOT:
 			break;
-		case SELECT_P:
-			select_parameter();
-			break;
-		case MEASURE:
+		case state_t::MAIN:
 			if (M5.BtnA.wasPressed() || M5.BtnB.wasPressed() || M5.BtnC.wasPressed())
 			{
-				_state = SELECT_P;
-				M5.Lcd.fillScreen(BLACK);
-				draw_menu(0);
-			}else{
-				draw_main(); // FIXME
-			};
+				_state = state_t::SELECT_PARAM;
+				draw_menu();
+				return;
+			}
+			draw_main();
+			break;
+
+		case state_t::CHANGE_PARAM:
+			parameter_change();
+			break;
+
+		case state_t::SELECT_PARAM:
+			select_parameter();
 			break;
 	}; //switch
 };
 
-// Current parameter to change
-void GUI::draw_menuitem(String txt, int place, int selected)
+void GUI::draw_boot()
 {
+	M5.Lcd.fillScreen(BLACK);
+
 	M5.Lcd.setTextSize(3);
+	M5.Lcd.setCursor (10, 10);
+	M5.Lcd.print("ESP-PID");
+	M5.Lcd.setTextSize(2);
+	M5.Lcd.setCursor (10, 40);
+	M5.Lcd.printf("version %d", VERSION);
+};
 
-	int y = place * 40 + 20;
+void GUI::draw_main()
+{
+	if(_main_holdoff > millis()) // FIXME
+		return;
 
-	M5.Lcd.setCursor (10, y);
-	if ( selected == place )
-		M5.Lcd.setTextColor(BLUE, WHITE);
-	else
-		M5.Lcd.setTextColor(WHITE, BLACK);
+	// M5.Lcd.fillScreen(BLACK);
 
-	M5.Lcd.print(txt);
-	if (txt != "X")
-	{
-		M5.Lcd.setTextSize(2);
-		M5.Lcd.print(" = ");
-		Para_Cusor_X[place] = M5.Lcd.getCursorX();
-		Para_Cusor_Y[place] = M5.Lcd.getCursorY();
-		M5.Lcd.print(para[place]);
-		M5.Lcd.print("      ");
-	};
+	// See if its time yet
+	time_t now = millis();
+	static time_t display_next = millis();
+	if(now < display_next)
+		return;
+
+	float MeasRH  = sht_sensor.getHumidity();
+	float MeasT = sht_sensor.getTemperature();
+	M5.Lcd.setTextSize(3);
+	M5.Lcd.setTextColor(WHITE, BLACK);
+
+	int y = 10;
+	M5.Lcd.setCursor(10, y);
+	M5.Lcd.print("T =  ");
+	M5.Lcd.print(MeasT, 1);
+	M5.Lcd.print(" C  ");
+
+	y += 30;
+	M5.Lcd.setCursor(10, y);
+	M5.Lcd.print("RH =  ");
+	M5.Lcd.print(MeasRH, 1);
+	M5.Lcd.print(" %  ");
+
+	y += 30;
+	M5.Lcd.setCursor(10, y);
+	M5.Lcd.print("Set = ");
+	M5.Lcd.print(settings.setpoint, 1);
+	M5.Lcd.print(" %  ");
+    // lcd.print(Output, 1);
+
+	display_next += DISPLAY_LOOPTIME_MS;
 };
 
 // show every menu item with current values
-void GUI::draw_menu(int it )
+void GUI::draw_menu()
 { 
-	int i;
+	M5.Lcd.fillScreen(BLACK);
 
 	// Menu list
   	M5.Lcd.setTextSize(3);
-  	Selected_Parameter = it;
-  	for (i = 0; i < 5; i++)
-    	draw_menuitem(item[i], i, Selected_Parameter);
+
+  	for (int i = 0; i < _PARAM_MAX; i++)
+    	draw_menuitem(i);
 
 	// Bottom help
 	M5.Lcd.setTextColor(WHITE, BLUE);
@@ -78,12 +141,52 @@ void GUI::draw_menu(int it )
 	M5.Lcd.print("<<<    Select    >>>");
 };
 
-// Parameter to change will be red colored
-void GUI::highlight_param(int item)
+// Current parameter to change
+void GUI::draw_menuitem(int item)
 {
+	M5.Lcd.setTextSize(3);
+
+	int y = item * 40 + 20;
+	const char* txt = ParamNames[item];
+
+	// Selected item gets a different color
+	M5.Lcd.setCursor (10, y);
+	if ( _selected_parameter == item )
+		M5.Lcd.setTextColor(BLUE, WHITE);
+	else
+		M5.Lcd.setTextColor(WHITE, BLACK);
+
+	// Print item
+	M5.Lcd.print(txt);
+	if(item == PARAM_BACK)
+		return;
+
+	// draw value
+	M5.Lcd.setTextSize(3);
+	M5.Lcd.print(" = ");
+	Para_Cusor_X[item] = M5.Lcd.getCursorX();
+	Para_Cusor_Y[item] = M5.Lcd.getCursorY();
+	double value;
+	switch(item)
+	{
+		case PARAM_SETPOINT:value = settings.setpoint; break;
+		case PARAM_KP: 		value = settings.Kp; break;
+		case PARAM_KI: 		value = settings.Ki; break;
+		case PARAM_KD: 		value = settings.Kd; break;
+		default: 			value= NAN; break;
+	};
+	M5.Lcd.print(value);
+	M5.Lcd.print("      ");
+};
+
+// Parameter to change will be red colored
+void GUI::draw_highlight_param()
+{
+	int item = _selected_parameter;
+	M5.Lcd.setTextSize(3);
 	M5.Lcd.setCursor(Para_Cusor_X[item], Para_Cusor_Y[item]);
 	M5.Lcd.setTextColor(RED, WHITE);
-	M5.Lcd.print(para[item]);
+	M5.Lcd.print(*_settingptr);
 };
 
 void GUI::parameter_change()
@@ -109,86 +212,66 @@ void GUI::parameter_change()
 	// Action
   	if (M5.BtnA.isPressed())
   	{
-    	para[Selected_Parameter] = para[Selected_Parameter] - key_step;
-    	highlight_param(Selected_Parameter);
-    	delay(key_delay);
+		*_settingptr -= key_step;
+		draw_highlight_param();
+		delay(key_delay);
   	};
   	if (M5.BtnB.wasPressed())
   	{
-    	_state = SELECT_P;
+    	_state = state_t::SELECT_PARAM;
     	M5.Lcd.fillScreen(BLACK);
-    	draw_menu(Selected_Parameter);
+    	draw_menu();
   	};
   	if (M5.BtnC.isPressed())
-  	{
-    	para[Selected_Parameter] = para[Selected_Parameter] + key_step;
-    	highlight_param(Selected_Parameter);
-    	delay(key_delay);
+	{	
+		*_settingptr += key_step;
+		draw_highlight_param();
+		delay(key_delay);
   	};
 };
+
 
 void GUI::select_parameter()
 {
   	if (M5.BtnA.wasPressed())
   	{
-    	Selected_Parameter = Selected_Parameter - 1;
-    	if ( Selected_Parameter < 0) 
-			Selected_Parameter = 4;
-    	draw_menu(Selected_Parameter);
-  	}
+		--_selected_parameter;
+		// if(_selected_parameter == PARAM_NONE)
+		// 	_selected_parameter = (_PARAM_MAX - 1;
+		draw_menu();
+		return;
+  	};
   	if (M5.BtnB.wasPressed())
   	{
-    	if (item[Selected_Parameter] != "X")
-    	{
-      		_state = CHANGE_P;
-      		highlight_param(Selected_Parameter);
-    	}else{
-      		M5.Lcd.fillScreen(BLACK);
-      		settings.write_flash(para);
-			//TODO: settings->flagUpdate()
-			pid_set_tuning(para[Kp], para[Ki], para[Kd]);
-      		_state = MEASURE;
-    	};
-  	};
-  	if (M5.BtnC.wasPressed())
-  	{
-    	Selected_Parameter = Selected_Parameter + 1;
-    	if ( Selected_Parameter > 4) 
-			Selected_Parameter = 0;
-    	draw_menu(Selected_Parameter);
-  	};
-};
+		if(_selected_parameter == PARAM_BACK)
+		{
+			// TODO: move to state machine
+			// settings.write_flash(para);
+			setman.saveDelayed();
+			pid_set_tuning(setman.settings);
 
-
-void GUI::draw_main()
-{
-
-	// See if its time yet
-	time_t now = millis();
-	static time_t display_next = 0;
-	if(now < display_next)
+			M5.Lcd.fillScreen(BLACK);
+			_state = state_t::MAIN;
+			return;
+		};
+		_state = state_t::CHANGE_PARAM;
+		switch(_selected_parameter)
+		{
+			case PARAM_SETPOINT:	_settingptr = &settings.setpoint; break;
+			case PARAM_KP: 			_settingptr = &settings.Kp; break;
+			case PARAM_KI: 			_settingptr = &settings.Ki; break;
+			case PARAM_KD: 			_settingptr = &settings.Kd; break;
+			default: 				_settingptr = nullptr; break;
+		};
+		draw_highlight_param();
 		return;
-
-	float MeasRH  = sht_sensor.getHumidity();
-	float MeasT = sht_sensor.getTemperature();
-	M5.Lcd.setTextSize(4);
-	M5.Lcd.setTextColor(WHITE, BLACK);
-
-	M5.Lcd.setCursor(10, 50);
-	M5.Lcd.print("T =  ");
-	M5.Lcd.print(MeasT, 1);
-	M5.Lcd.print(" C  ");
-
-	M5.Lcd.setCursor(10, 100);
-	M5.Lcd.print("RH =  ");
-	M5.Lcd.print(MeasRH, 1);
-	M5.Lcd.print(" %  ");
-
-	M5.Lcd.setCursor(10, 150);
-	M5.Lcd.print("Set = ");
-	M5.Lcd.print(para[0], 1);
-	M5.Lcd.print(" %  ");
-    // lcd.print(Output, 1);
-
-	display_next += DISPLAY_LOOPTIME_MS;
+	};
+	if (M5.BtnC.wasPressed())
+	{
+		++_selected_parameter;
+		// if(_selected_parameter == _PARAM_MAX)
+		// 	_selected_parameter = 1;
+		draw_menu();
+		return;
+	};
 };

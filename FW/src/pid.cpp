@@ -6,6 +6,8 @@
 
 #include "config.h"
 #include "globals.h"
+#include "settings.h"
+#include "tools-log.h"
 
 // Define Variables for the PID controler
 double Input, Output, Setpoint;
@@ -14,7 +16,7 @@ unsigned long windowStartTime;
 PID myPID(&Input, &Output, &Setpoint, 
 	DEFAULT_PID_P, DEFAULT_PID_I, DEFAULT_PID_D, DIRECT);
 
-void pid_begin()
+bool pid_begin()
 {
 	digitalWrite(PIN_VALVE, HIGH);
 
@@ -26,16 +28,29 @@ void pid_begin()
 
 	// Turn the PID on
 	myPID.SetMode(AUTOMATIC);
-}
+
+	return true;
+};
 
 void pid_set_tuning(double p, double i, double d)
 {
+	DBG("Setting tunings: P = %02f, I = %02f, D = %02f", p, i, d);
 	myPID.SetTunings(p, i, d);
 };
 
 void pid_set_setpoint(double sp)
 {
 	Setpoint = sp;
+};
+
+void pid_set_tuning(settings_t& s)
+{
+	pid_set_tuning(
+		s.Kp, 
+		s.Ki,
+		s.Kd);
+	pid_set_setpoint(s.setpoint);
+	return;
 };
 
 void pid_loop()

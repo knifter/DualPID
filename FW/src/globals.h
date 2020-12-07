@@ -7,6 +7,7 @@
 
 extern SHT3X sht_sensor;
 extern GUI gui;
-extern SettingsManager settings;
+extern SettingsManager setman;
+extern settings_t& settings;
 
 #endif //__GLOBALS_H

@@ -22,7 +22,6 @@ void setup()
 	digitalWrite(PIN_SPEAKER, LOW);
 	pinMode(PIN_SPEAKER, OUTPUT);
 	
-
 	Wire.begin(PIN_SDA, PIN_SCL);
 	if(!sht_sensor.begin())
 	{
@@ -30,14 +29,16 @@ void setup()
 		while(1);
 	};
 
-	settings.begin();
-  	read_flash(para);
-  	pid_begin();
+	gui.begin();
+	setman.begin();
+	pid_begin();
+	pid_set_tuning(setman.settings);
 };
 
 void loop()
 {
 	M5.update();
 	gui.loop();
+	setman.loop();
 	pid_loop();
 };

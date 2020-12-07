@@ -2,4 +2,5 @@
 
 SHT3X sht_sensor;
 GUI gui;
-SettingsManager settings;
+SettingsManager setman;
+settings_t& settings = setman.settings;

@@ -4,6 +4,11 @@
 #define DEBUG
 #define TOOLS_LOG_DEBUG
 
+#define VERSION					1
+
+#define NVS_NAMESPACE			"PidSettings"
+#define NVS_SETTINGS_IDENT		"EPIDSET"
+#define SETTINGS_DELAY_SAVE		5000
 #define DEFAULT_SETPOINT		50.0
 #define DEFAULT_PID_P			2.0
 #define DEFAULT_PID_I			5.0
