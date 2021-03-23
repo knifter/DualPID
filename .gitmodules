@@ -5,7 +5,7 @@
 	path = FW/lib/M5Stack
 	url = https://github.com/m5stack/M5Stack.git
 [submodule "FW/lib/lib-TwoWireDevice"]
-	path = FW/lib/lib-TwoWireDevice
+	path = FW/lib/TwoWireDevice
 	url = https://github.com/knifter/lib-TwoWireDevice
 [submodule "FW/lib/lib-tools"]
 	path = FW/lib/lib-tools
