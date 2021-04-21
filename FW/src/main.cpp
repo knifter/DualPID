@@ -9,14 +9,13 @@
 
 #include <tools-log.h>
 
-// Modi of display
+void halt(const char*);
 
 void setup()
 {
 	Serial.begin(115200);
 
   	M5.begin();
-  	M5.Lcd.fillScreen(BLACK);
 
   	pinMode(PIN_VALVE, OUTPUT);
 	digitalWrite(PIN_SPEAKER, LOW);
@@ -25,8 +24,7 @@ void setup()
 	Wire.begin(PIN_SDA, PIN_SCL);
 	if(!sht_sensor.begin())
 	{
-		DBG("ERROR: SHT31 Sensor init failed.");
-		while(1);
+		halt("SHT3X error");
 	};
 
 	gui.begin();
@@ -41,4 +39,15 @@ void loop()
 	gui.loop();
 	setman.loop();
 	pid_loop();
+};
+
+void halt(const char* error)
+{
+	DBG("HALT: %s", error);
+	M5.Lcd.fillScreen(RED);
+	M5.Lcd.setTextSize(3);
+	M5.Lcd.setTextColor(WHITE, RED);
+	M5.Lcd.setCursor(5, 5);
+	M5.Lcd.print(error);
+	while(1);
 };

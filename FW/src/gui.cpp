@@ -43,6 +43,7 @@ param_t& operator--(param_t& orig)
 
 bool GUI::begin()
 {
+    M5.Lcd.fillScreen(BLACK);
 	_state = state_t::BOOT;
 	return true;
 };
