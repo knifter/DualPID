@@ -2,7 +2,6 @@
 #include "pid.h"
 
 #include <Arduino.h>
-#include <PID_v1.h>
 #include <MiniPID.h>
 
 #include "config.h"
