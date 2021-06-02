@@ -10,4 +10,7 @@ extern GUI gui;
 extern SettingsManager setman;
 extern settings_t& settings;
 
+extern float g_MeasT;
+extern float g_MeasRH;
+
 #endif //__GLOBALS_H

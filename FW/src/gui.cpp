@@ -8,8 +8,6 @@
 #include "config.h"
 #include "tools-log.h"
 
-#define SCREEN_WIDTH	320
-#define SCREEN_HEIGHT	240
 
 param_t& operator++(param_t& orig)
 {
@@ -59,7 +57,10 @@ void GUI::loop()
 			break;
 		case BOOT_WAIT:
 			if(millis() > _holdoff)
+			{
+				M5.Lcd.fillScreen(BLACK);
 				_state = state_t::MAIN;
+			};
 			break;
 		case state_t::MAIN:
 			if (M5.BtnA.wasPressed() || M5.BtnB.wasPressed() || M5.BtnC.wasPressed())
@@ -103,57 +104,17 @@ void GUI::draw_main()
 	if(now < display_next)
 		return;
 
-	float MeasRH  = sht_sensor.getHumidity();
-	float MeasT = sht_sensor.getTemperature();
-	M5.Lcd.setTextSize(3);
-	M5.Lcd.setTextColor(WHITE, BLACK);
+	// M5.Lcd.setTextSize(2);
+	// M5.Lcd.setTextColor(WHITE, BLACK);
 
-	int y = 10;
-	M5.Lcd.setCursor(10, y);
-	M5.Lcd.print("T =  ");
-	M5.Lcd.print(MeasT, 1);
-	M5.Lcd.print(" C  ");
-
-	y += 30;
-	M5.Lcd.setCursor(10, y);
-	M5.Lcd.print("RH =  ");
-	M5.Lcd.print(MeasRH, 1);
-	M5.Lcd.print(" %  ");
-
-	y += 30;
-	M5.Lcd.setCursor(10, y);
-	M5.Lcd.print("Set = ");
-	M5.Lcd.print(settings.setpoint, 1);
-	M5.Lcd.print(" %  ");
-    // lcd.print(Output, 1);
+	// t_panel.setSize(0, 0, SCREEN_HEIGHT/2, SCREEN_WIDTH/2);
+	// rh_panel.setSize(0, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2);
+	t_panel.draw();
+	rh_panel.draw();
 
 	display_next += DISPLAY_LOOPTIME_MS;
-
-	// float outpercent = ( (pid_get_output()-WINDOWSIZE)/WINDOWSIZE);
-	float outpercent = -1 + pid_get_output()/WINDOWSIZE*2;
-	draw_outputbar(0, 100, SCREEN_WIDTH, 12, outpercent);
 };
 
-void GUI::draw_outputbar(const int x, const int y, const int w, const int h, const float percent)
-{
-	const int y_mid = y+h/2;
-	const int x_mid = x+w/2;
-	const int bw = abs(percent*w/2);	// Width of bar
-	// DBG("Out = %.0f, p = %.2f, bw=%d", pid_get_output(), percent, bw);
-
-	// Clear previous
-	M5.Lcd.fillRect(x, y, w, h, BLACK);
-
-	// HZ Centerline with vertical mid-marker
-	M5.Lcd.drawLine(x, y_mid, x+w, y_mid, LIGHTGREY);
-	M5.Lcd.drawLine(x_mid, y, x_mid, y+h, RED);
-
-	// Filled bar, starting mid going left or right
-	if(percent > 0)
-		M5.Lcd.fillRect(x_mid+1, y+1, bw, h-2, WHITE);
-	else
-		M5.Lcd.fillRect(x_mid-bw, y+1, bw, h-2, WHITE);
-};
 
 // show every menu item with current values
 void GUI::draw_menu()

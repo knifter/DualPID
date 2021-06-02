@@ -3,6 +3,9 @@
 
 #include <Arduino.h>
 
+#include "config.h"
+#include "panels.h"
+
 #define KEY_SLOW 				500
 #define KEY_FAST 				100
 #define KEY_VERY_FAST 			50
@@ -31,7 +34,10 @@ param_t& operator--(param_t& orig);
 class GUI
 {
 	public:
-		// GUI() {};
+		GUI() : 
+			t_panel(0, 0, 70, SCREEN_WIDTH/2), 
+			rh_panel(0, SCREEN_WIDTH/2, 70, SCREEN_WIDTH/2)
+			{};
 
 		bool begin();
 		void loop();
@@ -89,6 +95,9 @@ class GUI
 		// P I D parameters
 		// double para[5] = {50.0, 2., 5., 1., -1.0};
 		// Menuitems
+
+		TempStatPanel t_panel;
+		HumStatPanel rh_panel;
 };
 
 #endif // __GUI_H

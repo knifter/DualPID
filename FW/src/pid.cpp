@@ -19,7 +19,8 @@ MiniPID pid(DEFAULT_PID_P, DEFAULT_PID_I, DEFAULT_PID_D);
 
 bool pid_begin()
 {
-	digitalWrite(PIN_VALVE, HIGH);
+	digitalWrite(PIN_HB1_A, LOW);
+	digitalWrite(PIN_HB1_B, LOW);
 
 	windowStartTime = millis();
 	Input = 50;
@@ -87,9 +88,11 @@ void pid_loop()
   	if (Output > (now - windowStartTime))
   	{
 	    // Increase
-    	digitalWrite(PIN_VALVE, HIGH);
+		digitalWrite(PIN_HB1_A, LOW);
+		digitalWrite(PIN_HB1_B, HIGH);
   	} else {
     	// Decrease
-    	digitalWrite(PIN_VALVE, LOW);
+		digitalWrite(PIN_HB1_A, HIGH);
+		digitalWrite(PIN_HB1_B, LOW);
   	};
 };
