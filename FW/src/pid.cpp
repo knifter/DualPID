@@ -16,13 +16,15 @@
 
 bool PIDLoop::begin()
 {
-	digitalWrite(PIN_HB1_A, LOW);
-	digitalWrite(PIN_HB1_B, LOW);
+	digitalWrite(_pin_a, LOW);
+	digitalWrite(_pin_b, LOW);
 
 	_windowstarttime = millis();
 	_input = 50;
 	// _setpoint = DEFAULT_SETPOINT;
 	_output = WINDOWSIZE / 2;
+    _pid_next = 0;
+    _output_state = 0;
 
 	// Set the range between 0 and the full window size
 	_pid.setOutputLimits(0, WINDOWSIZE);
@@ -52,51 +54,42 @@ void PIDLoop::set_tuning(pidsettings_t& s)
 	return;
 };
 
-double PIDLoop::get_output()
-{
-	return _output;
-};
-
-int PIDLoop::get_output_digital()
-{
-    return _output_digital;
-};
-
 void PIDLoop::loop()
 {
-	// See if its time to do another PID iteration
-	time_t now = millis();
-	static time_t pid_next = 0;
-	if(now > pid_next)
-  	{
-    	// Setpoint for the PID
-    	// Setpoint = RH_setpoint;
+    // See if its time to do another PID iteration
+    time_t now = millis();
+    if(now > _pid_next)
+    {
+        // Setpoint for the PID
+        // Setpoint = RH_setpoint;
 
-    	// Input for the PID
-    	_input = sht_sensor.getHumidity();
-		_output = _pid.getOutput(_input);
+        // Input for the PID
+        _input = sht_sensor.getHumidity();
+        _output = _pid.getOutput(_input);
 
-		DBG("Output: %.0f", _output);
+        DBG("Output: %.0f", _output);
 
-		// Queue next iteration
-		pid_next += PID_LOOPTIME_MS;
-	};
+        // Queue next iteration
+        _pid_next += PID_LOOPTIME_MS;
+    };
 
-	// Process timewindow valve depending on PID Output
-	if (now - _windowstarttime > WINDOWSIZE)
-  	{ //time to shift the Relay Window
-	    _windowstarttime += WINDOWSIZE;
-  	};
-	
-	// Set output
-  	if (_output > (now - _windowstarttime))
-  	{
-	    // Increase
-		digitalWrite(_pin_a, LOW);
-		digitalWrite(_pin_b, HIGH);
-  	} else {
-    	// Decrease
-		digitalWrite(_pin_a, HIGH);
-		digitalWrite(_pin_b, LOW);
-  	};
+    // Process timewindow valve depending on PID Output
+    if (now - _windowstarttime > WINDOWSIZE)
+    { //time to shift the Relay Window
+        _windowstarttime += WINDOWSIZE;
+    };
+
+    // Set output
+    if (_output > (now - _windowstarttime))
+    {
+        // Increase
+        _output_state = 1;
+        digitalWrite(_pin_a, LOW);
+        digitalWrite(_pin_b, HIGH);
+    } else {
+        // Decrease
+        _output_state = 0;
+        digitalWrite(_pin_a, LOW);
+        digitalWrite(_pin_b, LOW);
+    };
 };

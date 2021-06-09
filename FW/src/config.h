@@ -27,10 +27,10 @@
 
 #define PIN_SDA					GPIO_NUM_21
 #define PIN_SCL					GPIO_NUM_22
-#define PIN_HB1_A				GPIO_NUM_2
-#define PIN_HB1_B				GPIO_NUM_5
-#define PIN_HB2_A				GPIO_NUM_13
-#define PIN_HB2_B				GPIO_NUM_15
+#define PIN_HB1_A				GPIO_NUM_13
+#define PIN_HB1_B				GPIO_NUM_15
+#define PIN_HB2_A				GPIO_NUM_2
+#define PIN_HB2_B				GPIO_NUM_5
 #define PIN_SPEAKER				GPIO_NUM_25
 
 #endif // __CONFIG_H

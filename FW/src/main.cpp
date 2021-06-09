@@ -18,11 +18,25 @@ void setup()
 
   	M5.begin();
 
+    // Init IO
+    digitalWrite(PIN_HB1_A, LOW);
+    digitalWrite(PIN_HB1_B, LOW);
+    digitalWrite(PIN_HB2_A, LOW);
+    digitalWrite(PIN_HB2_B, LOW);
   	pinMode(PIN_HB1_A, OUTPUT);
   	pinMode(PIN_HB1_B, OUTPUT);
+  	pinMode(PIN_HB2_A, OUTPUT);
+  	pinMode(PIN_HB2_B, OUTPUT);
 	digitalWrite(PIN_SPEAKER, LOW);
 	pinMode(PIN_SPEAKER, OUTPUT);
 	
+    // while(1)
+    // {
+    //     static bool tmp;
+    //     digitalWrite(PIN_HB2_B, tmp ? HIGH : LOW);
+    //     tmp = !tmp;
+    //     delay(500);
+    // };
 
 	Wire.begin(PIN_SDA, PIN_SCL);
 	if(!sht_sensor.begin())
@@ -45,7 +59,7 @@ void loop()
 	M5.update();
 	gui.loop();
 	setman.loop();
-	pid1.loop();
+	// pid1.loop();
 	pid2.loop();
 };
 
