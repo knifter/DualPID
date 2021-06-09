@@ -27,6 +27,7 @@ bool PIDLoop::begin()
     _output_state = 0;
 
 	// Set the range between 0 and the full window size
+    _pid.reset();
 	_pid.setOutputLimits(0, WINDOWSIZE);
 	_pid.setOutput(_output);
 

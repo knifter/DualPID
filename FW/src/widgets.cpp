@@ -68,7 +68,7 @@ void ProgressBar::draw()
     // _disp.setFont(FONT_NORMAL);
 	M5.lcd.setTextSize(1);
     // _disp.setCursor(_x+_w/2, _y+(_h+FONT_NORMAL_H)/2 - 1);
-#define FONT_NORMAL_H	10
+#define FONT_NORMAL_H	8
 	M5.lcd.setCursor(_left+_width/2, _top+_height/2-FONT_NORMAL_H/2 - 1);
     // _disp.printf("%d%%", _percent);
 	M5.lcd.printf("%d%%", _percent);
