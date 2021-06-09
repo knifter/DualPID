@@ -32,8 +32,10 @@ void setup()
 
 	gui.begin();
 	setman.begin();
-	pid_begin();
-	pid_set_tuning(setman.settings);
+	pid1.begin();
+	pid1.set_tuning(setman.settings.pid1);
+	pid2.begin();
+	pid2.set_tuning(setman.settings.pid2);
 };
 
 void loop()
@@ -43,7 +45,8 @@ void loop()
 	M5.update();
 	gui.loop();
 	setman.loop();
-	pid_loop();
+	pid1.loop();
+	pid2.loop();
 };
 
 void loop_measure()

@@ -162,10 +162,10 @@ void GUI::draw_menuitem(int item)
 	double value;
 	switch(item)
 	{
-		case PARAM_SETPOINT:value = settings.setpoint; break;
-		case PARAM_KP: 		value = settings.Kp; break;
-		case PARAM_KI: 		value = settings.Ki; break;
-		case PARAM_KD: 		value = settings.Kd; break;
+		case PARAM_SETPOINT:value = settings.pid2.setpoint; break;
+		case PARAM_KP: 		value = settings.pid2.Kp; break;
+		case PARAM_KI: 		value = settings.pid2.Ki; break;
+		case PARAM_KD: 		value = settings.pid2.Kd; break;
 		default: 			value= NAN; break;
 	};
 	M5.Lcd.print(value);
@@ -226,6 +226,8 @@ void GUI::parameter_change()
 
 void GUI::select_parameter()
 {
+	pidsettings_t& ps = setman.settings.pid2;
+
   	if (M5.BtnA.wasPressed())
   	{
 		--_selected_parameter;
@@ -241,7 +243,7 @@ void GUI::select_parameter()
 			// TODO: move to state machine
 			// settings.write_flash(para);
 			setman.saveDelayed();
-			pid_set_tuning(setman.settings);
+			pid2.set_tuning(ps);
 
 			M5.Lcd.fillScreen(BLACK);
 			_state = state_t::MAIN;
@@ -250,10 +252,10 @@ void GUI::select_parameter()
 		_state = state_t::CHANGE_PARAM;
 		switch(_selected_parameter)
 		{
-			case PARAM_SETPOINT:	_settingptr = &settings.setpoint; break;
-			case PARAM_KP: 			_settingptr = &settings.Kp; break;
-			case PARAM_KI: 			_settingptr = &settings.Ki; break;
-			case PARAM_KD: 			_settingptr = &settings.Kd; break;
+			case PARAM_SETPOINT:	_settingptr = &ps.setpoint; break;
+			case PARAM_KP: 			_settingptr = &ps.Kp; break;
+			case PARAM_KI: 			_settingptr = &ps.Ki; break;
+			case PARAM_KD: 			_settingptr = &ps.Kd; break;
 			default: 				_settingptr = nullptr; break;
 		};
 		draw_highlight_param();

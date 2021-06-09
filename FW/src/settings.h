@@ -14,6 +14,12 @@ typedef	struct
 	double Ki;
 	double Kd;
 	double setpoint;
+} pidsettings_t;
+
+typedef struct
+{
+	pidsettings_t pid1;
+	pidsettings_t pid2;
 } settings_t;
 
 class SettingsManager

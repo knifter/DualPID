@@ -31,9 +31,10 @@ void TempStatPanel::draw()
 	int x = _left+5;
 	int y = _top+5;
 	M5.Lcd.setTextSize(2);
+	M5.Lcd.setTextColor(WHITE, BLACK);
 	M5.Lcd.setCursor(x, y);
 	M5.Lcd.print("set: ");
-	M5.Lcd.print(settings.setpoint, 1);
+	M5.Lcd.print(settings.pid1.setpoint, 1);
 	M5.Lcd.print(" C ");
 	// lcd.print(Output, 1);
 
@@ -67,7 +68,7 @@ void HumStatPanel::draw()
 	M5.Lcd.setTextColor(WHITE, BLACK);
 	M5.Lcd.setCursor(x, y);
 	M5.Lcd.print("set: ");
-	M5.Lcd.print(settings.setpoint, 1);
+	M5.Lcd.print(settings.pid2.setpoint, 1);
 	M5.Lcd.print(" % ");
 	// lcd.print(Output, 1);
 

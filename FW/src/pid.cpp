@@ -9,58 +9,60 @@
 #include "settings.h"
 #include "tools-log.h"
 
-// Define Variables for the PID controler
-double Input, Output, Setpoint;
-unsigned long windowStartTime;
 
-// PID myPID(&Input, &Output, &Setpoint, 
-// 	DEFAULT_PID_P, DEFAULT_PID_I, DEFAULT_PID_D, DIRECT);
-MiniPID pid(DEFAULT_PID_P, DEFAULT_PID_I, DEFAULT_PID_D);
+// PIDLoop::PIDLoop()
+// {
+// };
 
-bool pid_begin()
+bool PIDLoop::begin()
 {
 	digitalWrite(PIN_HB1_A, LOW);
 	digitalWrite(PIN_HB1_B, LOW);
 
-	windowStartTime = millis();
-	Input = 50;
-	Setpoint = DEFAULT_SETPOINT;
-	Output = WINDOWSIZE / 2;
+	_windowstarttime = millis();
+	_input = 50;
+	// _setpoint = DEFAULT_SETPOINT;
+	_output = WINDOWSIZE / 2;
 
 	// Set the range between 0 and the full window size
-	pid.setOutputLimits(0, WINDOWSIZE);
-	pid.setOutput(Output);
+	_pid.setOutputLimits(0, WINDOWSIZE);
+	_pid.setOutput(_output);
 
 	return true;
 };
 
-void pid_set_tuning(double p, double i, double d)
+void PIDLoop::set_tuning(double p, double i, double d)
 {
 	DBG("Setting tunings: P = %02f, I = %02f, D = %02f", p, i, d);
-	pid.setParameters(p, i, d);
+	_pid.setParameters(p, i, d);
 };
 
-void pid_set_setpoint(double sp)
+void PIDLoop::set_setpoint(double sp)
 {
-	pid.setSetpoint(sp);
+	_pid.setSetpoint(sp);
 };
 
-void pid_set_tuning(settings_t& s)
+void PIDLoop::set_tuning(pidsettings_t& s)
 {
-	pid.setParameters(
+	_pid.setParameters(
 		s.Kp, 
 		s.Ki,
 		s.Kd);
-	pid.setSetpoint(s.setpoint);
+	_pid.setSetpoint(s.setpoint);
 	return;
 };
 
-double pid_get_output()
+double PIDLoop::get_output()
 {
-	return Output;
+	return _output;
 };
 
-void pid_loop()
+int PIDLoop::get_output_digital()
+{
+    return _output_digital;
+};
+
+void PIDLoop::loop()
 {
 	// See if its time to do another PID iteration
 	time_t now = millis();
@@ -71,28 +73,30 @@ void pid_loop()
     	// Setpoint = RH_setpoint;
 
     	// Input for the PID
-    	Input = sht_sensor.getHumidity();
-		Output = pid.getOutput(Input);
+    	_input = sht_sensor.getHumidity();
+		_output = _pid.getOutput(_input);
 
-		DBG("Output: %.0f", Output);
+		DBG("Output: %.0f", _output);
 
 		// Queue next iteration
 		pid_next += PID_LOOPTIME_MS;
 	};
 
 	// Process timewindow valve depending on PID Output
-	if (now - windowStartTime > WINDOWSIZE)
+	if (now - _windowstarttime > WINDOWSIZE)
   	{ //time to shift the Relay Window
-	    windowStartTime += WINDOWSIZE;
+	    _windowstarttime += WINDOWSIZE;
   	};
-  	if (Output > (now - windowStartTime))
+	
+	// Set output
+  	if (_output > (now - _windowstarttime))
   	{
 	    // Increase
-		digitalWrite(PIN_HB1_A, LOW);
-		digitalWrite(PIN_HB1_B, HIGH);
+		digitalWrite(_pin_a, LOW);
+		digitalWrite(_pin_b, HIGH);
   	} else {
     	// Decrease
-		digitalWrite(PIN_HB1_A, HIGH);
-		digitalWrite(PIN_HB1_B, LOW);
+		digitalWrite(_pin_a, HIGH);
+		digitalWrite(_pin_b, LOW);
   	};
 };
