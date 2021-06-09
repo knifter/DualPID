@@ -21,6 +21,9 @@ class TempStatPanel : public Panel
 		TempStatPanel(const int t, const int l, const int h, const int w);
 
 		void draw();
+
+    private:
+        ProgressBar _bar;
 };
 
 class HumStatPanel : public Panel
@@ -29,4 +32,7 @@ class HumStatPanel : public Panel
 		HumStatPanel(const int t, const int l, const int h, const int w);
 
 		void draw();
+
+    private:
+        ProgressBar _bar;
 };

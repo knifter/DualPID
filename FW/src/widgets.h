@@ -14,6 +14,8 @@ class Widget
 
         int top() { return _top;};
         int left() { return _left; };        
+        int width() { return _width; };
+        int height() { return _height; };
 		int bottom() { return _top+_height; };
 		int right() { return _left+_width; };
 		void setSize(const int top, const int left, const int height, const int width);
@@ -24,9 +26,10 @@ class Widget
 };
 
 /*********************************************************************************************/
-class ProgressBar : Widget
+class ProgressBar : public Widget
 {
     public:
+        ProgressBar();
         ProgressBar(int x, int y, int w, int h);
 
         void setValue(int p);

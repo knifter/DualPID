@@ -4,7 +4,7 @@
 #define DEBUG                   1
 #define TOOLS_LOG_DEBUG
 
-#define VERSION					20210609
+#define VERSION				    20210609
 
 #define NVS_NAMESPACE			"PidSettings"
 #define NVS_SETTINGS_IDENT		"EPIDSET"

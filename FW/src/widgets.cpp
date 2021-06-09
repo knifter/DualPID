@@ -26,6 +26,12 @@ void Widget::setSize(const int t, const int l, const int h, const int w)
 	_width = w;	
 };
 
+/***********************************************************************************************************/
+ProgressBar::ProgressBar() : Widget(0, 0, 0, 0)
+{
+    _percent = 0;
+};
+
 ProgressBar::ProgressBar(int t, int l, int w, int h) : Widget(t, l, w, h)
 {
     _percent = 0;
@@ -48,26 +54,27 @@ void ProgressBar::draw()
     // Clear pb center
     // _disp.setColorIndex(0); // White
     // _disp.drawBox(_x+1, _y+1, _w-2, _h-2);
-	M5.lcd.fillRect(_left+1, _top+1, _width-2, _height-2, WHITE);
+	M5.lcd.fillRect(_left+1, _top+1, _width-2, _height-2, BLACK);
 
-    // Fill center
+    // Fill center up to p
     // _disp.setColorIndex(1); // Black
     // _disp.drawFrame(_x, _y, _w, _h);
-	M5.lcd.drawRect(_left, _top, _width, _height, BLACK);
+	M5.lcd.drawRect(_left, _top, _width, _height, WHITE);
     // _disp.drawBox(_x+1, _y+1, bar, _h-2);
-	M5.lcd.fillRect(_left+1, _top+1, bar, _height-2, BLACK);
+	M5.lcd.fillRect(_left+1, _top+1, bar, _height-2, WHITE);
 
     // Print percentage
     // _disp.setColorIndex(1);
     // _disp.setFont(FONT_NORMAL);
 	M5.lcd.setTextSize(1);
     // _disp.setCursor(_x+_w/2, _y+(_h+FONT_NORMAL_H)/2 - 1);
-#define FONT_NORMAL_H	5
-	M5.lcd.setCursor(_left+_width/2, _top+(_height+FONT_NORMAL_H)/2 - 1);
+#define FONT_NORMAL_H	10
+	M5.lcd.setCursor(_left+_width/2, _top+_height/2-FONT_NORMAL_H/2 - 1);
     // _disp.printf("%d%%", _percent);
 	M5.lcd.printf("%d%%", _percent);
 };
 
+/***********************************************************************************************************/
 void do_not_me(const int x, const int y, const int w, const int h, const float percent)
 {
 	const int y_mid = y+h/2;

@@ -21,7 +21,7 @@ void Panel::drawBorder(uint32_t color, uint32_t w)
 
 TempStatPanel::TempStatPanel(int t, int l, int h, int w) : Panel(t, l, h, w)
 {
-
+    _bar.setSize(bottom() - 11, left(), 10, width() );
 };
 
 void TempStatPanel::draw()
@@ -38,7 +38,7 @@ void TempStatPanel::draw()
 	M5.Lcd.print(" C ");
 	// lcd.print(Output, 1);
 
-	y += 30;
+	y += 28;
 	x += 10;
 	M5.Lcd.setTextSize(3);
 	M5.Lcd.setTextColor(WHITE, BLACK);
@@ -47,16 +47,13 @@ void TempStatPanel::draw()
 	M5.Lcd.print(pid1.get_input(), 1);
 	M5.Lcd.print(" C ");
 
-	// float outpercent = -1 + pid_get_output()/WINDOWSIZE*2;
-	// const int bottom = _top+_height;
-	// const int bar_height = 12;
-	// draw_outputbar(left, bottom() - bar_height, width(), bar_height, outpercent);
-
+    _bar.setValue(pid1.get_output()*100/WINDOWSIZE);
+    _bar.draw();
 };
 
 HumStatPanel::HumStatPanel(int t, int l, int h, int w) : Panel(t, l, h, w)
 {
-
+    _bar.setSize(bottom() - 11, left(), 10, width() );
 };
 
 void HumStatPanel::draw()
@@ -73,7 +70,7 @@ void HumStatPanel::draw()
 	M5.Lcd.print(" % ");
 	// lcd.print(Output, 1);
 
-	y += 30;
+	y += 28;
 	x += 10;
 	M5.Lcd.setTextSize(3);
 	M5.Lcd.setCursor(x, y);
@@ -81,8 +78,6 @@ void HumStatPanel::draw()
 	M5.Lcd.print(pid2.get_input(), 1);
 	M5.Lcd.print(" % ");
 
-	// float outpercent = -1 + pid_get_output()/WINDOWSIZE*2;
-	// int bottom = top+height;
-	// int bar_height = 12;
-	// // draw_outputbar(left, bottom 
+    _bar.setValue(pid2.get_output()*100/WINDOWSIZE);
+    _bar.draw();
 };
