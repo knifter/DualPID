@@ -13,6 +13,7 @@ class PIDLoop // : protected MiniPID
     public:
         PIDLoop(int pin_a, int pin_b, pid_value_callback_ptr func) :
             _pid(DEFAULT_PID_P, DEFAULT_PID_I, DEFAULT_PID_D),
+            _cb_value(func),
             _pin_a(pin_a), 
             _pin_b(pin_b)
             {};
@@ -22,11 +23,13 @@ class PIDLoop // : protected MiniPID
         void set_tuning(pidsettings_t&);
         void set_setpoint(double);
         void loop();
+        double get_input() { return _input; };
         double get_output() { return _output; };
         int get_output_state() { return _output_state; };
 
     private: 
         MiniPID _pid;
+        pid_value_callback_ptr _cb_value;
 
         // double Input, Output, Setpoint;
         double _input, _output;
@@ -34,6 +37,7 @@ class PIDLoop // : protected MiniPID
         time_t _windowstarttime;
         int _pin_a, _pin_b;
         time_t _pid_next;
+
 };
 
 #endif // __PID_H

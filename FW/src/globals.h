@@ -14,7 +14,7 @@ extern settings_t& settings;
 extern PIDLoop pid1;
 extern PIDLoop pid2;
 
-extern float g_MeasT;
-extern float g_MeasRH;
+double get_value1();
+double get_value2();
 
 #endif //__GLOBALS_H

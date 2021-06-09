@@ -30,14 +30,6 @@ void setup()
 	digitalWrite(PIN_SPEAKER, LOW);
 	pinMode(PIN_SPEAKER, OUTPUT);
 	
-    // while(1)
-    // {
-    //     static bool tmp;
-    //     digitalWrite(PIN_HB2_B, tmp ? HIGH : LOW);
-    //     tmp = !tmp;
-    //     delay(500);
-    // };
-
 	Wire.begin(PIN_SDA, PIN_SCL);
 	if(!sht_sensor.begin())
 	{
@@ -54,25 +46,11 @@ void setup()
 
 void loop()
 {
-	loop_measure();
-
 	M5.update();
 	gui.loop();
 	setman.loop();
-	// pid1.loop();
+	pid1.loop();
 	pid2.loop();
-};
-
-void loop_measure()
-{
-	time_t now = millis();
-	static time_t measure_next = millis();
-	if(now < measure_next)
-		return;
-	measure_next += MEASURE_INTERVAL_MS;
-
-	g_MeasRH  = sht_sensor.getHumidity();
-	g_MeasT = sht_sensor.getTemperature();
 };
 
 void halt(const char* error)

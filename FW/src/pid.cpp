@@ -64,7 +64,7 @@ void PIDLoop::loop()
         // Setpoint = RH_setpoint;
 
         // Input for the PID
-        _input = sht_sensor.getHumidity();
+        _input = _cb_value();
         _output = _pid.getOutput(_input);
 
         DBG("Output: %.0f", _output);

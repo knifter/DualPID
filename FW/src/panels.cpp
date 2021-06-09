@@ -31,7 +31,7 @@ void TempStatPanel::draw()
 	int x = _left+5;
 	int y = _top+5;
 	M5.Lcd.setTextSize(2);
-	M5.Lcd.setTextColor(WHITE, BLACK);
+	M5.Lcd.setTextColor(DARKGREY, BLACK);
 	M5.Lcd.setCursor(x, y);
 	M5.Lcd.print("set: ");
 	M5.Lcd.print(settings.pid1.setpoint, 1);
@@ -41,9 +41,10 @@ void TempStatPanel::draw()
 	y += 30;
 	x += 10;
 	M5.Lcd.setTextSize(3);
+	M5.Lcd.setTextColor(WHITE, BLACK);
 	M5.Lcd.setCursor(x, y);
 	// M5.Lcd.print("");
-	M5.Lcd.print(g_MeasT, 1);
+	M5.Lcd.print(pid1.get_input(), 1);
 	M5.Lcd.print(" C ");
 
 	// float outpercent = -1 + pid_get_output()/WINDOWSIZE*2;
@@ -77,7 +78,7 @@ void HumStatPanel::draw()
 	M5.Lcd.setTextSize(3);
 	M5.Lcd.setCursor(x, y);
 	// M5.Lcd.print("");
-	M5.Lcd.print(g_MeasRH, 1);
+	M5.Lcd.print(pid2.get_input(), 1);
 	M5.Lcd.print(" % ");
 
 	// float outpercent = -1 + pid_get_output()/WINDOWSIZE*2;
