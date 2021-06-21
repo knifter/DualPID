@@ -29,11 +29,18 @@ void setup()
   	pinMode(PIN_HB2_B, OUTPUT);
 	digitalWrite(PIN_SPEAKER, LOW);
 	pinMode(PIN_SPEAKER, OUTPUT);
-	
+
+    // while(1)
+    // {
+    //     static bool tmp;
+    //     digitalWrite(PIN_HB2_B, tmp=!tmp);
+    //     delay(500);
+    // };
+
 	Wire.begin(PIN_SDA, PIN_SCL);
 	if(!sht_sensor.begin())
 	{
-		halt("SHT3X error");
+		halt("SHT3X sensor error");
 	};
 
 	gui.begin();
