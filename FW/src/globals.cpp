@@ -2,7 +2,7 @@
 
 #include "pid.h"
 
-SHT3X sht_sensor(Wire);
+SHT3X sht_sensor(Wire, SHT_ADDRESS);
 GUI gui;
 SettingsManager setman;
 settings_t& settings = setman.settings;
