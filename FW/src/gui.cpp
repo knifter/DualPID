@@ -1,6 +1,8 @@
 // Sohow an menu item with current value
 #include "gui.h"
 
+#include <lvgl.h>
+
 #include "pid.h"
 #include "config.h"
 #include "tools-log.h"
@@ -11,11 +13,81 @@
 
 #include <M5Stack.h>
 
+
+void lv_disp_cb(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p)
+{
+    // spi_begin()
+    SPI.beginTransaction(SPISettings(SPI_FREQUENCY, MSBFIRST, TFT_SPI_MODE));
+    CS_L;
+    M5.Lcd.setWindow(area->x1, area->y1, area->x2, area->y2);
+    // spi_end();
+    CS_H;
+    SPI.endTransaction();
+
+	uint32_t size = lv_area_get_width(area) * lv_area_get_height(area);
+    void* colorptr = color_p;
+
+    // spi_begin()
+    SPI.beginTransaction(SPISettings(SPI_FREQUENCY, MSBFIRST, TFT_SPI_MODE));
+    CS_L;
+    SPI.writePixels(colorptr, size*2);
+    // spi_end();
+    CS_H;
+    SPI.endTransaction();
+
+    lv_disp_flush_ready(disp);         /* Indicate you are ready with the flushing*/
+};
+
+#ifdef M5CORE2
+void lv_touchpad_cb(lv_indev_drv_t * indev, lv_indev_data_t * data)
+{
+    Point p = M5.Touch.getPressPoint();
+    if(p.x == -1 && p.y == -1)
+    {
+        data->state = LV_INDEV_STATE_RELEASED;
+        return;
+    };
+    data->point.x = p.x;
+    data->point.y = p.y;
+    data->state = LV_INDEV_STATE_PRESSED;
+};
+#endif
+
+void lv_keys_cb(lv_indev_drv_t * indev, lv_indev_data_t * data)
+{
+	data->state = LV_INDEV_STATE_RELEASED;
+	return;
+};
+
+
 bool GUI::begin()
 {
     M5.Lcd.fillScreen(BLACK);
 
-		// Empty activity stack
+	lv_init();
+
+    lv_disp_draw_buf_init(&_lv_draw_buf, _lv_color_buf, NULL, LV_BUF_SIZE);
+
+    lv_disp_drv_init(&_lv_display_drv);          /*Basic initialization*/
+    _lv_display_drv.flush_cb = lv_disp_cb;    /*Set your driver function*/
+    _lv_display_drv.draw_buf = &_lv_draw_buf;        /*Assign the buffer to the display*/
+    _lv_display_drv.hor_res = SCREEN_WIDTH;   /*Set the horizontal resolution of the display*/
+    _lv_display_drv.ver_res = SCREEN_HEIGHT;   /*Set the vertical resolution of the display*/
+    lv_disp_drv_register(&_lv_display_drv);      /*Finally register the driver*/
+
+#ifdef M5CORE2
+    lv_indev_drv_init(&_lv_touch_drv);             /*Basic initialization*/
+    _lv_touch_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*/
+    _lv_touch_drv.read_cb = lv_touchpad_cb;      /*Set your driver function*/
+    lv_indev_drv_register(&_lv_touch_drv);         /*Finally register the driver*/
+#endif
+
+    lv_indev_drv_init(&_lv_keys_drv);             /*Basic initialization*/
+    _lv_keys_drv.type = LV_INDEV_TYPE_KEYPAD;    /*Touch pad is a pointer-like device*/
+    _lv_keys_drv.read_cb = lv_keys_cb;      /*Set your driver function*/
+    lv_indev_drv_register(&_lv_touch_drv);         /*Finally register the driver*/
+
+	// Empty activity stack
 	while(!_scrstack.empty())
 		_scrstack.pop();
 
@@ -27,6 +99,7 @@ bool GUI::begin()
 
 void GUI::loop()
 {
+
 		// DBG("HANDLE-BEGIN");
 	_event = (event_t) keytool_get_event(scan_keys());
 	if(_event)
@@ -100,6 +173,15 @@ void GUI::loop()
 		};
 	};
 #endif
+
+	// LVGL ticker
+    time_t now = millis();
+	{
+    	static time_t prv = now;
+    	lv_tick_inc(now - prv);
+    	prv = now;
+	};
+    lv_timer_handler();
 
 };
 

@@ -27,6 +27,7 @@
 
 #define SCREEN_WIDTH			320
 #define SCREEN_HEIGHT			240
+#define LV_BUF_SIZE				(SCREEN_WIDTH*SCREEN_WIDTH/10)
 
 #define SHT_ADDRESS             0x44
 #define PIN_SDA					GPIO_NUM_21

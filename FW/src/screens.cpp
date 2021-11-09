@@ -31,6 +31,7 @@ void Screen::close()
 BootScreen::BootScreen() // : Activity()
 {
     _start = millis();
+
 };
 
 void BootScreen::draw()

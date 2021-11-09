@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <stack>
 #include <Arduino.h>
+#include <lvgl.h>
 
 #include "config.h"
 #include "panels.h"
@@ -62,6 +63,13 @@ class GUI
 		event_t 		_event		= KEY_NONE;
         state_t 		_state		= DRAW;
 		ScreenStack		_scrstack;
+
+		// LVGL
+		lv_disp_draw_buf_t 	_lv_draw_buf;
+	    lv_color_t 			_lv_color_buf[LV_BUF_SIZE];
+		lv_disp_drv_t 		_lv_display_drv;        /*Descriptor of a display driver*/
+		lv_indev_drv_t 		_lv_touch_drv;           /*Descriptor of a input device driver*/
+		lv_indev_drv_t 		_lv_keys_drv;           /*Descriptor of a input device driver*/
 
 		int				_debug_page;
 #ifdef DEBUG
