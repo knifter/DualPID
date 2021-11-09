@@ -4,6 +4,7 @@
 #include "globals.h"
 #include "pid.h"
 
+#include <M5Stack.h>
 
 // void Panel::draw()
 // {

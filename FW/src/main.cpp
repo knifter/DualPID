@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <M5Stack.h>
 #include <SHT3X.h>
 
 #include "config.h"
@@ -7,7 +6,10 @@
 #include "settings.h"
 #include "pid.h"
 
-#include <tools-log.h>
+#include "tools-log.h"
+
+#include <M5Stack.h>
+
 
 void halt(const char*);
 void loop_measure();

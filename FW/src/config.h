@@ -4,6 +4,9 @@
 #define DEBUG                   1
 #define TOOLS_LOG_DEBUG
 
+#define DEBUG_INTERVAL_MS		100
+#define BOOTSCREEN_TIMEOUT_MS	2000
+
 #define VERSION				    20210709
 
 #define NVS_NAMESPACE			"PidSettings"
@@ -25,7 +28,7 @@
 #define SCREEN_WIDTH			320
 #define SCREEN_HEIGHT			240
 
-#define SHT_ADDRESS             0x45
+#define SHT_ADDRESS             0x44
 #define PIN_SDA					GPIO_NUM_21
 #define PIN_SCL					GPIO_NUM_22
 #define PIN_HB1_A				GPIO_NUM_2
@@ -33,5 +36,9 @@
 #define PIN_HB2_A				GPIO_NUM_13
 #define PIN_HB2_B				GPIO_NUM_15
 #define PIN_SPEAKER				GPIO_NUM_25
+
+#define PIN_BTN_A				0
+#define PIN_BTN_B				0
+#define PIN_BTN_C				0
 
 #endif // __CONFIG_H

@@ -1,10 +1,14 @@
 #ifndef __GUI_H
 #define __GUI_H
 
+#include <stdlib.h>
+#include <stdint.h>
+#include <stack>
 #include <Arduino.h>
 
 #include "config.h"
 #include "panels.h"
+#include "event.h"
 
 #define KEY_SLOW 				500
 #define KEY_FAST 				100
@@ -12,12 +16,11 @@
 #define KEY_STEP_SLOW 			0.1
 #define KEY_STEP_FAST 			0.5
 
-// typedef enum
-// {
-// 	SELECT_P,
-// 	CHANGE_P,
-// 	MEASURE,
-// } gui_state_t;
+class Screen;
+enum class ScreenType;
+
+typedef std::shared_ptr<Screen> ScreenPtr;
+typedef std::stack<ScreenPtr>	ScreenStack;
 
 enum param_t
 {
@@ -34,70 +37,38 @@ param_t& operator--(param_t& orig);
 class GUI
 {
 	public:
-		GUI() : 
-			t_panel(0, 0, 70, SCREEN_WIDTH/2), 
-			rh_panel(0, SCREEN_WIDTH/2, 70, SCREEN_WIDTH/2)
-			{};
+		GUI() {};
 
 		bool begin();
 		void loop();
+        void draw();        // Always redraws the whole screen for the current state
+		void resend();		// re-send screenbuffer
+        typedef enum
+        {
+            DRAW,
+			SEND,
+			HANDLE
+        } state_t;
 
-		void draw_boot();
-		void draw_help();
-		void draw_menu();
-		void draw_main();
-		void draw_menuitem(int place);
-		void parameter_change();
-		void select_parameter();
-		void draw_highlight_param();
-		void draw_outputbar(const int x, const int y, const int w, const int h, const float percent);
+		ScreenPtr	pushScreen(ScreenType, void* data = NULL);
+		void		pushMessageScreen(const char* title, const char* line1 = nullptr, const char* line2 = nullptr, const char* line3 = nullptr);
+		void		popScreen(Screen* = nullptr);
 
 	private:
-		// typedef enum : int
-		// {
-		// 	PARAM_NONE,
-		// 	PARAM_SETPOINT, 
-		// 	PARAM_KP,
-		// 	PARAM_KI,
-		// 	PARAM_KD,
-		// 	PARAM_BACK,
-		// 	_PARAM_MAX
-		// } param_t;
+		uint32_t 	scan_keys();
+		bool 		handle_global_events(const event_t);
 
+		event_t 		_event		= KEY_NONE;
+        state_t 		_state		= DRAW;
+		ScreenStack		_scrstack;
 
-		const char* ParamNames[_PARAM_MAX+1] = {
-			"S",
-			"P",
-			"I",
-			"D",
-			"<Back"
-		};	
-
-		typedef enum
-		{
-			BOOT,
-			BOOT_WAIT,
-			MAIN,
-			CHANGE_PARAM,
-			SELECT_PARAM
-		} state_t;
-
-		param_t _selected_parameter = PARAM_SETPOINT;
-		double* _settingptr = nullptr;
-		time_t _holdoff = 0;
-		state_t _state = state_t::BOOT;
-		// int Selected_Parameter = KSETPOINT;
-
-		// Memorize place of the numbers to changes
-		uint16_t Para_Cusor_X[5];
-		uint16_t Para_Cusor_Y[5];
-		
-		// P I D parameters
-		// double para[5] = {50.0, 2., 5., 1., -1.0};
-		// Menuitems
-
-		TempStatPanel t_panel;
-		HumStatPanel rh_panel;
+		int				_debug_page;
+#ifdef DEBUG
+		void			draw_debug();
+		bool			_debug		= false;
+		time_t 			_next_debug = 0;
+		event_t			_last_event = KEY_NONE;
+#endif
 };
 
 #endif // __GUI_H

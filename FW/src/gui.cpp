@@ -1,272 +1,221 @@
 // Sohow an menu item with current value
 #include "gui.h"
 
-#include <M5Stack.h>
-
-#include "globals.h"
 #include "pid.h"
 #include "config.h"
 #include "tools-log.h"
+#include "globals.h"
+#include "tools-keys.h"
 
+#include "screens.h"
 
-param_t& operator++(param_t& orig)
-{
-	if(orig < _PARAM_MAX)
-		orig = static_cast<param_t>(orig + 1);
-	else
-		orig = static_cast<param_t>(0);
-	return orig;
-};
-param_t& operator--(param_t& orig)
-{
-	if(orig == 0)
-		orig = static_cast<param_t>(_PARAM_MAX - 1);
-	else
-	    orig = static_cast<param_t>(orig - 1);
-	return orig;
-};
-
-// param_t operator++(param_t& orig, int)
-// {
-// 	param_t rVal = orig;
-// 	++orig;
-// 	return rVal;
-// };
-// param_t operator--(param_t& orig, int)
-// {
-// 	param_t rVal = orig;
-// 	--orig;
-// 	return rVal;
-// };
+#include <M5Stack.h>
 
 bool GUI::begin()
 {
     M5.Lcd.fillScreen(BLACK);
-	_state = state_t::BOOT;
+
+		// Empty activity stack
+	while(!_scrstack.empty())
+		_scrstack.pop();
+
+	// And put bootscreen on the bottom
+	pushScreen(ScreenType::BOOT);
+
 	return true;
 };
 
 void GUI::loop()
 {
-	switch(_state)
+		// DBG("HANDLE-BEGIN");
+	_event = (event_t) keytool_get_event(scan_keys());
+	if(_event)
 	{
-		case state_t::BOOT:
-			draw_boot();
-			_holdoff = millis() + 1500;
-			_state = state_t::BOOT_WAIT;
-			break;
-		case BOOT_WAIT:
-			if(millis() > _holdoff)
+		_last_event = _event;
+		DBG("GUI: event = 0x%x", _event);
+	};
+
+	if(handle_global_events(_event))
+		_event = KEY_NONE;
+
+	// ActStack may not be empty
+	if(_scrstack.size() == 0)
+	{
+		ERROR("actstack empty, push(BOOT)");
+		pushScreen(ScreenType::BOOT);
+	};
+
+	// Keeping this (smart) ptr here is important! It prevents pop() from deleting the 
+	// Activity while in handle(). It will be deleted when act goes out of scope too
+	ScreenPtr scr = _scrstack.top();
+
+	// Debug activity
+#ifdef DEBUG_GUI
+	static ActivityPtr prev_act = nullptr;
+	if(act != prev_act)
+	{
+		if(prev_act == nullptr)
+			DBG("GUI: <null> -> %s", act->name());
+		else
+			DBG("GUI: %s -> %s", prev_act->name(), act->name());
+		prev_act = act;
+	};
+#endif
+
+    // gui statemachine, draw when needed
+    switch(_state)
+    {
+		case DRAW:
+			DBG("GUI: draw(%s)", scr->name());
+			scr->draw();
+			// draw_battery();
+
+			_next_debug = 0;
+			_state = SEND;
+            // no break: send it right away
+            break; // TODO: without this screen is not properly cleared in debug?
+		case SEND:
+		    // _disp.sendBuffer();
+
+			_state = HANDLE;
+			// no break; handle it right away:
+            // break;
+		case HANDLE:
+			scr->handle(_event);
+            break;
+	};
+
+#ifdef DEBUG
+	if(_debug)
+	{
+		// Throttle our debug printing a bit
+		time_t now = millis();
+		if(now > _next_debug)
+		{
+			_next_debug = now + DEBUG_INTERVAL_MS;
+
+			draw_debug();
+            // _disp.sendBuffer();
+			_state = SEND;
+		};
+	};
+#endif
+
+};
+
+void GUI::draw()
+{
+	_state = DRAW;
+};
+
+void GUI::resend()
+{
+	_state = SEND;
+};
+
+bool GUI::handle_global_events(const event_t event)
+{
+	// Handle global key-presses
+	switch(event)
+	{
+		case KEY_ABC_LONG:
+			_debug = !_debug;
+			_state = DRAW;
+			return true;
+		case KEY_A_LONG:
+			if(_debug)
 			{
-				M5.Lcd.fillScreen(BLACK);
-				_state = state_t::MAIN;
+				_debug_page--;
+				_state = DRAW;
+				return true;
 			};
-			break;
-		case state_t::MAIN:
-			if (M5.BtnA.wasPressed() || M5.BtnB.wasPressed() || M5.BtnC.wasPressed())
+		case KEY_C_LONG: 
+			if(_debug)
 			{
-				_state = state_t::SELECT_PARAM;
-				draw_menu();
-				return;
-			}
-			draw_main();
-			break;
-
-		case state_t::CHANGE_PARAM:
-			parameter_change();
-			break;
-
-		case state_t::SELECT_PARAM:
-			select_parameter();
-			break;
-	}; //switch
-};
-
-void GUI::draw_boot()
-{
-	M5.Lcd.fillScreen(BLACK);
-
-	M5.Lcd.setTextSize(3);
-	M5.Lcd.setCursor (10, 10);
-	M5.Lcd.print("ESP-PID");
-	M5.Lcd.setTextSize(2);
-	M5.Lcd.setCursor (10, 40);
-	M5.Lcd.printf("version %d", VERSION);
-};
-
-void GUI::draw_main()
-{
-	// M5.Lcd.fillScreen(BLACK);
-
-	// See if its time yet
-	time_t now = millis();
-	static time_t display_next = millis();
-	if(now < display_next)
-		return;
-
-	// M5.Lcd.setTextSize(2);
-	// M5.Lcd.setTextColor(WHITE, BLACK);
-
-	// t_panel.setSize(0, 0, SCREEN_HEIGHT/2, SCREEN_WIDTH/2);
-	// rh_panel.setSize(0, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2);
-	t_panel.draw();
-	rh_panel.draw();
-
-	display_next += DISPLAY_LOOPTIME_MS;
-};
-
-
-// show every menu item with current values
-void GUI::draw_menu()
-{ 
-	M5.Lcd.fillScreen(BLACK);
-
-	// Menu list
-  	M5.Lcd.setTextSize(3);
-
-  	for (int i = 0; i < _PARAM_MAX; i++)
-    	draw_menuitem(i);
-
-	// Bottom help
-	M5.Lcd.setTextColor(WHITE, BLUE);
-	M5.Lcd.setCursor(40, 225);
-	M5.Lcd.setTextSize(2);
-	M5.Lcd.print("<<<    Select    >>>");
-};
-
-// Current parameter to change
-void GUI::draw_menuitem(int item)
-{
-	M5.Lcd.setTextSize(3);
-
-	int y = item * 40 + 20;
-	const char* txt = ParamNames[item];
-
-	// Selected item gets a different color
-	M5.Lcd.setCursor (10, y);
-	if ( _selected_parameter == item )
-		M5.Lcd.setTextColor(BLUE, WHITE);
-	else
-		M5.Lcd.setTextColor(WHITE, BLACK);
-
-	// Print item
-	M5.Lcd.print(txt);
-	if(item == PARAM_BACK)
-		return;
-
-	// draw value
-	M5.Lcd.setTextSize(3);
-	M5.Lcd.print(" = ");
-	Para_Cusor_X[item] = M5.Lcd.getCursorX();
-	Para_Cusor_Y[item] = M5.Lcd.getCursorY();
-	double value;
-	switch(item)
-	{
-		case PARAM_SETPOINT:value = settings.pid2.setpoint; break;
-		case PARAM_KP: 		value = settings.pid2.Kp; break;
-		case PARAM_KI: 		value = settings.pid2.Ki; break;
-		case PARAM_KD: 		value = settings.pid2.Kd; break;
-		default: 			value= NAN; break;
+				_debug_page++;
+				_state = DRAW;
+				return true;
+			};
+		// case KEY_P_LONG:
+		// 	// Someone is holding the power button, we're probably going down soon. Let's save what we can
+		// 	return true;
+		default:
+			return false;
 	};
-	M5.Lcd.print(value);
-	M5.Lcd.print("      ");
+
+	return false;
 };
 
-// Parameter to change will be red colored
-void GUI::draw_highlight_param()
+ScreenPtr GUI::pushScreen(ScreenType scrtype, void* data)
 {
-	int item = _selected_parameter;
-	M5.Lcd.setTextSize(3);
-	M5.Lcd.setCursor(Para_Cusor_X[item], Para_Cusor_Y[item]);
-	M5.Lcd.setTextColor(RED, WHITE);
-	M5.Lcd.print(*_settingptr);
-};
-
-void GUI::parameter_change()
-{
-	// Acceleration logic
-	static float key_step = KEY_STEP_SLOW;
-	static int key_delay = KEY_SLOW;
-	if (M5.BtnA.pressedFor(5000) or M5.BtnC.pressedFor(5000))
+	ScreenPtr scr = NULL;
+	switch(scrtype)
 	{
-		key_delay = KEY_VERY_FAST;
-		key_step = KEY_STEP_FAST;
-	}
-  	else if (M5.BtnA.pressedFor(2000) or M5.BtnC.pressedFor(2000))
-  	{
-	    key_delay = KEY_FAST;
-  	}
-	else
-  	{
-    	key_delay = KEY_SLOW;
-    	key_step = KEY_STEP_SLOW;
-  	};
+		case ScreenType::BOOT:			scr = std::make_shared<BootScreen>(); break;
+		case ScreenType::MAIN:			scr = std::make_shared<MainScreen>(); break;
+		case ScreenType::MENU:			scr = std::make_shared<MenuScreen>(); break;
 
-	// Action
-  	if (M5.BtnA.isPressed())
-  	{
-		*_settingptr -= key_step;
-		draw_highlight_param();
-		delay(key_delay);
-  	};
-  	if (M5.BtnB.wasPressed())
-  	{
-    	_state = state_t::SELECT_PARAM;
-    	M5.Lcd.fillScreen(BLACK);
-    	draw_menu();
-  	};
-  	if (M5.BtnC.isPressed())
-	{	
-		*_settingptr += key_step;
-		draw_highlight_param();
-		delay(key_delay);
-  	};
+		default:
+			pushMessageScreen("Error:", __FUNCTION__, "Invalid <ScreenType>", " identifier"); 
+			return NULL;
+	};
+	DBG("GUI: Push(%s)", scr->name());
+	_scrstack.push(scr);
+	draw();
+	return scr;
 };
 
+void GUI::pushMessageScreen(const char* title, const char* line1, const char* line2, const char* line3)
+{	
+	_scrstack.push(
+		std::make_shared<MessageScreen>(title, line1, line2, line3)
+	);
+	draw();
+};
 
-void GUI::select_parameter()
+void GUI::popScreen(Screen* scr)
 {
-	pidsettings_t& ps = setman.settings.pid2;
+	// There must an activity on the stack to do this..
+	if(_scrstack.empty())
+		return;
 
-  	if (M5.BtnA.wasPressed())
-  	{
-		--_selected_parameter;
-		// if(_selected_parameter == PARAM_NONE)
-		// 	_selected_parameter = (_PARAM_MAX - 1;
-		draw_menu();
-		return;
-  	};
-  	if (M5.BtnB.wasPressed())
-  	{
-		if(_selected_parameter == PARAM_BACK)
-		{
-			// TODO: move to state machine
-			// settings.write_flash(para);
-			setman.saveDelayed();
-			pid2.set_tuning(ps);
+	// ActivityPtr is a smart ptr. It will delete a in GUI::handle() eventually
+	ScreenPtr top = _scrstack.top();
+	_scrstack.pop();
+	DBG("GUI: pop(%s)", top->name());
 
-			M5.Lcd.fillScreen(BLACK);
-			_state = state_t::MAIN;
-			return;
-		};
-		_state = state_t::CHANGE_PARAM;
-		switch(_selected_parameter)
-		{
-			case PARAM_SETPOINT:	_settingptr = &ps.setpoint; break;
-			case PARAM_KP: 			_settingptr = &ps.Kp; break;
-			case PARAM_KI: 			_settingptr = &ps.Ki; break;
-			case PARAM_KD: 			_settingptr = &ps.Kd; break;
-			default: 				_settingptr = nullptr; break;
-		};
-		draw_highlight_param();
-		return;
-	};
-	if (M5.BtnC.wasPressed())
-	{
-		++_selected_parameter;
-		// if(_selected_parameter == _PARAM_MAX)
-		// 	_selected_parameter = 1;
-		draw_menu();
-		return;
-	};
+    // Just a check for now
+    if(scr != nullptr && top.get() != scr)
+    {
+        ERROR("Screen* given does not match top().");
+        pushMessageScreen("ERROR", "Screen* != top()");
+        return;
+    };
+
+	// DBG("popped, will delete (eventually): %s(%p)", a->name(), a);
+	_state = DRAW;
+	return;
 };
+
+uint32_t GUI::scan_keys()
+{
+	// Read current states
+	uint32_t pressed = KEY_NONE;
+	if(digitalRead(PIN_BTN_A) == LOW)
+		pressed |= KEY_A;
+	if(digitalRead(PIN_BTN_B) == LOW)
+		pressed |= KEY_B;
+	if(digitalRead(PIN_BTN_C) == LOW)
+		pressed |= KEY_C;
+	// if(digitalRead(PIN_POWERINT) == LOW)
+	// 	pressed |= KEY_P;
+	return pressed;
+};
+
+
+#ifdef DEBUG
+void GUI::draw_debug()
+{	
+
+};
+#endif // DEBUG
