@@ -3,7 +3,6 @@
 #include "widgets.h"
 
 #include <M5Stack.h>
-#undef min
 
 class Panel : public Widget
 {

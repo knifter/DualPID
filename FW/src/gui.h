@@ -1,6 +1,7 @@
 #ifndef __GUI_H
 #define __GUI_H
 
+// #undef min
 #include <stdlib.h>
 #include <stdint.h>
 #include <stack>
