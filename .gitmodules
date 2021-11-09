@@ -7,8 +7,8 @@
 [submodule "FW/lib/lib-tools"]
 	path = FW/lib/lib-tools
 	url = https://github.com/knifter/lib-tools.git
-[submodule "FW/lib/lib-sht3x\\"]
-	path = FW/lib/lib-sht3x\\
+[submodule "FW/lib/SHT3x"]
+	path = FW/lib/SHT3x
 	url = https://github.com/knifter/lib-sht3x
 [submodule "FW/lib/MiniPID"]
 	path = FW/lib/MiniPID
