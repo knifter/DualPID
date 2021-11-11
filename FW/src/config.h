@@ -30,6 +30,7 @@
 #define LV_BUF_SIZE				(SCREEN_WIDTH*SCREEN_WIDTH/10)
 
 #define SHT_ADDRESS             0x44
+
 #define PIN_SDA					GPIO_NUM_21
 #define PIN_SCL					GPIO_NUM_22
 #define PIN_HB1_A				GPIO_NUM_2
@@ -38,8 +39,8 @@
 #define PIN_HB2_B				GPIO_NUM_15
 #define PIN_SPEAKER				GPIO_NUM_25
 
-#define PIN_BTN_A				0
-#define PIN_BTN_B				0
-#define PIN_BTN_C				0
+#define PIN_BTN_A				GPIO_NUM_39
+#define PIN_BTN_B				GPIO_NUM_38
+#define PIN_BTN_C				GPIO_NUM_37
 
 #endif // __CONFIG_H

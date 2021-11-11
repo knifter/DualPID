@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stack>
+#include <memory>
 #include <Arduino.h>
 #include <lvgl.h>
 
