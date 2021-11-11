@@ -46,13 +46,10 @@ class Screen : NonCopyable
 		virtual ScreenType type() { return ScreenType::BASE; };
 
 		void close();
-        virtual void draw() = 0;
         virtual bool handle(event_t) = 0;
+        // virtual bool start() {};
+        // virtual bool stop() {};
 		virtual const char* name() { return ScreenNames[(int) type()]; };
-		// virtual const char* title() { return ScreenTitles[(int) type()]; };
-
-    protected:
-		GUI& _gui;
 };
 
 /*** BOOT ************************************************************************************/
@@ -62,11 +59,11 @@ class BootScreen : public Screen
 		BootScreen();
 		virtual ScreenType type() { return ScreenType::BOOT; };
 
-        void draw();
         bool handle(event_t);
 
     private:
-        uint32_t _start = 0;
+        uint32_t    _start = 0;
+		lv_obj_t*	_label;
 };
 
 /*** MAIN ************************************************************************************/
@@ -74,18 +71,20 @@ class MainScreen : public Screen
 {
     public:
 		MainScreen() :
-			_t_panel(0, 0, 70, SCREEN_WIDTH/2), 
-			_rh_panel(0, SCREEN_WIDTH/2, 70, SCREEN_WIDTH/2)
+			_t_panel(0, 0, 70, DISPLAY_WIDTH/2), 
+			_rh_panel(0, DISPLAY_WIDTH/2, 70, DISPLAY_WIDTH/2)
 			{};
 
 		virtual ScreenType type() { return ScreenType::MAIN; };
 
-        void draw();
         bool handle(event_t);
 	
 	private:
-		TempStatPanel _t_panel;
-		HumStatPanel _rh_panel;
+        lv_obj_t    *_box_pid1;
+        lv_obj_t    *_box_pid2;
+
+		// TempStatPanel _t_panel;
+		// HumStatPanel _rh_panel;
 
 };
 
@@ -96,7 +95,6 @@ class MessageScreen : public Screen
         MessageScreen(const char* title, const char* line1 = nullptr, const char* line2 = nullptr, const char* line3 = nullptr, const char* line_btn = "[ Ok ]");
 		virtual ScreenType type() { return ScreenType::MESSAGE; };
 
-        void draw();
         bool handle(event_t);
 
     private:
@@ -108,12 +106,22 @@ class MessageScreen : public Screen
 };
 
 /*** Menu ************************************************************************************/
+typedef enum : int
+{
+    PARAM_NONE,
+    PARAM_SETPOINT, 
+    PARAM_KP,
+    PARAM_KI,
+    PARAM_KD,
+    PARAM_BACK,
+    _PARAM_MAX
+} param_t;
+
 class MenuScreen : public Screen
 {
     public:
 		virtual ScreenType type() { return ScreenType::MENU; };
 
-        void draw();
         bool handle(event_t);
 		void draw_menu();
 		void draw_menuitem(int item);
@@ -129,17 +137,6 @@ class MenuScreen : public Screen
 			SELECT_PARAM
 		} state_t;
 		state_t _state = state_t::MAIN;
-
-		// typedef enum : int
-		// {
-		// 	PARAM_NONE,
-		// 	PARAM_SETPOINT, 
-		// 	PARAM_KP,
-		// 	PARAM_KI,
-		// 	PARAM_KD,
-		// 	PARAM_BACK,
-		// 	_PARAM_MAX
-		// } param_t;
 
 		const char* ParamNames[_PARAM_MAX+1] = {
 			"S",

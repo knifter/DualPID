@@ -12,37 +12,32 @@
 #include "tools-log.h"
 #include "globals.h"
 
-Screen::Screen() : _gui(gui) 
+Screen::Screen()
 {
-	// DBG("CONSTRUCT %s(%p)", this->title(), this);
+	DBG("CONSTRUCT %s(%p)", this->title(), this);
 };
 
 Screen::~Screen() 
 { 
-	// DBG("DESTROY %s(%p)", this->title(), this); 
+	DBG("DESTROY %s(%p)", this->title(), this); 
 };
 
 void Screen::close() 
 { 
-    _gui.popScreen(this);
+    gui.popScreen(this);
 };
 
 /*** BOOT ************************************************************************************/
 BootScreen::BootScreen() // : Activity()
 {
     _start = millis();
-};
 
-void BootScreen::draw()
-{
-	// M5.Lcd.fillScreen(BLACK);
-
-	// M5.Lcd.setTextSize(3);
-	// M5.Lcd.setCursor (10, 10);
-	// M5.Lcd.print("ESP-PID");
-	// M5.Lcd.setTextSize(2);
-	// M5.Lcd.setCursor (10, 40);
-	// M5.Lcd.printf("version %d", VERSION);
+	_label = lv_label_create(lv_scr_act());
+    lv_obj_set_size(_label, DISPLAY_WIDTH, 50);
+	lv_obj_center(_label);
+    lv_obj_set_style_text_color(_label, lv_palette_main(LV_PALETTE_RED), LV_PART_ANY);
+    lv_obj_set_style_text_align(_label, LV_TEXT_ALIGN_CENTER, 0);
+    lv_label_set_text_fmt(_label, "M5DualPID v%d", VERSION);
 };
 
 bool BootScreen::handle(event_t event)
@@ -56,25 +51,22 @@ bool BootScreen::handle(event_t event)
 };
 
 /*** MAIN ************************************************************************************/
-void MainScreen::draw()
+MainScreen::MainScreen()
 {
-	// M5.Lcd.fillScreen(BLACK);
+    _box_pid1 = lv_obj_create(lv_scr_act());
+    lv_obj_set_pos(_box_pid1, 0, 0);
+    lv_obj_set_size(_box_pid1, DISPLAY_WIDTH/2, 100);
 
-	// See if its time yet
-	time_t now = millis();
-	static time_t display_next = millis();
-	if(now < display_next)
-		return;
+    _box_pid2 = lv_obj_create(lv_scr_act());
 
 	// M5.Lcd.setTextSize(2);
 	// M5.Lcd.setTextColor(WHITE, BLACK);
 
+
 	// t_panel.setSize(0, 0, SCREEN_HEIGHT/2, SCREEN_WIDTH/2);
 	// rh_panel.setSize(0, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2);
-	_t_panel.draw();
-	_rh_panel.draw();
-
-	display_next += DISPLAY_LOOPTIME_MS;
+	// _t_panel.draw();
+	// _rh_panel.draw();
 };
 
 bool MainScreen::handle(event_t event)
@@ -117,9 +109,9 @@ MessageScreen::MessageScreen(const char* title, const char* line1, const char* l
 	_line_btn[sizeof(_line_btn) - 1] = '\0';
 };
 
-void MessageScreen::draw()
-{
-	const int x = 10, y = 8, w = SCREEN_WIDTH-20, h=SCREEN_HEIGHT-10;
+// void MessageScreen::draw()
+// {
+// 	const int x = 10, y = 8, w = DISPLAY_WIDTH-20, h=DISPLAY_HEIGHT-10;
 
 	// Draw bounding box.
 	// _disp.setDrawColor(0);
@@ -162,7 +154,7 @@ void MessageScreen::draw()
 	// 		x+w/2 - _disp.getStrWidth(_line_btn)/2, y+h-2,
 	// 		_line_btn);
 	// };
-};
+// };
 
 bool MessageScreen::handle(event_t event)
 {
@@ -182,56 +174,43 @@ bool MessageScreen::handle(event_t event)
 /*** MENU ************************************************************************************/
 param_t& operator++(param_t& orig)
 {
-	if(orig < _PARAM_MAX)
-		orig = static_cast<param_t>(orig + 1);
-	else
-		orig = static_cast<param_t>(0);
-	return orig;
+    if(orig < _PARAM_MAX)
+        orig = static_cast<param_t>(orig + 1);
+    else
+        orig = static_cast<param_t>(0);
+    return orig;
 };
 param_t& operator--(param_t& orig)
 {
-	if(orig == 0)
-		orig = static_cast<param_t>(_PARAM_MAX - 1);
-	else
-	    orig = static_cast<param_t>(orig - 1);
-	return orig;
+    if(orig == 0)
+        orig = static_cast<param_t>(_PARAM_MAX - 1);
+    else
+        orig = static_cast<param_t>(orig - 1);
+    return orig;
 };
 
-// param_t operator++(param_t& orig, int)
+// void MenuScreen::draw()
 // {
-// 	param_t rVal = orig;
-// 	++orig;
-// 	return rVal;
+// 	switch(_state)
+// 	{
+// 		case state_t::MAIN:
+// 			// if (M5.BtnA.wasPressed() || M5.BtnB.wasPressed() || M5.BtnC.wasPressed())
+// 			// {
+// 			// 	_state = state_t::SELECT_PARAM;
+// 			// 	draw_menu();
+// 			// 	return;
+// 			// };
+// 			break;
+
+// 		case state_t::CHANGE_PARAM:
+// 			parameter_change();
+// 			break;
+
+// 		case state_t::SELECT_PARAM:
+// 			select_parameter();
+// 			break;
+// 	}; //switch
 // };
-// param_t operator--(param_t& orig, int)
-// {
-// 	param_t rVal = orig;
-// 	--orig;
-// 	return rVal;
-// };
-
-void MenuScreen::draw()
-{
-	switch(_state)
-	{
-		case state_t::MAIN:
-			// if (M5.BtnA.wasPressed() || M5.BtnB.wasPressed() || M5.BtnC.wasPressed())
-			// {
-			// 	_state = state_t::SELECT_PARAM;
-			// 	draw_menu();
-			// 	return;
-			// };
-			break;
-
-		case state_t::CHANGE_PARAM:
-			parameter_change();
-			break;
-
-		case state_t::SELECT_PARAM:
-			select_parameter();
-			break;
-	}; //switch
-};
 
 // show every menu item with current values
 void MenuScreen::draw_menu()
@@ -354,7 +333,6 @@ void MenuScreen::parameter_change()
 	// 	delay(key_delay);
   	// };
 };
-
 
 void MenuScreen::select_parameter()
 {

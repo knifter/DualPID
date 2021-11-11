@@ -11,15 +11,6 @@
 
 #include "screens.h"
 
-// #define LGFX_M5STACK_CORE2         // M5Stack Core2
-#define LGFX_USE_V1
-#define LGFX_AUTODETECT
-
-#include <LovyanGFX.hpp>
-#include <LGFX_TFT_eSPI.hpp>
-
-LGFX gfx;
-
 // LVGL Callback funcs
 void lv_disp_cb(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p);
 void lv_keys_cb(lv_indev_drv_t * indev, lv_indev_data_t * data);
@@ -33,7 +24,6 @@ bool GUI::begin()
     gfx.setRotation(1);
     gfx.setColorDepth(24);
 
-
 	lv_init();
 
     lv_disp_draw_buf_init(&_lv_draw_buf, _lv_color_buf, NULL, LV_BUF_SIZE);
@@ -41,11 +31,11 @@ bool GUI::begin()
     lv_disp_drv_init(&_lv_display_drv);          /*Basic initialization*/
     _lv_display_drv.flush_cb = lv_disp_cb;    /*Set your driver function*/
     _lv_display_drv.draw_buf = &_lv_draw_buf;        /*Assign the buffer to the display*/
-    _lv_display_drv.hor_res = SCREEN_WIDTH;   /*Set the horizontal resolution of the display*/
-    _lv_display_drv.ver_res = SCREEN_HEIGHT;   /*Set the vertical resolution of the display*/
+    _lv_display_drv.hor_res = DISPLAY_WIDTH;   /*Set the horizontal resolution of the display*/
+    _lv_display_drv.ver_res = DISPLAY_HEIGHT;   /*Set the vertical resolution of the display*/
     lv_disp_drv_register(&_lv_display_drv);      /*Finally register the driver*/
 
-#ifdef TFT_TOUCH
+#ifdef GUI_TOUCH
     uint16_t calData[] = { 239, 3926, 233, 265, 3856, 3896, 3714, 308};
     gfx.setTouchCalibrate(calData);
 
@@ -72,7 +62,6 @@ bool GUI::begin()
 
 void GUI::loop()
 {
-
 		// DBG("HANDLE-BEGIN");
 	_event = (event_t) keytool_get_event(scan_keys());
 	if(_event)
@@ -108,44 +97,7 @@ void GUI::loop()
 	};
 #endif
 
-    // gui statemachine, draw when needed
-    switch(_state)
-    {
-		case DRAW:
-			DBG("GUI: draw(%s)", scr->name());
-			scr->draw();
-			// draw_battery();
-
-			_next_debug = 0;
-			_state = SEND;
-            // no break: send it right away
-            break; // TODO: without this screen is not properly cleared in debug?
-		case SEND:
-		    // _disp.sendBuffer();
-
-			_state = HANDLE;
-			// no break; handle it right away:
-            // break;
-		case HANDLE:
-			scr->handle(_event);
-            break;
-	};
-
-#ifdef DEBUG
-	if(_debug)
-	{
-		// Throttle our debug printing a bit
-		time_t now = millis();
-		if(now > _next_debug)
-		{
-			_next_debug = now + DEBUG_INTERVAL_MS;
-
-			draw_debug();
-            // _disp.sendBuffer();
-			_state = SEND;
-		};
-	};
-#endif
+    scr->handle(_event);
 
 	// LVGL ticker
     time_t now = millis();
@@ -274,7 +226,7 @@ void lv_disp_cb(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p)
     lv_disp_flush_ready( disp );
 };
 
-#ifdef TFT_TOUCH
+#ifdef GUI_TOUCH
 void lv_touchpad_cb(lv_indev_drv_t * indev, lv_indev_data_t * data)
 {
     // Point p = M5.Touch.getPressPoint();

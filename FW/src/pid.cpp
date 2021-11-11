@@ -22,13 +22,13 @@ bool PIDLoop::begin()
 	_windowstarttime = millis();
 	_input = 50;
 	// _setpoint = DEFAULT_SETPOINT;
-	_output = WINDOWSIZE / 2;
+	_output = PID_WINDOWSIZE / 2;
     _pid_next = 0;
     _output_state = 0;
 
 	// Set the range between 0 and the full window size
     _pid.reset();
-	_pid.setOutputLimits(0, WINDOWSIZE);
+	_pid.setOutputLimits(0, PID_WINDOWSIZE);
 	_pid.setOutput(_output);
 
 	return true;
@@ -75,9 +75,9 @@ void PIDLoop::loop()
     };
 
     // Process timewindow valve depending on PID Output
-    if (now - _windowstarttime > WINDOWSIZE)
+    if (now - _windowstarttime > PID_WINDOWSIZE)
     { //time to shift the Relay Window
-        _windowstarttime += WINDOWSIZE;
+        _windowstarttime += PID_WINDOWSIZE;
     };
 
     // Set output

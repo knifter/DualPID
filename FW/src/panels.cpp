@@ -48,7 +48,7 @@ void TempStatPanel::draw()
 	// M5.Lcd.print(pid1.get_input(), 1);
 	// M5.Lcd.print(" C ");
 
-    _bar.setValue(pid1.get_output()*100/WINDOWSIZE);
+    _bar.setValue(pid1.get_output()*100/PID_WINDOWSIZE);
     _bar.draw();
 };
 
@@ -79,6 +79,6 @@ void HumStatPanel::draw()
 	// M5.Lcd.print(pid2.get_input(), 1);
 	// M5.Lcd.print(" % ");
 
-    _bar.setValue(pid2.get_output()*100/WINDOWSIZE);
+    _bar.setValue(pid2.get_output()*100/PID_WINDOWSIZE);
     _bar.draw();
 };

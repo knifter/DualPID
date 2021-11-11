@@ -5,9 +5,9 @@
 #define TOOLS_LOG_DEBUG
 
 #define DEBUG_INTERVAL_MS		100
-#define BOOTSCREEN_TIMEOUT_MS	2000
+#define BOOTSCREEN_TIMEOUT_MS	1000
 
-#define VERSION				    20210709
+#define VERSION				    20211111
 
 #define NVS_NAMESPACE			"PidSettings"
 #define NVS_SETTINGS_IDENT		"EPIDSET"
@@ -22,14 +22,14 @@
 // #define ANALOG_SENSOR_RH    35
 //#define ANALOG_HUM_ADJUST   2
 #define PID_LOOPTIME_MS     	1000            // PID delta-T: 2 seconds as it was
-#define DISPLAY_LOOPTIME_MS 	500             // Display update rate: every half a second
-#define WINDOWSIZE          	5000      		// time-windows size in ms
+// #define DISPLAY_LOOPTIME_MS 	500             // Display update rate: every half a second
+#define PID_WINDOWSIZE        	5000      		// time-windows size in ms
 
-#define SCREEN_WIDTH			320
-#define SCREEN_HEIGHT			240
-#define LV_BUF_SIZE				(SCREEN_WIDTH*SCREEN_WIDTH/10)
+#define DISPLAY_WIDTH			320
+#define DISPLAY_HEIGHT			240
+#define LV_BUF_SIZE				(DISPLAY_WIDTH*DISPLAY_WIDTH/10)
 
-#define SHT_ADDRESS             0x44
+#define SHT_ADDRESS             0x45
 
 #define PIN_SDA					GPIO_NUM_21
 #define PIN_SCL					GPIO_NUM_22

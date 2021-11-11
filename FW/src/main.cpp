@@ -36,13 +36,14 @@ void setup()
     //     delay(500);
     // };
 
+	gui.begin();
+
 	Wire.begin(PIN_SDA, PIN_SCL);
 	if(!sht_sensor.begin())
 	{
 		halt("SHT3X sensor error");
 	};
 
-	gui.begin();
 	setman.begin();
 	pid1.begin();
 	pid1.set_tuning(setman.settings.pid1);
@@ -62,10 +63,10 @@ void loop()
 void halt(const char* error)
 {
 	DBG("HALT: %s", error);
-	// lcd.fillScreen(TFT_RED);
-	// lcd.setTextSize(3);
-	// lcd.setTextColor(TFT_WHITE, TFT_RED);
-	// lcd.setCursor(5, 5);
-	// lcd.print(error);
+	gfx.fillScreen(TFT_RED);
+	gfx.setTextSize(3);
+	gfx.setTextColor(TFT_WHITE, TFT_RED);
+	gfx.setCursor(5, 5);
+	gfx.print(error);
 	while(1);
 };
