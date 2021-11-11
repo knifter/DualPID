@@ -10,3 +10,6 @@
 [submodule "FW/lib/MiniPID"]
 	path = FW/lib/MiniPID
 	url = https://github.com/knifter/MiniPID.git
+[submodule "FW/lib/lib-SHT3x"]
+	path = FW/lib/lib-SHT3x
+	url = https://github.com/knifter/lib-SHT3x
