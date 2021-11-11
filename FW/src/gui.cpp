@@ -274,28 +274,6 @@ void lv_disp_cb(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p)
     lv_disp_flush_ready( disp );
 };
 
-    // // spi_begin()
-    // SPI.beginTransaction(SPISettings(SPI_FREQUENCY, MSBFIRST, TFT_SPI_MODE));
-    // CS_L;
-    // M5.Lcd.setWindow(area->x1, area->y1, area->x2, area->y2);
-    // // spi_end();
-    // CS_H;
-    // SPI.endTransaction();
-
-	// uint32_t size = lv_area_get_width(area) * lv_area_get_height(area);
-    // void* colorptr = color_p;
-
-    // // spi_begin()
-    // SPI.beginTransaction(SPISettings(SPI_FREQUENCY, MSBFIRST, TFT_SPI_MODE));
-    // CS_L;
-    // SPI.writePixels(colorptr, size*2);
-    // // spi_end();
-    // CS_H;
-    // SPI.endTransaction();
-
-//     lv_disp_flush_ready(disp);         /* Indicate you are ready with the flushing*/
-// };
-
 #ifdef TFT_TOUCH
 void lv_touchpad_cb(lv_indev_drv_t * indev, lv_indev_data_t * data)
 {
