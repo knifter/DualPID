@@ -12,6 +12,7 @@
 #include "screens.h"
 
 // LVGL Callback funcs
+uint32_t scan_keys();
 void lv_disp_cb(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p);
 void lv_keys_cb(lv_indev_drv_t * indev, lv_indev_data_t * data);
 #ifdef M5CORE2
@@ -62,18 +63,13 @@ bool GUI::begin()
 
 void GUI::loop()
 {
-		// DBG("HANDLE-BEGIN");
-	_event = (event_t) keytool_get_event(scan_keys());
-	if(_event)
-	{
-		_last_event = _event;
-		DBG("GUI: event = 0x%x", _event);
-	};
+	// DBG("HANDLE-BEGIN");
 
-	if(handle_global_events(_event))
-		_event = KEY_NONE;
+    // TODO: Use LVGL to handle global keys/events
+	// if(handle_global_keys(_keypad))
+	// 	_event = KEY_NONE;
 
-	// ActStack may not be empty
+	// ScreenStack may not be empty
 	if(_scrstack.size() == 0)
 	{
 		ERROR("actstack empty, push(BOOT)");
@@ -97,7 +93,7 @@ void GUI::loop()
 	};
 #endif
 
-    scr->handle(_event);
+    scr->loop();
 
 	// LVGL ticker
     time_t now = millis();
@@ -108,49 +104,6 @@ void GUI::loop()
 	};
     lv_timer_handler();
 
-};
-
-void GUI::draw()
-{
-	_state = DRAW;
-};
-
-void GUI::resend()
-{
-	_state = SEND;
-};
-
-bool GUI::handle_global_events(const event_t event)
-{
-	// Handle global key-presses
-	switch(event)
-	{
-		case KEY_ABC_LONG:
-			_debug = !_debug;
-			_state = DRAW;
-			return true;
-		case KEY_A_LONG:
-			if(_debug)
-			{
-				_debug_page--;
-				_state = DRAW;
-				return true;
-			};
-		case KEY_C_LONG: 
-			if(_debug)
-			{
-				_debug_page++;
-				_state = DRAW;
-				return true;
-			};
-		// case KEY_P_LONG:
-		// 	// Someone is holding the power button, we're probably going down soon. Let's save what we can
-		// 	return true;
-		default:
-			return false;
-	};
-
-	return false;
 };
 
 ScreenPtr GUI::pushScreen(ScreenType scrtype, void* data)
@@ -166,18 +119,22 @@ ScreenPtr GUI::pushScreen(ScreenType scrtype, void* data)
 			pushMessageScreen("Error:", __FUNCTION__, "Invalid <ScreenType>", " identifier"); 
 			return NULL;
 	};
-	DBG("GUI: Push(%s)", scr->name());
-	_scrstack.push(scr);
-	draw();
+    pushScreen(scr, data);
 	return scr;
 };
 
-void GUI::pushMessageScreen(const char* title, const char* line1, const char* line2, const char* line3)
-{	
-	_scrstack.push(
-		std::make_shared<MessageScreen>(title, line1, line2, line3)
-	);
-	draw();
+ScreenPtr GUI::pushScreen(ScreenPtr scr, void* data)
+{
+	DBG("GUI: Push(%s)", scr->name());
+	_scrstack.push(scr);
+    scr->load();
+
+	return scr;
+};
+
+ScreenPtr GUI::pushMessageScreen(const char* title, const char* line1, const char* line2, const char* line3)
+{
+    return pushScreen(std::make_shared<MessageScreen>(title, line1, line2, line3));
 };
 
 void GUI::popScreen(Screen* scr)
@@ -190,7 +147,7 @@ void GUI::popScreen(Screen* scr)
 	ScreenPtr top = _scrstack.top();
 	_scrstack.pop();
 	DBG("GUI: pop(%s)", top->name());
-
+    
     // Just a check for now
     if(scr != nullptr && top.get() != scr)
     {
@@ -199,8 +156,10 @@ void GUI::popScreen(Screen* scr)
         return;
     };
 
+    // make the screen below active again
+    _scrstack.top()->load();
+
 	// DBG("popped, will delete (eventually): %s(%p)", a->name(), a);
-	_state = DRAW;
 	return;
 };
 
@@ -258,7 +217,7 @@ void lv_touchpad_cb(lv_indev_drv_t * indev, lv_indev_data_t * data)
 };
 #endif
 
-uint32_t GUI::scan_keys()
+uint32_t scan_keys()
 {
 	// Read current states
 	uint32_t pressed = KEY_NONE;
@@ -270,11 +229,15 @@ uint32_t GUI::scan_keys()
 		pressed |= KEY_C;
 	// if(digitalRead(PIN_POWERINT) == LOW)
 	// 	pressed |= KEY_P;
-	return pressed;
+	return keytool_get_event(pressed);
 };
 
 void lv_keys_cb(lv_indev_drv_t * indev, lv_indev_data_t * data)
 {
-	data->state = LV_INDEV_STATE_RELEASED;
+    data->key = scan_keys();//last_key();            /*Get the last pressed or released key*/
+    if(data->key != KEY_NONE) 
+        data->state = LV_INDEV_STATE_PRESSED;
+    else 
+        data->state = LV_INDEV_STATE_RELEASED;
 	return;
 };

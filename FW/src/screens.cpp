@@ -14,12 +14,20 @@
 
 Screen::Screen()
 {
-	DBG("CONSTRUCT %s(%p)", this->title(), this);
+	DBG("CONSTRUCT %s(%p)", this->name(), this);
+    _screen = lv_obj_create(NULL);
 };
 
 Screen::~Screen() 
 { 
-	DBG("DESTROY %s(%p)", this->title(), this); 
+	DBG("DESTROY %s(%p)", this->name(), this); 
+    lv_obj_del(_screen);
+    _screen = nullptr;
+};
+
+void Screen::load()
+{
+    lv_scr_load(_screen);
 };
 
 void Screen::close() 
@@ -28,11 +36,11 @@ void Screen::close()
 };
 
 /*** BOOT ************************************************************************************/
-BootScreen::BootScreen() // : Activity()
+BootScreen::BootScreen() : Screen()
 {
     _start = millis();
 
-	_label = lv_label_create(lv_scr_act());
+	_label = lv_label_create(_screen);
     lv_obj_set_size(_label, DISPLAY_WIDTH, 50);
 	lv_obj_center(_label);
     lv_obj_set_style_text_color(_label, lv_palette_main(LV_PALETTE_RED), LV_PART_ANY);
@@ -40,7 +48,7 @@ BootScreen::BootScreen() // : Activity()
     lv_label_set_text_fmt(_label, "M5DualPID v%d", VERSION);
 };
 
-bool BootScreen::handle(event_t event)
+bool BootScreen::loop()
 {
     uint32_t now = millis();
     if((now - _start) > BOOTSCREEN_TIMEOUT_MS)
@@ -53,11 +61,11 @@ bool BootScreen::handle(event_t event)
 /*** MAIN ************************************************************************************/
 MainScreen::MainScreen()
 {
-    _box_pid1 = lv_obj_create(lv_scr_act());
+    _box_pid1 = lv_obj_create(_screen);
     lv_obj_set_pos(_box_pid1, 0, 0);
     lv_obj_set_size(_box_pid1, DISPLAY_WIDTH/2, 100);
 
-    _box_pid2 = lv_obj_create(lv_scr_act());
+    _box_pid2 = lv_obj_create(_screen);
 
 	// M5.Lcd.setTextSize(2);
 	// M5.Lcd.setTextColor(WHITE, BLACK);
@@ -69,19 +77,9 @@ MainScreen::MainScreen()
 	// _rh_panel.draw();
 };
 
-bool MainScreen::handle(event_t event)
+bool MainScreen::loop()
 {
-    switch(event)
-    {
-        case KEY_A: 
-        case KEY_B: 
-        case KEY_C: 
-			gui.pushScreen(ScreenType::MENU);
-		case KEY_P:
-			break;
-		default: return false; break;
-    };
-	return true;
+    return false;
 };
 
 /*** MESSAGE ************************************************************************************/
@@ -156,18 +154,18 @@ MessageScreen::MessageScreen(const char* title, const char* line1, const char* l
 	// };
 // };
 
-bool MessageScreen::handle(event_t event)
+bool MessageScreen::loop()
 {
-	switch(event)
-	{
-		case KEY_A:
-		case KEY_B:
-		case KEY_C:
-			gui.popScreen();
-			return true;
-		default:
-			return false;
-	};
+	// switch(event)
+	// {
+	// 	case KEY_A:
+	// 	case KEY_B:
+	// 	case KEY_C:
+	// 		gui.popScreen();
+	// 		return true;
+	// 	default:
+	// 		return false;
+	// };
 	return false;
 };
 

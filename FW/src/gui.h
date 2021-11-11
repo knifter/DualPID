@@ -32,25 +32,13 @@ class GUI
 
 		bool begin();
 		void loop();
-        void draw();        // Always redraws the whole screen for the current state
-		void resend();		// re-send screenbuffer
-        typedef enum
-        {
-            DRAW,
-			SEND,
-			HANDLE
-        } state_t;
 
 		ScreenPtr	pushScreen(ScreenType, void* data = NULL);
-		void		pushMessageScreen(const char* title, const char* line1 = nullptr, const char* line2 = nullptr, const char* line3 = nullptr);
+		ScreenPtr	pushScreen(ScreenPtr, void* data = NULL);
+		ScreenPtr	pushMessageScreen(const char* title, const char* line1 = nullptr, const char* line2 = nullptr, const char* line3 = nullptr);
 		void		popScreen(Screen* = nullptr);
 
 	private:
-		uint32_t 	scan_keys();
-		bool 		handle_global_events(const event_t);
-
-		event_t 		_event		= KEY_NONE;
-        state_t 		_state		= DRAW;
 		ScreenStack		_scrstack;
 
 		// LVGL
@@ -60,12 +48,11 @@ class GUI
 		lv_indev_drv_t 		_lv_touch_drv;           /*Descriptor of a input device driver*/
 		lv_indev_drv_t 		_lv_keys_drv;           /*Descriptor of a input device driver*/
 
-		int				_debug_page;
 #ifdef DEBUG
 		void			draw_debug();
+		int				_debug_page;
 		bool			_debug		= false;
 		time_t 			_next_debug = 0;
-		event_t			_last_event = KEY_NONE;
 #endif
 };
 

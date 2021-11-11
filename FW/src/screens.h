@@ -46,10 +46,12 @@ class Screen : NonCopyable
 		virtual ScreenType type() { return ScreenType::BASE; };
 
 		void close();
-        virtual bool handle(event_t) = 0;
-        // virtual bool start() {};
-        // virtual bool stop() {};
+        virtual bool loop() {};
+        virtual void load();
+
 		virtual const char* name() { return ScreenNames[(int) type()]; };
+    protected:
+        lv_obj_t*   _screen;
 };
 
 /*** BOOT ************************************************************************************/
@@ -59,7 +61,7 @@ class BootScreen : public Screen
 		BootScreen();
 		virtual ScreenType type() { return ScreenType::BOOT; };
 
-        bool handle(event_t);
+        bool loop();
 
     private:
         uint32_t    _start = 0;
@@ -70,14 +72,11 @@ class BootScreen : public Screen
 class MainScreen : public Screen
 {
     public:
-		MainScreen() :
-			_t_panel(0, 0, 70, DISPLAY_WIDTH/2), 
-			_rh_panel(0, DISPLAY_WIDTH/2, 70, DISPLAY_WIDTH/2)
-			{};
+		MainScreen();
 
 		virtual ScreenType type() { return ScreenType::MAIN; };
 
-        bool handle(event_t);
+        bool loop();
 	
 	private:
         lv_obj_t    *_box_pid1;
@@ -95,7 +94,7 @@ class MessageScreen : public Screen
         MessageScreen(const char* title, const char* line1 = nullptr, const char* line2 = nullptr, const char* line3 = nullptr, const char* line_btn = "[ Ok ]");
 		virtual ScreenType type() { return ScreenType::MESSAGE; };
 
-        bool handle(event_t);
+        bool loop();
 
     private:
 		char _title[10];
@@ -129,7 +128,8 @@ class MenuScreen : public Screen
 		void parameter_change();
 		void select_parameter();
 
-	private:
+	private:        
+        // Menu crap:
 		typedef enum
 		{
 			MAIN,
