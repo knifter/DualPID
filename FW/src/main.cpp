@@ -8,8 +8,7 @@
 
 #include "tools-log.h"
 
-#include <M5Stack.h>
-
+// #include <M5Stack.h>
 
 void halt(const char*);
 void loop_measure();
@@ -17,8 +16,6 @@ void loop_measure();
 void setup()
 {
 	Serial.begin(115200);
-
-  	M5.begin();
 
     // Init IO
     digitalWrite(PIN_HB1_A, LOW);
@@ -55,7 +52,7 @@ void setup()
 
 void loop()
 {
-	M5.update();
+	// M5.update();
 	gui.loop();
 	setman.loop();
 	pid1.loop();
@@ -65,10 +62,10 @@ void loop()
 void halt(const char* error)
 {
 	DBG("HALT: %s", error);
-	M5.Lcd.fillScreen(RED);
-	M5.Lcd.setTextSize(3);
-	M5.Lcd.setTextColor(WHITE, RED);
-	M5.Lcd.setCursor(5, 5);
-	M5.Lcd.print(error);
+	// lcd.fillScreen(TFT_RED);
+	// lcd.setTextSize(3);
+	// lcd.setTextColor(TFT_WHITE, TFT_RED);
+	// lcd.setCursor(5, 5);
+	// lcd.print(error);
 	while(1);
 };

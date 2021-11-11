@@ -2,7 +2,8 @@
 
 #include "widgets.h"
 
-#include <M5Stack.h>
+
+// #include <M5Stack.h>
 
 class Panel : public Widget
 {
@@ -11,7 +12,7 @@ class Panel : public Widget
 		// ~Panel();
 
 		// void draw();
-		void drawBorder(uint32_t color = WHITE, uint32_t width = 1);
+		void drawBorder(uint32_t color, uint32_t width = 1);
 };
 
 class TempStatPanel : public Panel

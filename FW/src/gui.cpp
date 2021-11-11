@@ -11,58 +11,28 @@
 
 #include "screens.h"
 
-#include <M5Stack.h>
+// #define LGFX_M5STACK_CORE2         // M5Stack Core2
+#define LGFX_USE_V1
+#define LGFX_AUTODETECT
 
+#include <LovyanGFX.hpp>
+#include <LGFX_TFT_eSPI.hpp>
 
-void lv_disp_cb(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p)
-{
-    // spi_begin()
-    SPI.beginTransaction(SPISettings(SPI_FREQUENCY, MSBFIRST, TFT_SPI_MODE));
-    CS_L;
-    M5.Lcd.setWindow(area->x1, area->y1, area->x2, area->y2);
-    // spi_end();
-    CS_H;
-    SPI.endTransaction();
+LGFX gfx;
 
-	uint32_t size = lv_area_get_width(area) * lv_area_get_height(area);
-    void* colorptr = color_p;
-
-    // spi_begin()
-    SPI.beginTransaction(SPISettings(SPI_FREQUENCY, MSBFIRST, TFT_SPI_MODE));
-    CS_L;
-    SPI.writePixels(colorptr, size*2);
-    // spi_end();
-    CS_H;
-    SPI.endTransaction();
-
-    lv_disp_flush_ready(disp);         /* Indicate you are ready with the flushing*/
-};
-
+// LVGL Callback funcs
+void lv_disp_cb(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p);
+void lv_keys_cb(lv_indev_drv_t * indev, lv_indev_data_t * data);
 #ifdef M5CORE2
-void lv_touchpad_cb(lv_indev_drv_t * indev, lv_indev_data_t * data)
-{
-    Point p = M5.Touch.getPressPoint();
-    if(p.x == -1 && p.y == -1)
-    {
-        data->state = LV_INDEV_STATE_RELEASED;
-        return;
-    };
-    data->point.x = p.x;
-    data->point.y = p.y;
-    data->state = LV_INDEV_STATE_PRESSED;
-};
+void lv_touchpad_cb(lv_indev_drv_t * indev, lv_indev_data_t * data);
 #endif
-
-void lv_keys_cb(lv_indev_drv_t * indev, lv_indev_data_t * data)
-{
-	data->state = LV_INDEV_STATE_RELEASED;
-	return;
-};
-
 
 bool GUI::begin()
 {
-    M5.Lcd.fillScreen(BLACK);
+    gfx.init();
+    gfx.setRotation(1);
+    gfx.setColorDepth(24);
+
 
 	lv_init();
 
@@ -75,7 +45,10 @@ bool GUI::begin()
     _lv_display_drv.ver_res = SCREEN_HEIGHT;   /*Set the vertical resolution of the display*/
     lv_disp_drv_register(&_lv_display_drv);      /*Finally register the driver*/
 
-#ifdef M5CORE2
+#ifdef TFT_TOUCH
+    uint16_t calData[] = { 239, 3926, 233, 265, 3856, 3896, 3714, 308};
+    gfx.setTouchCalibrate(calData);
+
     lv_indev_drv_init(&_lv_touch_drv);             /*Basic initialization*/
     _lv_touch_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*/
     _lv_touch_drv.read_cb = lv_touchpad_cb;      /*Set your driver function*/
@@ -119,7 +92,7 @@ void GUI::loop()
 	};
 
 	// Keeping this (smart) ptr here is important! It prevents pop() from deleting the 
-	// Activity while in handle(). It will be deleted when act goes out of scope too
+	// Activity while in handle(). It will be deleted when scr goes out of scope too
 	ScreenPtr scr = _scrstack.top();
 
 	// Debug activity
@@ -279,6 +252,82 @@ void GUI::popScreen(Screen* scr)
 	return;
 };
 
+
+#ifdef DEBUG
+void GUI::draw_debug()
+{	
+
+};
+#endif // DEBUG
+
+void lv_disp_cb(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p)
+{
+    uint32_t w = ( area->x2 - area->x1 + 1 );
+    uint32_t h = ( area->y2 - area->y1 + 1 );
+
+    gfx.startWrite();
+    gfx.setAddrWindow( area->x1, area->y1, w, h );
+    //gfx.pushColors( ( uint16_t * )&color_p->full, w * h, true );
+    gfx.writePixels((lgfx::rgb565_t *)&color_p->full, w * h);
+    gfx.endWrite();
+
+    lv_disp_flush_ready( disp );
+};
+
+    // // spi_begin()
+    // SPI.beginTransaction(SPISettings(SPI_FREQUENCY, MSBFIRST, TFT_SPI_MODE));
+    // CS_L;
+    // M5.Lcd.setWindow(area->x1, area->y1, area->x2, area->y2);
+    // // spi_end();
+    // CS_H;
+    // SPI.endTransaction();
+
+	// uint32_t size = lv_area_get_width(area) * lv_area_get_height(area);
+    // void* colorptr = color_p;
+
+    // // spi_begin()
+    // SPI.beginTransaction(SPISettings(SPI_FREQUENCY, MSBFIRST, TFT_SPI_MODE));
+    // CS_L;
+    // SPI.writePixels(colorptr, size*2);
+    // // spi_end();
+    // CS_H;
+    // SPI.endTransaction();
+
+//     lv_disp_flush_ready(disp);         /* Indicate you are ready with the flushing*/
+// };
+
+#ifdef TFT_TOUCH
+void lv_touchpad_cb(lv_indev_drv_t * indev, lv_indev_data_t * data)
+{
+    // Point p = M5.Touch.getPressPoint();
+    // if(p.x == -1 && p.y == -1)
+    // {
+    //     data->state = LV_INDEV_STATE_RELEASED;
+    //     return;
+    // };
+    // data->point.x = p.x;
+    // data->point.y = p.y;
+    // data->state = LV_INDEV_STATE_PRESSED;
+
+    uint16_t touchX, touchY;
+    if(gfx.getTouch( &touchX, &touchY))
+    {
+        data->state = LV_INDEV_STATE_PR;
+
+        /*Set the coordinates*/
+        data->point.x = touchX;
+        data->point.y = touchY;
+
+        Serial.print( "Data x " );
+        Serial.println( touchX );
+
+        Serial.print( "Data y " );
+        Serial.println( touchY );
+    };
+    data->state = LV_INDEV_STATE_REL;
+};
+#endif
+
 uint32_t GUI::scan_keys()
 {
 	// Read current states
@@ -294,10 +343,8 @@ uint32_t GUI::scan_keys()
 	return pressed;
 };
 
-
-#ifdef DEBUG
-void GUI::draw_debug()
-{	
-
+void lv_keys_cb(lv_indev_drv_t * indev, lv_indev_data_t * data)
+{
+	data->state = LV_INDEV_STATE_RELEASED;
+	return;
 };
-#endif // DEBUG

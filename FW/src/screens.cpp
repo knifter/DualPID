@@ -31,19 +31,18 @@ void Screen::close()
 BootScreen::BootScreen() // : Activity()
 {
     _start = millis();
-
 };
 
 void BootScreen::draw()
 {
-	M5.Lcd.fillScreen(BLACK);
+	// M5.Lcd.fillScreen(BLACK);
 
-	M5.Lcd.setTextSize(3);
-	M5.Lcd.setCursor (10, 10);
-	M5.Lcd.print("ESP-PID");
-	M5.Lcd.setTextSize(2);
-	M5.Lcd.setCursor (10, 40);
-	M5.Lcd.printf("version %d", VERSION);
+	// M5.Lcd.setTextSize(3);
+	// M5.Lcd.setCursor (10, 10);
+	// M5.Lcd.print("ESP-PID");
+	// M5.Lcd.setTextSize(2);
+	// M5.Lcd.setCursor (10, 40);
+	// M5.Lcd.printf("version %d", VERSION);
 };
 
 bool BootScreen::handle(event_t event)
@@ -126,8 +125,8 @@ void MessageScreen::draw()
 	// _disp.setDrawColor(0);
 	// _disp.drawBox(x-1, y-1, w+2, h+2);
 	// draw_roundedrectangle(_disp, x, y, w, h, 5);
-	M5.Lcd.drawRect(x-1, y-1, w+2, h+2, WHITE);
-	M5.Lcd.drawRoundRect(x, y, w, h, 5, BLACK);
+	// M5.Lcd.drawRect(x-1, y-1, w+2, h+2, WHITE);
+	// M5.Lcd.drawRoundRect(x, y, w, h, 5, BLACK);
 	
 
 	// Text in box
@@ -216,12 +215,12 @@ void MenuScreen::draw()
 	switch(_state)
 	{
 		case state_t::MAIN:
-			if (M5.BtnA.wasPressed() || M5.BtnB.wasPressed() || M5.BtnC.wasPressed())
-			{
-				_state = state_t::SELECT_PARAM;
-				draw_menu();
-				return;
-			};
+			// if (M5.BtnA.wasPressed() || M5.BtnB.wasPressed() || M5.BtnC.wasPressed())
+			// {
+			// 	_state = state_t::SELECT_PARAM;
+			// 	draw_menu();
+			// 	return;
+			// };
 			break;
 
 		case state_t::CHANGE_PARAM:
@@ -237,19 +236,19 @@ void MenuScreen::draw()
 // show every menu item with current values
 void MenuScreen::draw_menu()
 { 
-	M5.Lcd.fillScreen(BLACK);
+	// M5.Lcd.fillScreen(BLACK);
 
 	// Menu list
-  	M5.Lcd.setTextSize(3);
+  	// M5.Lcd.setTextSize(3);
 
   	for (int i = 0; i < _PARAM_MAX; i++)
     	draw_menuitem(i);
 
 	// Bottom help
-	M5.Lcd.setTextColor(WHITE, BLUE);
-	M5.Lcd.setCursor(40, 225);
-	M5.Lcd.setTextSize(2);
-	M5.Lcd.print("<<<    Select    >>>");
+	// M5.Lcd.setTextColor(WHITE, BLUE);
+	// M5.Lcd.setCursor(40, 225);
+	// M5.Lcd.setTextSize(2);
+	// M5.Lcd.print("<<<    Select    >>>");
 };
 
 bool MenuScreen::handle(event_t event)
@@ -270,28 +269,28 @@ bool MenuScreen::handle(event_t event)
 // Current parameter to change
 void MenuScreen::draw_menuitem(int item)
 {
-	M5.Lcd.setTextSize(3);
+	// M5.Lcd.setTextSize(3);
 
 	int y = item * 40 + 20;
 	const char* txt = ParamNames[item];
 
 	// Selected item gets a different color
-	M5.Lcd.setCursor (10, y);
-	if ( _selected_parameter == item )
-		M5.Lcd.setTextColor(BLUE, WHITE);
-	else
-		M5.Lcd.setTextColor(WHITE, BLACK);
+	// M5.Lcd.setCursor (10, y);
+	// if ( _selected_parameter == item )
+	// 	M5.Lcd.setTextColor(BLUE, WHITE);
+	// else
+	// 	M5.Lcd.setTextColor(WHITE, BLACK);
 
 	// Print item
-	M5.Lcd.print(txt);
+	// M5.Lcd.print(txt);
 	if(item == PARAM_BACK)
 		return;
 
 	// draw value
-	M5.Lcd.setTextSize(3);
-	M5.Lcd.print(" = ");
-	Para_Cusor_X[item] = M5.Lcd.getCursorX();
-	Para_Cusor_Y[item] = M5.Lcd.getCursorY();
+	// M5.Lcd.setTextSize(3);
+	// M5.Lcd.print(" = ");
+	// Para_Cusor_X[item] = M5.Lcd.getCursorX();
+	// Para_Cusor_Y[item] = M5.Lcd.getCursorY();
 	double value;
 	switch(item)
 	{
@@ -301,18 +300,18 @@ void MenuScreen::draw_menuitem(int item)
 		case PARAM_KD: 		value = settings.pid2.Kd; break;
 		default: 			value= NAN; break;
 	};
-	M5.Lcd.print(value);
-	M5.Lcd.print("      ");
+	// M5.Lcd.print(value);
+	// M5.Lcd.print("      ");
 };
 
 // Parameter to change will be red colored
 void MenuScreen::draw_highlight_param()
 {
 	int item = _selected_parameter;
-	M5.Lcd.setTextSize(3);
-	M5.Lcd.setCursor(Para_Cusor_X[item], Para_Cusor_Y[item]);
-	M5.Lcd.setTextColor(RED, WHITE);
-	M5.Lcd.print(*_settingptr);
+	// M5.Lcd.setTextSize(3);
+	// M5.Lcd.setCursor(Para_Cusor_X[item], Para_Cusor_Y[item]);
+	// M5.Lcd.setTextColor(RED, WHITE);
+	// M5.Lcd.print(*_settingptr);
 };
 
 void MenuScreen::parameter_change()
@@ -320,40 +319,40 @@ void MenuScreen::parameter_change()
 	// Acceleration logic
 	static float key_step = KEY_STEP_SLOW;
 	static int key_delay = KEY_SLOW;
-	if (M5.BtnA.pressedFor(5000) or M5.BtnC.pressedFor(5000))
-	{
-		key_delay = KEY_VERY_FAST;
-		key_step = KEY_STEP_FAST;
-	}
-  	else if (M5.BtnA.pressedFor(2000) or M5.BtnC.pressedFor(2000))
-  	{
-	    key_delay = KEY_FAST;
-  	}
-	else
+	// if (M5.BtnA.pressedFor(5000) or M5.BtnC.pressedFor(5000))
+	// {
+	// 	key_delay = KEY_VERY_FAST;
+	// 	key_step = KEY_STEP_FAST;
+	// }
+  	// else if (M5.BtnA.pressedFor(2000) or M5.BtnC.pressedFor(2000))
+  	// {
+	//     key_delay = KEY_FAST;
+  	// }
+	// else
   	{
     	key_delay = KEY_SLOW;
     	key_step = KEY_STEP_SLOW;
   	};
 
 	// Action
-  	if (M5.BtnA.isPressed())
-  	{
-		*_settingptr -= key_step;
-		draw_highlight_param();
-		delay(key_delay);
-  	};
-  	if (M5.BtnB.wasPressed())
-  	{
-    	_state = state_t::SELECT_PARAM;
-    	M5.Lcd.fillScreen(BLACK);
-    	draw();
-  	};
-  	if (M5.BtnC.isPressed())
-	{	
-		*_settingptr += key_step;
-		draw_highlight_param();
-		delay(key_delay);
-  	};
+  	// if (M5.BtnA.isPressed())
+  	// {
+	// 	*_settingptr -= key_step;
+	// 	draw_highlight_param();
+	// 	delay(key_delay);
+  	// };
+  	// if (M5.BtnB.wasPressed())
+  	// {
+    // 	_state = state_t::SELECT_PARAM;
+    // 	M5.Lcd.fillScreen(BLACK);
+    // 	draw();
+  	// };
+  	// if (M5.BtnC.isPressed())
+	// {	
+	// 	*_settingptr += key_step;
+	// 	draw_highlight_param();
+	// 	delay(key_delay);
+  	// };
 };
 
 
@@ -361,45 +360,45 @@ void MenuScreen::select_parameter()
 {
 	pidsettings_t& ps = setman.settings.pid2;
 
-  	if (M5.BtnA.wasPressed())
-  	{
-		--_selected_parameter;
-		// if(_selected_parameter == PARAM_NONE)
-		// 	_selected_parameter = (_PARAM_MAX - 1;
-		draw_menu();
-		return;
-  	};
-  	if (M5.BtnB.wasPressed())
-  	{
-		if(_selected_parameter == PARAM_BACK)
-		{
-			// TODO: move to state machine
-			// settings.write_flash(para);
-			setman.saveDelayed();
-			pid2.set_tuning(ps);
+  	// if (M5.BtnA.wasPressed())
+  	// {
+	// 	--_selected_parameter;
+	// 	// if(_selected_parameter == PARAM_NONE)
+	// 	// 	_selected_parameter = (_PARAM_MAX - 1;
+	// 	draw_menu();
+	// 	return;
+  	// };
+  	// if (M5.BtnB.wasPressed())
+  	// {
+	// 	if(_selected_parameter == PARAM_BACK)
+	// 	{
+	// 		// TODO: move to state machine
+	// 		// settings.write_flash(para);
+	// 		setman.saveDelayed();
+	// 		pid2.set_tuning(ps);
 
-			M5.Lcd.fillScreen(BLACK);
-			_state = state_t::MAIN;
-			return;
-		};
-		_state = state_t::CHANGE_PARAM;
-		switch(_selected_parameter)
-		{
-			case PARAM_SETPOINT:	_settingptr = &ps.setpoint; break;
-			case PARAM_KP: 			_settingptr = &ps.Kp; break;
-			case PARAM_KI: 			_settingptr = &ps.Ki; break;
-			case PARAM_KD: 			_settingptr = &ps.Kd; break;
-			default: 				_settingptr = nullptr; break;
-		};
-		draw_highlight_param();
-		return;
-	};
-	if (M5.BtnC.wasPressed())
-	{
-		++_selected_parameter;
-		// if(_selected_parameter == _PARAM_MAX)
-		// 	_selected_parameter = 1;
-		draw_menu();
-		return;
-	};
+	// 		M5.Lcd.fillScreen(BLACK);
+	// 		_state = state_t::MAIN;
+	// 		return;
+	// 	};
+	// 	_state = state_t::CHANGE_PARAM;
+	// 	switch(_selected_parameter)
+	// 	{
+	// 		case PARAM_SETPOINT:	_settingptr = &ps.setpoint; break;
+	// 		case PARAM_KP: 			_settingptr = &ps.Kp; break;
+	// 		case PARAM_KI: 			_settingptr = &ps.Ki; break;
+	// 		case PARAM_KD: 			_settingptr = &ps.Kd; break;
+	// 		default: 				_settingptr = nullptr; break;
+	// 	};
+	// 	draw_highlight_param();
+	// 	return;
+	// };
+	// if (M5.BtnC.wasPressed())
+	// {
+	// 	++_selected_parameter;
+	// 	// if(_selected_parameter == _PARAM_MAX)
+	// 	// 	_selected_parameter = 1;
+	// 	draw_menu();
+	// 	return;
+	// };
 };
