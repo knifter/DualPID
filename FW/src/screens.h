@@ -3,11 +3,13 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <lvgl.h>
 
 #include "tools-nocopy.h"
 
 #include "event.h"
 #include "gui.h"
+
 
 enum class ScreenType
 {
@@ -46,7 +48,7 @@ class Screen : NonCopyable
 		virtual ScreenType type() { return ScreenType::BASE; };
 
 		void close();
-        virtual bool loop() {};
+        virtual bool loop() { return true; };
         virtual void load();
 
 		virtual const char* name() { return ScreenNames[(int) type()]; };
@@ -65,10 +67,21 @@ class BootScreen : public Screen
 
     private:
         uint32_t    _start = 0;
-		lv_obj_t*	_label;
 };
 
 /*** MAIN ************************************************************************************/
+class PidWidget
+{
+	public:
+		PidWidget(lv_obj_t* parent, const char* unit);
+		lv_obj_t	*box, *lbl_sp, *lbl_value, *bar_output;
+		lv_style_t 	style_font26;
+		String unit;
+		void setSetPoint(float sp);
+		void setValue(float v);
+		void setBar(float p);   
+};
+
 class MainScreen : public Screen
 {
     public:
@@ -79,29 +92,11 @@ class MainScreen : public Screen
         bool loop();
 	
 	private:
-        lv_obj_t    *_box_pid1;
-        lv_obj_t    *_box_pid2;
+		PidWidget* pw1 = nullptr;
+		PidWidget* pw2 = nullptr;
+		
+        // lv_obj_t    *_box_pid2;
 
-		// TempStatPanel _t_panel;
-		// HumStatPanel _rh_panel;
-
-};
-
-/*** MESSAGE ************************************************************************************/
-class MessageScreen : public Screen
-{
-    public:
-        MessageScreen(const char* title, const char* line1 = nullptr, const char* line2 = nullptr, const char* line3 = nullptr, const char* line_btn = "[ Ok ]");
-		virtual ScreenType type() { return ScreenType::MESSAGE; };
-
-        bool loop();
-
-    private:
-		char _title[10];
-		char _line1[24];
-		char _line2[24];
-		char _line3[24];
-		char _line_btn[24];
 };
 
 /*** Menu ************************************************************************************/

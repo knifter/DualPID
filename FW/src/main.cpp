@@ -8,8 +8,6 @@
 
 #include "tools-log.h"
 
-// #include <M5Stack.h>
-
 void halt(const char*);
 void loop_measure();
 
@@ -49,15 +47,31 @@ void setup()
 	pid1.set_tuning(setman.settings.pid1);
 	pid2.begin();
 	pid2.set_tuning(setman.settings.pid2);
+
+	// gui.showMessage("Test", "a very long text this is not.\nBut long enough?");
+};
+
+uint32_t scan_keys()
+{
+	// Read current states
+	uint32_t pressed = KEY_NONE;
+	if(digitalRead(PIN_BTN_A) == LOW)
+		pressed |= KEY_A;
+	if(digitalRead(PIN_BTN_B) == LOW)
+		pressed |= KEY_B;
+	if(digitalRead(PIN_BTN_C) == LOW)
+		pressed |= KEY_C;
+	// if(digitalRead(PIN_POWERINT) == LOW)
+	// 	pressed |= KEY_P;
+	return keytool_get_event(pressed);
 };
 
 void loop()
 {
-	// M5.update();
-	gui.loop();
 	setman.loop();
 	pid1.loop();
 	pid2.loop();
+	gui.loop(); 
 };
 
 void halt(const char* error)

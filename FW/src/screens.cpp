@@ -3,7 +3,6 @@
 #include <memory>
 
 #include "gui.h"
-#include "widgets.h"
 
 #include "config.h"
 #ifdef DEBUG_ACTIVITIES_CPP
@@ -11,23 +10,25 @@
 #endif
 #include "tools-log.h"
 #include "globals.h"
+#include "soogh-color.h"
+
 
 Screen::Screen()
 {
-	DBG("CONSTRUCT %s(%p)", this->name(), this);
+	// DBG("CONSTRUCT %s(%p)", this->name(), this);
     _screen = lv_obj_create(NULL);
 };
 
 Screen::~Screen() 
 { 
-	DBG("DESTROY %s(%p)", this->name(), this); 
-    lv_obj_del(_screen);
-    _screen = nullptr;
+	// DBG("DESTROY %s(%p)", this->name(), this); 
+    lv_obj_del(_screen); _screen = nullptr;
 };
 
 void Screen::load()
 {
-    lv_scr_load(_screen);
+    // lv_scr_load(_screen);
+    lv_scr_load_anim(_screen, LV_SCR_LOAD_ANIM_FADE_ON, 300, 0, false);
 };
 
 void Screen::close() 
@@ -40,12 +41,12 @@ BootScreen::BootScreen() : Screen()
 {
     _start = millis();
 
-	_label = lv_label_create(_screen);
-    lv_obj_set_size(_label, DISPLAY_WIDTH, 50);
-	lv_obj_center(_label);
-    lv_obj_set_style_text_color(_label, lv_palette_main(LV_PALETTE_RED), LV_PART_ANY);
-    lv_obj_set_style_text_align(_label, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text_fmt(_label, "M5DualPID v%d", VERSION);
+	lv_obj_t* l = lv_label_create(_screen);
+    lv_obj_set_size(l, DISPLAY_WIDTH, 50);
+	lv_obj_center(l);
+    lv_obj_set_style_text_color(l, COLOR_RED, LV_PART_ANY);
+    lv_obj_set_style_text_align(l, LV_TEXT_ALIGN_CENTER, 0);
+    lv_label_set_text_fmt(l, "M5DualPID v%d", VERSION);
 };
 
 bool BootScreen::loop()
@@ -59,114 +60,72 @@ bool BootScreen::loop()
 };
 
 /*** MAIN ************************************************************************************/
+PidWidget::PidWidget(lv_obj_t* parent, const char* unit_in)
+{
+	unit = unit_in;
+	box = lv_obj_create(parent);
+	lv_obj_set_size(box, DISPLAY_WIDTH/2, 80);
+	lv_obj_set_style_border_width(box, 2, 0);
+	lv_obj_set_style_pad_all(box, 5, 0);
+
+	lv_style_init(&style_font26);
+	lv_style_set_text_font(&style_font26, &lv_font_montserrat_26);
+
+	// Setpoint label
+	{
+		lbl_sp = lv_label_create(box);
+		lv_obj_set_style_border_width(lbl_sp, 1, 0);
+		lv_obj_set_size(lbl_sp, LV_PCT(100), 20);
+		lv_obj_align(lbl_sp, LV_ALIGN_TOP_MID, 0, 0);
+		lv_obj_set_style_text_color(lbl_sp, COLOR_GREY, LV_PART_ANY);
+		lv_obj_set_style_text_align(lbl_sp, LV_TEXT_ALIGN_CENTER, 0);
+		lv_label_set_text(lbl_sp, "<setpoint>");
+	};
+	// Value label
+	{
+		lbl_value = lv_label_create(box);
+		lv_obj_set_style_border_width(lbl_value, 1, 0);
+		lv_obj_set_size(lbl_value, LV_PCT(100), 30);
+		lv_obj_align_to(lbl_value, lbl_sp, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
+		lv_obj_add_style(lbl_value, &style_font26, 0);
+		lv_obj_set_style_text_color(lbl_value, COLOR_BLACK, LV_PART_ANY);
+		lv_obj_set_style_text_align(lbl_value, LV_TEXT_ALIGN_CENTER, 0);
+		lv_label_set_text(lbl_value, "<value>");
+	};
+
+	// Output bar
+	{
+		bar_output = lv_bar_create(box);
+		lv_obj_set_style_border_width(bar_output, 1, 0);
+		lv_obj_set_size(bar_output, LV_PCT(100), 10);
+		lv_obj_align(bar_output, LV_ALIGN_BOTTOM_MID, 0, 0);
+		lv_bar_set_range(bar_output, 0, 100);
+	};
+}; // PidWidget()
+
+void PidWidget::setSetPoint(float sp) { lv_label_set_text_fmt(lbl_sp, "sp = %0.01f %s", sp, unit.c_str()); };
+void PidWidget::setValue(float v) { 	lv_label_set_text_fmt(lbl_value, "%0.01f %s", v, unit.c_str()); };
+void PidWidget::setBar(float p) {     lv_bar_set_value(bar_output, p, LV_ANIM_ON); };
+
 MainScreen::MainScreen()
 {
-    _box_pid1 = lv_obj_create(_screen);
-    lv_obj_set_pos(_box_pid1, 0, 0);
-    lv_obj_set_size(_box_pid1, DISPLAY_WIDTH/2, 100);
-
-    _box_pid2 = lv_obj_create(_screen);
-
-	// M5.Lcd.setTextSize(2);
-	// M5.Lcd.setTextColor(WHITE, BLACK);
-
-
-	// t_panel.setSize(0, 0, SCREEN_HEIGHT/2, SCREEN_WIDTH/2);
-	// rh_panel.setSize(0, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH/2);
-	// _t_panel.draw();
-	// _rh_panel.draw();
+	// pw1 = new PidWidget(_screen, "\xe2\x84\x83");
+	pw1 = new PidWidget(_screen, "\xc2\xb0""C");
+	pw2 = new PidWidget(_screen, "%RH");
+	lv_obj_align_to(pw2->box, pw1->box, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
 };
 
 bool MainScreen::loop()
 {
+	pw1->setSetPoint(settings.pid1.setpoint);
+	pw1->setValue(pid1.get_input());
+	pw1->setBar(pid1.get_output()*100/PID_WINDOWSIZE);
+
+	pw2->setSetPoint(settings.pid2.setpoint);
+	pw2->setValue(pid2.get_input());
+	pw2->setBar(pid2.get_output()*100/PID_WINDOWSIZE);
+    
     return false;
-};
-
-/*** MESSAGE ************************************************************************************/
-MessageScreen::MessageScreen(const char* title, const char* line1, const char* line2, const char* line3, const char* line_btn)
-{
-	_title[0] = '\0';
-	_line1[0] = '\0';
-	_line2[0] = '\0';
-	_line3[0] = '\0';
-	_line_btn[0] = '\0';
-	if(title)
-		strncpy(_title, title, sizeof(_title)-1);
-	if(line1 != nullptr)
-		strncpy(_line1, line1, sizeof(_line1)-1); 
-	if(line2 != nullptr)
-		strncpy(_line2, line2, sizeof(_line2)-1); 
-	if(line3 != nullptr)
-		strncpy(_line3, line3, sizeof(_line3)-1);
-	if(line_btn != nullptr)
-		strncpy(_line_btn, line_btn, sizeof(_line_btn)-1);
-	_title[sizeof(_title) - 1] = '\0';
-	_line1[sizeof(_line1) - 1] = '\0';
-	_line2[sizeof(_line2) - 1] = '\0';
-	_line3[sizeof(_line3) - 1] = '\0';
-	_line_btn[sizeof(_line_btn) - 1] = '\0';
-};
-
-// void MessageScreen::draw()
-// {
-// 	const int x = 10, y = 8, w = DISPLAY_WIDTH-20, h=DISPLAY_HEIGHT-10;
-
-	// Draw bounding box.
-	// _disp.setDrawColor(0);
-	// _disp.drawBox(x-1, y-1, w+2, h+2);
-	// draw_roundedrectangle(_disp, x, y, w, h, 5);
-	// M5.Lcd.drawRect(x-1, y-1, w+2, h+2, WHITE);
-	// M5.Lcd.drawRoundRect(x, y, w, h, 5, BLACK);
-	
-
-	// Text in box
-	// _disp.setDrawColor(1);
-	// int ty = y + 3;
-	// if(_title[0])
-	// {
-	// 	ty+=FONT_MSGHEAD_H;
-		// _disp.setFont(FONT_MSGHEAD);
-		// _disp.drawStr(x+5, ty, _title);
-	// };
-	// _disp.setFont(FONT_NORMAL);
-	// ty+=1;
-	// if(_line1[0])
-	// {
-	// 	ty+=FONT_NORMAL_H + 1;
-	// 	_disp.drawStr(x+3, ty, _line1);
-	// };
-	// if(_line2[0])
-	// {
-	// 	ty+=FONT_NORMAL_H + 1;
-	// 	_disp.drawStr(x+3, ty, _line2);
-	// };
-	// if(_line3[0])
-	// {
-	// 	ty+=FONT_NORMAL_H + 1;
-	// 	_disp.drawStr(x+3, ty, _line3);
-	// };
-	// if(_line_btn[0])
-	// {
-	// 	_disp.drawHLine(x, y + h - 10, w);
-	// 	_disp.drawStr(
-	// 		x+w/2 - _disp.getStrWidth(_line_btn)/2, y+h-2,
-	// 		_line_btn);
-	// };
-// };
-
-bool MessageScreen::loop()
-{
-	// switch(event)
-	// {
-	// 	case KEY_A:
-	// 	case KEY_B:
-	// 	case KEY_C:
-	// 		gui.popScreen();
-	// 		return true;
-	// 	default:
-	// 		return false;
-	// };
-	return false;
 };
 
 /*** MENU ************************************************************************************/

@@ -10,8 +10,8 @@
 #include <lvgl.h>
 
 #include "config.h"
-#include "panels.h"
 #include "event.h"
+#include "tools-nocopy.h"
 
 #define KEY_SLOW 				500
 #define KEY_FAST 				100
@@ -25,22 +25,24 @@ enum class ScreenType;
 typedef std::shared_ptr<Screen> ScreenPtr;
 typedef std::stack<ScreenPtr>	ScreenStack;
 
-class GUI
+class GUI : NonCopyable
 {
 	public:
-		GUI() {};
+		// GUI() {};
 
 		bool begin();
-		void loop();
+		time_t loop();
 
-		ScreenPtr	pushScreen(ScreenType, void* data = NULL);
-		ScreenPtr	pushScreen(ScreenPtr, void* data = NULL);
-		ScreenPtr	pushMessageScreen(const char* title, const char* line1 = nullptr, const char* line2 = nullptr, const char* line3 = nullptr);
+		ScreenPtr	pushScreen(ScreenType, void* data = nullptr);
+		ScreenPtr	pushScreen(ScreenPtr, void* data = nullptr);
 		void		popScreen(Screen* = nullptr);
+
+		void showMessage(const char* title, const char* text);
 
 	private:
 		ScreenStack		_scrstack;
-
+		time_t			_prv_tick;
+		
 		// LVGL
 		lv_disp_draw_buf_t 	_lv_draw_buf;
 	    lv_color_t 			_lv_color_buf[LV_BUF_SIZE];
@@ -48,12 +50,13 @@ class GUI
 		lv_indev_drv_t 		_lv_touch_drv;           /*Descriptor of a input device driver*/
 		lv_indev_drv_t 		_lv_keys_drv;           /*Descriptor of a input device driver*/
 
-#ifdef DEBUG
+	#ifdef GUI_DEBUG
 		void			draw_debug();
 		int				_debug_page;
 		bool			_debug		= false;
 		time_t 			_next_debug = 0;
-#endif
+	#endif
+
 };
 
 #endif // __GUI_H

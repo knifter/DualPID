@@ -5,8 +5,8 @@
 #define LGFX_AUTODETECT
 // #define LGFX_M5STACK_CORE2         // M5Stack Core2
 #include <LGFX_TFT_eSPI.hpp>
-#include <SHT3x.h>
 
+#include <SHT3x.h>
 #include "gui.h"
 #include "settings.h"
 #include "pid.h"

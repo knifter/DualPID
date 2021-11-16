@@ -13,3 +13,6 @@
 [submodule "FW/lib/lib-SHT3x"]
 	path = FW/lib/lib-SHT3x
 	url = https://github.com/knifter/lib-SHT3x
+[submodule "FW/lib/lib-soogh"]
+	path = FW/lib/lib-soogh
+	url = https://github.com/knifter/lib-soogh

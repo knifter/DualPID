@@ -12,11 +12,13 @@
 #include "screens.h"
 
 // LVGL Callback funcs
-uint32_t scan_keys();
 void lv_disp_cb(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p);
-void lv_keys_cb(lv_indev_drv_t * indev, lv_indev_data_t * data);
-#ifdef M5CORE2
+#ifdef GUI_TOUCH
 void lv_touchpad_cb(lv_indev_drv_t * indev, lv_indev_data_t * data);
+#endif
+#ifdef GUI_KEYPAD
+uint32_t scan_keys();
+void lv_keys_cb(lv_indev_drv_t * indev, lv_indev_data_t * data);
 #endif
 
 bool GUI::begin()
@@ -46,10 +48,12 @@ bool GUI::begin()
     lv_indev_drv_register(&_lv_touch_drv);         /*Finally register the driver*/
 #endif
 
+#ifdef GUI_KEYPAD
     lv_indev_drv_init(&_lv_keys_drv);             /*Basic initialization*/
     _lv_keys_drv.type = LV_INDEV_TYPE_KEYPAD;    /*Touch pad is a pointer-like device*/
     _lv_keys_drv.read_cb = lv_keys_cb;      /*Set your driver function*/
     lv_indev_drv_register(&_lv_touch_drv);         /*Finally register the driver*/
+#endif // GUI_KEYPAD
 
 	// Empty activity stack
 	while(!_scrstack.empty())
@@ -61,10 +65,8 @@ bool GUI::begin()
 	return true;
 };
 
-void GUI::loop()
+time_t GUI::loop()
 {
-	// DBG("HANDLE-BEGIN");
-
     // TODO: Use LVGL to handle global keys/events
 	// if(handle_global_keys(_keypad))
 	// 	_event = KEY_NONE;
@@ -81,7 +83,7 @@ void GUI::loop()
 	ScreenPtr scr = _scrstack.top();
 
 	// Debug activity
-#ifdef DEBUG_GUI
+#ifdef GUI_DEBUG
 	static ActivityPtr prev_act = nullptr;
 	if(act != prev_act)
 	{
@@ -98,12 +100,10 @@ void GUI::loop()
 	// LVGL ticker
     time_t now = millis();
 	{
-    	static time_t prv = now;
-    	lv_tick_inc(now - prv);
-    	prv = now;
+    	lv_tick_inc(now - _prv_tick);
+    	_prv_tick = now;
 	};
-    lv_timer_handler();
-
+    return lv_timer_handler();
 };
 
 ScreenPtr GUI::pushScreen(ScreenType scrtype, void* data)
@@ -116,7 +116,7 @@ ScreenPtr GUI::pushScreen(ScreenType scrtype, void* data)
 		case ScreenType::MENU:			scr = std::make_shared<MenuScreen>(); break;
 
 		default:
-			pushMessageScreen("Error:", __FUNCTION__, "Invalid <ScreenType>", " identifier"); 
+			showMessage("ERROR", "Invalid <ScreenType> identifier!"); 
 			return NULL;
 	};
     pushScreen(scr, data);
@@ -132,9 +132,15 @@ ScreenPtr GUI::pushScreen(ScreenPtr scr, void* data)
 	return scr;
 };
 
-ScreenPtr GUI::pushMessageScreen(const char* title, const char* line1, const char* line2, const char* line3)
+void GUI::showMessage(const char* title, const char* text)
 {
-    return pushScreen(std::make_shared<MessageScreen>(title, line1, line2, line3));
+    static const char * btns[] ={"Close", ""};
+
+    //lv_layer_top()
+    lv_obj_t * mbox1 = lv_msgbox_create(NULL, title, text, btns, false);
+    // lv_obj_add_event_cb(mbox1, event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    // lv_obj_t *but = lv_msgbox_get_btns(mbox1);
+    lv_obj_center(mbox1);
 };
 
 void GUI::popScreen(Screen* scr)
@@ -152,7 +158,7 @@ void GUI::popScreen(Screen* scr)
     if(scr != nullptr && top.get() != scr)
     {
         ERROR("Screen* given does not match top().");
-        pushMessageScreen("ERROR", "Screen* != top()");
+        showMessage("ERROR", "Screen* != top()");
         return;
     };
 
@@ -164,12 +170,12 @@ void GUI::popScreen(Screen* scr)
 };
 
 
-#ifdef DEBUG
+#ifdef GUI_DEBUG
 void GUI::draw_debug()
 {	
 
 };
-#endif // DEBUG
+#endif // GUI_DEBUG
 
 void lv_disp_cb(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p)
 {
@@ -179,7 +185,7 @@ void lv_disp_cb(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p)
     gfx.startWrite();
     gfx.setAddrWindow( area->x1, area->y1, w, h );
     //gfx.pushColors( ( uint16_t * )&color_p->full, w * h, true );
-    gfx.writePixels((lgfx::rgb565_t *)&color_p->full, w * h);
+    gfx.writePixelsDMA((lgfx::rgb565_t *)&color_p->full, w * h);
     gfx.endWrite();
 
     lv_disp_flush_ready( disp );
@@ -217,6 +223,7 @@ void lv_touchpad_cb(lv_indev_drv_t * indev, lv_indev_data_t * data)
 };
 #endif
 
+#ifdef GUI_KEYPAD
 uint32_t scan_keys()
 {
 	// Read current states
@@ -241,3 +248,4 @@ void lv_keys_cb(lv_indev_drv_t * indev, lv_indev_data_t * data)
         data->state = LV_INDEV_STATE_RELEASED;
 	return;
 };
+#endif // GUI_KEYPAD

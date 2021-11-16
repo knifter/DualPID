@@ -18,6 +18,9 @@
 #define DEFAULT_PID_D			2.0
 #define MEASURE_INTERVAL_MS		1000
 
+#define PID1_UNIT_TEXT			"C"
+#define PID2_UNIT_TEXT			"%RH"
+
 // #define PIN_VALVE           11
 // #define ANALOG_SENSOR_RH    35
 //#define ANALOG_HUM_ADJUST   2
