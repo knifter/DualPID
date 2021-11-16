@@ -32,23 +32,31 @@ class GUI : NonCopyable
 
 		bool begin();
 		time_t loop();
+		bool handle(event_t key); // SOOGH
 
 		ScreenPtr	pushScreen(ScreenType, void* data = nullptr);
 		ScreenPtr	pushScreen(ScreenPtr, void* data = nullptr);
 		void		popScreen(Screen* = nullptr);
 
-		void showMessage(const char* title, const char* text);
+		void showMessage(const char* title, const char* text); // SOOGH
 
 	private:
 		ScreenStack		_scrstack;
 		time_t			_prv_tick;
+		lv_obj_t		*_msgbox = nullptr;
 		
 		// LVGL
 		lv_disp_draw_buf_t 	_lv_draw_buf;
 	    lv_color_t 			_lv_color_buf[LV_BUF_SIZE];
 		lv_disp_drv_t 		_lv_display_drv;        /*Descriptor of a display driver*/
+	#ifdef GUI_TOUCH
 		lv_indev_drv_t 		_lv_touch_drv;           /*Descriptor of a input device driver*/
+	#endif
+	#ifdef GUI_KEYPAD
 		lv_indev_drv_t 		_lv_keys_drv;           /*Descriptor of a input device driver*/
+		lv_indev_t*			_indev_keypad;
+	    lv_group_t* _keygroup;
+	#endif
 
 	#ifdef GUI_DEBUG
 		void			draw_debug();

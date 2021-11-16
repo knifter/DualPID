@@ -68,7 +68,7 @@ void PIDLoop::loop()
         _input = _cb_value();
         _output = _pid.getOutput(_input);
 
-        DBG("Output: %.0f", _output);
+        // DBG("Output: %.0f", _output);
 
         // Queue next iteration
         _pid_next += PID_LOOPTIME_MS;

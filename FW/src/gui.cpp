@@ -11,13 +11,19 @@
 
 #include "screens.h"
 
+#ifdef GUI_DEBUG
+    #define GUI_DBG     DBG
+#else
+    #define GUI_DBG(msg, ...)
+#endif
+
 // LVGL Callback funcs
 void lv_disp_cb(lv_disp_drv_t* disp, const lv_area_t* area, lv_color_t* color_p);
 #ifdef GUI_TOUCH
 void lv_touchpad_cb(lv_indev_drv_t * indev, lv_indev_data_t * data);
 #endif
 #ifdef GUI_KEYPAD
-uint32_t scan_keys();
+uint32_t _last_key = 0;
 void lv_keys_cb(lv_indev_drv_t * indev, lv_indev_data_t * data);
 #endif
 
@@ -31,28 +37,32 @@ bool GUI::begin()
 
     lv_disp_draw_buf_init(&_lv_draw_buf, _lv_color_buf, NULL, LV_BUF_SIZE);
 
-    lv_disp_drv_init(&_lv_display_drv);          /*Basic initialization*/
-    _lv_display_drv.flush_cb = lv_disp_cb;    /*Set your driver function*/
-    _lv_display_drv.draw_buf = &_lv_draw_buf;        /*Assign the buffer to the display*/
-    _lv_display_drv.hor_res = DISPLAY_WIDTH;   /*Set the horizontal resolution of the display*/
-    _lv_display_drv.ver_res = DISPLAY_HEIGHT;   /*Set the vertical resolution of the display*/
-    lv_disp_drv_register(&_lv_display_drv);      /*Finally register the driver*/
+    lv_disp_drv_init(&_lv_display_drv);             /*Basic initialization*/
+    _lv_display_drv.flush_cb = lv_disp_cb;          /*Set your driver function*/
+    _lv_display_drv.draw_buf = &_lv_draw_buf;       /*Assign the buffer to the display*/
+    _lv_display_drv.hor_res = DISPLAY_WIDTH;        /*Set the horizontal resolution of the display*/
+    _lv_display_drv.ver_res = DISPLAY_HEIGHT;       /*Set the vertical resolution of the display*/
+    lv_disp_drv_register(&_lv_display_drv);         /*Finally register the driver*/
 
 #ifdef GUI_TOUCH
     uint16_t calData[] = { 239, 3926, 233, 265, 3856, 3896, 3714, 308};
     gfx.setTouchCalibrate(calData);
 
-    lv_indev_drv_init(&_lv_touch_drv);             /*Basic initialization*/
-    _lv_touch_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*/
-    _lv_touch_drv.read_cb = lv_touchpad_cb;      /*Set your driver function*/
-    lv_indev_drv_register(&_lv_touch_drv);         /*Finally register the driver*/
+    lv_indev_drv_init(&_lv_touch_drv);              /*Basic initialization*/
+    _lv_touch_drv.type = LV_INDEV_TYPE_POINTER;     /*Touch pad is a pointer-like device*/
+    _lv_touch_drv.read_cb = lv_touchpad_cb;         /*Set your driver function*/
+    lv_indev_drv_register(&_lv_touch_drv);          /*Finally register the driver*/
 #endif
 
 #ifdef GUI_KEYPAD
-    lv_indev_drv_init(&_lv_keys_drv);             /*Basic initialization*/
-    _lv_keys_drv.type = LV_INDEV_TYPE_KEYPAD;    /*Touch pad is a pointer-like device*/
-    _lv_keys_drv.read_cb = lv_keys_cb;      /*Set your driver function*/
-    lv_indev_drv_register(&_lv_touch_drv);         /*Finally register the driver*/
+    lv_indev_drv_init(&_lv_keys_drv);               /*Basic initialization*/
+    _lv_keys_drv.type = LV_INDEV_TYPE_KEYPAD;       /*Touch pad is a pointer-like device*/
+    _lv_keys_drv.read_cb = lv_keys_cb;              /*Set your driver function*/
+    _indev_keypad = lv_indev_drv_register(&_lv_keys_drv);          /*Finally register the driver*/
+
+    _keygroup = lv_group_create();
+    lv_indev_set_group(_indev_keypad, _keygroup);
+    lv_group_set_default(_keygroup);
 #endif // GUI_KEYPAD
 
 	// Empty activity stack
@@ -106,14 +116,65 @@ time_t GUI::loop()
     return lv_timer_handler();
 };
 
+bool GUI::handle(event_t e)
+{
+    // Handle global events
+    switch(e)
+    {
+        case KEY_A:
+        case KEY_B:
+        case KEY_C:
+            if(_msgbox)
+            {
+                lv_msgbox_close(_msgbox); _msgbox = nullptr;
+                return true;
+            };
+        default: break;
+    };
+
+    // See if the Screen handles it
+   	ScreenPtr scr = _scrstack.top();
+    if(scr->handle(e))
+        return true;
+
+    // Give the key to LVGL
+    switch(e)
+    {
+        case KEY_A:     _last_key = LV_KEY_LEFT; break;
+        case KEY_B:     _last_key = LV_KEY_ENTER; break;
+        case KEY_C:     _last_key = LV_KEY_RIGHT; break;
+        case KEY_B_LONG:_last_key = LV_KEY_ESC; break;
+        default: return false;
+    };
+    return true;
+};
+
+void GUI::showMessage(const char* title, const char* text)
+{
+    static const char * btns[] ={"Close", ""};
+
+    // Close the previous, if still one open
+    if(_msgbox)
+    {
+        DBG("Destroying previous message box.");
+        lv_msgbox_close(_msgbox);
+    };
+
+    //lv_layer_top()
+    _msgbox = lv_msgbox_create(NULL, title, text, btns, false);
+    // lv_obj_add_event_cb(mbox1, event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    // lv_obj_t *but = lv_msgbox_get_btns(mbox1);
+    lv_obj_center(_msgbox);
+};
+
 ScreenPtr GUI::pushScreen(ScreenType scrtype, void* data)
 {
 	ScreenPtr scr = NULL;
 	switch(scrtype)
 	{
-		case ScreenType::BOOT:			scr = std::make_shared<BootScreen>(); break;
-		case ScreenType::MAIN:			scr = std::make_shared<MainScreen>(); break;
-		case ScreenType::MENU:			scr = std::make_shared<MenuScreen>(); break;
+		case ScreenType::BOOT:	scr = std::make_shared<BootScreen>(); break;
+		case ScreenType::MAIN:	scr = std::make_shared<MainScreen>(); break;
+		case ScreenType::MENU:	scr = std::make_shared<MenuScreen>(); break;
 
 		default:
 			showMessage("ERROR", "Invalid <ScreenType> identifier!"); 
@@ -125,22 +186,11 @@ ScreenPtr GUI::pushScreen(ScreenType scrtype, void* data)
 
 ScreenPtr GUI::pushScreen(ScreenPtr scr, void* data)
 {
-	DBG("GUI: Push(%s)", scr->name());
+	GUI_DBG("GUI: Push %s(%p)", scr->name(), scr);
 	_scrstack.push(scr);
     scr->load();
 
 	return scr;
-};
-
-void GUI::showMessage(const char* title, const char* text)
-{
-    static const char * btns[] ={"Close", ""};
-
-    //lv_layer_top()
-    lv_obj_t * mbox1 = lv_msgbox_create(NULL, title, text, btns, false);
-    // lv_obj_add_event_cb(mbox1, event_cb, LV_EVENT_VALUE_CHANGED, NULL);
-    // lv_obj_t *but = lv_msgbox_get_btns(mbox1);
-    lv_obj_center(mbox1);
 };
 
 void GUI::popScreen(Screen* scr)
@@ -150,9 +200,9 @@ void GUI::popScreen(Screen* scr)
 		return;
 
 	// ActivityPtr is a smart ptr. It will delete a in GUI::handle() eventually
-	ScreenPtr top = _scrstack.top();
+    ScreenPtr top = _scrstack.top();
 	_scrstack.pop();
-	DBG("GUI: pop(%s)", top->name());
+	GUI_DBG("pop(%s)", top->name());
     
     // Just a check for now
     if(scr != nullptr && top.get() != scr)
@@ -162,10 +212,17 @@ void GUI::popScreen(Screen* scr)
         return;
     };
 
+	if(_scrstack.size() == 0)
+	{
+		ERROR("Empty ScreenStack. push(BOOT).");
+        showMessage("ERROR", "ScreenStack empty! push(BOOT)");
+		pushScreen(ScreenType::BOOT);
+	};
+
     // make the screen below active again
     _scrstack.top()->load();
 
-	// DBG("popped, will delete (eventually): %s(%p)", a->name(), a);
+	GUI_DBG("popped, will delete (eventually): %s(%p)", top->name(), top);
 	return;
 };
 
@@ -224,28 +281,31 @@ void lv_touchpad_cb(lv_indev_drv_t * indev, lv_indev_data_t * data)
 #endif
 
 #ifdef GUI_KEYPAD
-uint32_t scan_keys()
-{
-	// Read current states
-	uint32_t pressed = KEY_NONE;
-	if(digitalRead(PIN_BTN_A) == LOW)
-		pressed |= KEY_A;
-	if(digitalRead(PIN_BTN_B) == LOW)
-		pressed |= KEY_B;
-	if(digitalRead(PIN_BTN_C) == LOW)
-		pressed |= KEY_C;
-	// if(digitalRead(PIN_POWERINT) == LOW)
-	// 	pressed |= KEY_P;
-	return keytool_get_event(pressed);
-};
+// uint32_t scan_keys()
+// {
+// 	// Read current states
+// 	uint32_t pressed = KEY_NONE;
+// 	if(digitalRead(PIN_BTN_A) == LOW)
+// 		pressed |= KEY_A;
+// 	if(digitalRead(PIN_BTN_B) == LOW)
+// 		pressed |= KEY_B;
+// 	if(digitalRead(PIN_BTN_C) == LOW)
+// 		pressed |= KEY_C;
+// 	// if(digitalRead(PIN_POWERINT) == LOW)
+// 	// 	pressed |= KEY_P;
+// 	return pressed;
+// };
 
 void lv_keys_cb(lv_indev_drv_t * indev, lv_indev_data_t * data)
 {
-    data->key = scan_keys();//last_key();            /*Get the last pressed or released key*/
-    if(data->key != KEY_NONE) 
+    data->key = _last_key;
+    data->state = LV_INDEV_STATE_RELEASED;
+    if(data->key)
+    {
+        // DBG("LVGL KEY: %x", data->key);
         data->state = LV_INDEV_STATE_PRESSED;
-    else 
-        data->state = LV_INDEV_STATE_RELEASED;
+    };
+    _last_key = 0;
 	return;
 };
 #endif // GUI_KEYPAD

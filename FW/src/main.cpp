@@ -27,6 +27,10 @@ void setup()
 	digitalWrite(PIN_SPEAKER, LOW);
 	pinMode(PIN_SPEAKER, OUTPUT);
 
+	pinMode(PIN_BTN_A, INPUT);
+	pinMode(PIN_BTN_B, INPUT);
+	pinMode(PIN_BTN_C, INPUT);
+
     // while(1)
     // {
     //     static bool tmp;
@@ -51,7 +55,7 @@ void setup()
 	// gui.showMessage("Test", "a very long text this is not.\nBut long enough?");
 };
 
-uint32_t scan_keys()
+event_t scan_keys()
 {
 	// Read current states
 	uint32_t pressed = KEY_NONE;
@@ -63,15 +67,19 @@ uint32_t scan_keys()
 		pressed |= KEY_C;
 	// if(digitalRead(PIN_POWERINT) == LOW)
 	// 	pressed |= KEY_P;
-	return keytool_get_event(pressed);
+	return (event_t) keytool_get_event(pressed);
 };
 
 void loop()
 {
+	event_t e = scan_keys();
+	if(e)
+		gui.handle(e);
+
 	setman.loop();
 	pid1.loop();
 	pid2.loop();
-	gui.loop(); 
+	gui.loop();
 };
 
 void halt(const char* error)

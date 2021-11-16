@@ -15,13 +15,13 @@
 
 Screen::Screen()
 {
-	// DBG("CONSTRUCT %s(%p)", this->name(), this);
+	DBG("CONSTRUCT %s(%p)", this->name(), this);
     _screen = lv_obj_create(NULL);
 };
 
 Screen::~Screen() 
 { 
-	// DBG("DESTROY %s(%p)", this->name(), this); 
+	DBG("DESTROY %s(%p)", this->name(), this); 
     lv_obj_del(_screen); _screen = nullptr;
 };
 
@@ -49,6 +49,12 @@ BootScreen::BootScreen() : Screen()
     lv_label_set_text_fmt(l, "M5DualPID v%d", VERSION);
 };
 
+void BootScreen::load()
+{
+	Screen::load();
+    _start = millis();
+};
+
 bool BootScreen::loop()
 {
     uint32_t now = millis();
@@ -57,6 +63,20 @@ bool BootScreen::loop()
         gui.pushScreen(ScreenType::MAIN);
     };
 	return false;
+};
+
+bool BootScreen::handle(event_t e)
+{
+	switch(e)
+	{
+		case KEY_A:
+		case KEY_B:
+		case KEY_C:
+	        gui.pushScreen(ScreenType::MAIN);
+			return true;
+		default:
+			return false;
+	};
 };
 
 /*** MAIN ************************************************************************************/
@@ -126,6 +146,12 @@ bool MainScreen::loop()
 	pw2->setBar(pid2.get_output()*100/PID_WINDOWSIZE);
     
     return false;
+};
+
+bool MainScreen::handle(event_t key)
+{
+	// DBG("KEY: %x", key);
+	return false;
 };
 
 /*** MENU ************************************************************************************/

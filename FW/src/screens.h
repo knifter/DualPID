@@ -47,9 +47,10 @@ class Screen : NonCopyable
 		virtual ~Screen();
 		virtual ScreenType type() { return ScreenType::BASE; };
 
-		void close();
         virtual bool loop() { return true; };
         virtual void load();
+		virtual bool handle(event_t key) { return false; };
+		virtual void close();
 
 		virtual const char* name() { return ScreenNames[(int) type()]; };
     protected:
@@ -63,7 +64,9 @@ class BootScreen : public Screen
 		BootScreen();
 		virtual ScreenType type() { return ScreenType::BOOT; };
 
-        bool loop();
+		virtual bool loop();
+		virtual void load();
+		virtual bool handle(event_t key);
 
     private:
         uint32_t    _start = 0;
@@ -89,7 +92,8 @@ class MainScreen : public Screen
 
 		virtual ScreenType type() { return ScreenType::MAIN; };
 
-        bool loop();
+        virtual bool loop();
+		virtual bool handle(event_t);
 	
 	private:
 		PidWidget* pw1 = nullptr;

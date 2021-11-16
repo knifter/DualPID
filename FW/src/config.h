@@ -3,6 +3,7 @@
 
 #define DEBUG                   1
 #define TOOLS_LOG_DEBUG
+#define GUI_KEYPAD
 
 #define DEBUG_INTERVAL_MS		100
 #define BOOTSCREEN_TIMEOUT_MS	1000
@@ -41,6 +42,7 @@
 #define PIN_HB2_A				GPIO_NUM_13
 #define PIN_HB2_B				GPIO_NUM_15
 #define PIN_SPEAKER				GPIO_NUM_25
+#define PIN_BACKLIGHT			GPIO_NUM_32
 
 #define PIN_BTN_A				GPIO_NUM_39
 #define PIN_BTN_B				GPIO_NUM_38
