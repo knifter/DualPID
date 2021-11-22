@@ -29,9 +29,9 @@
 // #define DISPLAY_LOOPTIME_MS 	500             // Display update rate: every half a second
 #define PID_WINDOWSIZE        	5000      		// time-windows size in ms
 
-#define DISPLAY_WIDTH			320
-#define DISPLAY_HEIGHT			240
-#define LV_BUF_SIZE				(DISPLAY_WIDTH*DISPLAY_WIDTH/10)
+// #define DISPLAY_WIDTH			320
+// #define DISPLAY_HEIGHT			240
+// #define LV_BUF_SIZE				(DISPLAY_WIDTH*DISPLAY_WIDTH/10)
 
 #define SHT_ADDRESS             0x45
 

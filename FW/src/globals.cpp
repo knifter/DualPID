@@ -1,8 +1,9 @@
 #include "globals.h"
 
+#include "gui.h"
+#include <SHT3x.h>
+#include "settings.h"
 #include "pid.h"
-
-LGFX gfx;
 
 SHT3X sht_sensor(Wire, SHT_ADDRESS);
 GUI gui;

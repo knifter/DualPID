@@ -5,6 +5,7 @@
 #include "globals.h"
 #include "settings.h"
 #include "pid.h"
+#include "screens.h"
 
 #include "tools-log.h"
 
@@ -39,6 +40,8 @@ void setup()
     // };
 
 	gui.begin();
+    ScreenPtr scr = std::make_shared<BootScreen>(gui);
+    gui.pushScreen(scr);
 
 	Wire.begin(PIN_SDA, PIN_SCL);
 	if(!sht_sensor.begin())
@@ -82,13 +85,14 @@ void loop()
 	gui.loop();
 };
 
+extern LGFX _lgfx;
 void halt(const char* error)
 {
 	DBG("HALT: %s", error);
-	gfx.fillScreen(TFT_RED);
-	gfx.setTextSize(3);
-	gfx.setTextColor(TFT_WHITE, TFT_RED);
-	gfx.setCursor(5, 5);
-	gfx.print(error);
+	_lgfx.fillScreen(TFT_RED);
+	_lgfx.setTextSize(3);
+	_lgfx.setTextColor(TFT_WHITE, TFT_RED);
+	_lgfx.setCursor(5, 5);
+	_lgfx.print(error);
 	while(1);
 };
