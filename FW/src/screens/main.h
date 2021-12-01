@@ -19,7 +19,7 @@ class MainScreen : public Screen
 		virtual ScreenType type() { return ScreenType::MAIN; };
 
         virtual bool loop();
-		virtual bool handle(uint32_t);
+		virtual bool handle(soogh_event_t);
 	
 	private:
 		PidWidget* pw1 = nullptr;

@@ -92,7 +92,7 @@ bool MainScreen::loop()
     return false;
 };
 
-bool MainScreen::handle(uint32_t key)
+bool MainScreen::handle(soogh_event_t key)
 {
 	switch(key)
 	{
