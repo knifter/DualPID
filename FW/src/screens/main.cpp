@@ -12,6 +12,18 @@
 // C-style callbacks
 
 /*** MAIN ************************************************************************************/
+class PidWidget
+{
+	public:
+		PidWidget(lv_obj_t* parent, const char* unit);
+		lv_obj_t	*box, *lbl_sp, *lbl_value, *bar_output;
+		lv_style_t 	style_font26;
+		String unit;
+		void setSetPoint(float sp);
+		void setValue(float v);
+		void setBar(float p);   
+};
+
 PidWidget::PidWidget(lv_obj_t* parent, const char* unit_in)
 {
 	unit = unit_in;
@@ -57,7 +69,7 @@ PidWidget::PidWidget(lv_obj_t* parent, const char* unit_in)
 
 void PidWidget::setSetPoint(float sp) { lv_label_set_text_fmt(lbl_sp, "sp = %0.01f %s", sp, unit.c_str()); };
 void PidWidget::setValue(float v) { 	lv_label_set_text_fmt(lbl_value, "%0.01f %s", v, unit.c_str()); };
-void PidWidget::setBar(float p) {     lv_bar_set_value(bar_output, p, LV_ANIM_ON); };
+void PidWidget::setBar(float p) {     	lv_bar_set_value(bar_output, p, LV_ANIM_ON); };
 
 MainScreen::MainScreen(SooghGUI& g) : Screen(g)
 {
@@ -80,8 +92,24 @@ bool MainScreen::loop()
     return false;
 };
 
-bool MainScreen::handle(event_t key)
+bool MainScreen::handle(uint32_t key)
 {
-	// DBG("KEY: %x", key);
+	switch(key)
+	{
+		case KEY_A_SHORT:
+			
+			break;
+		case KEY_B_SHORT:
+			break;
+		case KEY_C_SHORT:
+			break;
+		case KEY_B_LONG:
+		{
+			ScreenPtr scr = std::make_shared<MenuScreen>(_gui);
+	        _gui.pushScreen(scr);
+			return true;
+		};
+		default: break;
+	};
 	return false;
 };

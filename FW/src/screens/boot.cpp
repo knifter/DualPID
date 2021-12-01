@@ -38,13 +38,13 @@ bool BootScreen::loop()
 	return false;
 };
 
-bool BootScreen::handle(event_t e)
+bool BootScreen::handle(uint32_t e)
 {
 	switch(e)
 	{
-		case KEY_A:
-		case KEY_B:
-		case KEY_C:
+		case KEY_A_SHORT:
+		case KEY_B_SHORT:
+		case KEY_C_SHORT:
 	        gui.pushScreen(ScreenType::MAIN);
 			return true;
 		default:

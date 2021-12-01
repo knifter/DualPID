@@ -11,6 +11,7 @@
 
 void halt(const char*);
 void loop_measure();
+uint32_t scan_keys();
 
 void setup()
 {
@@ -40,8 +41,6 @@ void setup()
     // };
 
 	gui.begin();
-    ScreenPtr scr = std::make_shared<BootScreen>(gui);
-    gui.pushScreen(scr);
 
 	Wire.begin(PIN_SDA, PIN_SCL);
 	if(!sht_sensor.begin())
@@ -55,10 +54,29 @@ void setup()
 	pid2.begin();
 	pid2.set_tuning(setman.settings.pid2);
 
-	// gui.showMessage("Test", "a very long text this is not.\nBut long enough?");
+    ScreenPtr scr = std::make_shared<BootScreen>(gui);
+    gui.pushScreen(scr);
 };
 
-event_t scan_keys()
+void loop()
+{
+	gui.handle(key2event(scan_keys()));
+
+	setman.loop();
+	pid1.loop();
+	pid2.loop();
+	gui.loop();
+};
+
+void halt(const char* error)
+{
+	gui.showMessage("ERROR:", error);
+	DBG("HALT: %s", error);
+	while(true)
+		gui.loop();
+};
+
+uint32_t scan_keys()
 {
 	// Read current states
 	uint32_t pressed = KEY_NONE;
@@ -70,29 +88,5 @@ event_t scan_keys()
 		pressed |= KEY_C;
 	// if(digitalRead(PIN_POWERINT) == LOW)
 	// 	pressed |= KEY_P;
-	return (event_t) keytool_get_event(pressed);
-};
-
-void loop()
-{
-	event_t e = scan_keys();
-	if(e)
-		gui.handle(e);
-
-	setman.loop();
-	pid1.loop();
-	pid2.loop();
-	gui.loop();
-};
-
-extern LGFX _lgfx;
-void halt(const char* error)
-{
-	DBG("HALT: %s", error);
-	_lgfx.fillScreen(TFT_RED);
-	_lgfx.setTextSize(3);
-	_lgfx.setTextColor(TFT_WHITE, TFT_RED);
-	_lgfx.setCursor(5, 5);
-	_lgfx.print(error);
-	while(1);
+	return pressed;
 };

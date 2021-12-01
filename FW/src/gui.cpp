@@ -32,9 +32,9 @@ bool GUI::handle(soogh_event_t e)
     // Handle global events
     switch(e)
     {
-        case KEY_A:
-        case KEY_B:
-        case KEY_C:
+        case KEY_A_SHORT:
+        case KEY_B_SHORT:
+        case KEY_C_SHORT:
             if(_msgbox)
             {
                 lv_msgbox_close(_msgbox); _msgbox = nullptr;
@@ -48,16 +48,14 @@ bool GUI::handle(soogh_event_t e)
     if(scr->handle(e))
         return true;
 
-    // Give the key to LVGL
-    extern uint32_t _lvgl_key; // FIXME: soogh hack
+    // Give the bare keys to LVGL
     switch(e)
     {
-        case KEY_A:     _lvgl_key = LV_KEY_LEFT; break;
-        case KEY_B:     _lvgl_key = LV_KEY_ENTER; break;
-        case KEY_C:     _lvgl_key = LV_KEY_RIGHT; break;
-        case KEY_B_LONG:_lvgl_key = LV_KEY_ESC; break;
-        default: return false;
+        case KEY_A:     lvgl_enc_pressed = true;  lvgl_enc_last_key = LV_KEY_LEFT ; break;
+        case KEY_B:     lvgl_enc_pressed = true;  lvgl_enc_last_key = LV_KEY_ENTER; break;
+        case KEY_C:     lvgl_enc_pressed = true;  lvgl_enc_last_key = LV_KEY_RIGHT; break;
+        case KEY_AC:    lvgl_enc_pressed = true;  lvgl_enc_last_key = LV_KEY_BACKSPACE; break;
+        case KEY_NONE:  lvgl_enc_pressed = false;
     };
     return true;
 };
-

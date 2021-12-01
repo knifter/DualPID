@@ -18,7 +18,7 @@ class BootScreen : public Screen
 
 		virtual bool loop();
 		virtual void load();
-		virtual bool handle(event_t key);
+		virtual bool handle(uint32_t key);
 
     private:
         uint32_t    _start = 0;
