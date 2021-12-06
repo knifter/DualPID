@@ -18,7 +18,7 @@ BootScreen::BootScreen(SooghGUI& g) : Screen(g)
     lv_obj_set_size(label, LV_PCT(100), 50);
 	lv_obj_center(label);
     lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text_fmt(label, "AutoPilot v%d", VERSION);
+    lv_label_set_text_fmt(label, "HumReg v%d", VERSION);
 };
 
 void BootScreen::load()
@@ -38,14 +38,14 @@ bool BootScreen::loop()
 	return false;
 };
 
-bool BootScreen::handle(uint32_t e)
+bool BootScreen::handle(soogh_event_t e)
 {
 	switch(e)
 	{
 		case KEY_A_SHORT:
 		case KEY_B_SHORT:
 		case KEY_C_SHORT:
-	        gui.pushScreen(ScreenType::MAIN);
+	        gui.pushScreenType(ScreenType::MAIN);
 			return true;
 		default:
 			return false;

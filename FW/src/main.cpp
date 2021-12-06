@@ -60,7 +60,8 @@ void setup()
 
 void loop()
 {
-	gui.handle(key2event(scan_keys()));
+    soogh_event_t e = static_cast<soogh_event_t>(key2event(scan_keys()));
+	gui.handle(e);
 
 	setman.loop();
 	pid1.loop();

@@ -6,7 +6,6 @@
 
 #include <soogh.h>
 
-#include "event.h"
 #include "gui.h"
 
 /*** BOOT ************************************************************************************/
@@ -18,7 +17,7 @@ class BootScreen : public Screen
 
 		virtual bool loop();
 		virtual void load();
-		virtual bool handle(uint32_t key);
+		virtual bool handle(soogh_event_t);
 
     private:
         uint32_t    _start = 0;
