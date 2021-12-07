@@ -10,10 +10,10 @@
 
 typedef	struct 
 {
-	double Kp;
-	double Ki;
-	double Kd;
-	double setpoint;
+	float Kp;
+	float Ki;
+	float Kd;
+	float setpoint;
 } pidsettings_t;
 
 typedef struct

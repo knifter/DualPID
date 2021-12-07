@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include <soogh.h>
+#include <treemenu.h>
 
 #include "gui.h"
 
@@ -26,6 +27,8 @@ class MainScreen : public Screen
 	    lv_obj_t * chart;
 		lv_chart_series_t *ser1, *ser2;
         // lv_obj_t    *_box_pid2;
+
+		TreeMenu menu;
 
 };
 

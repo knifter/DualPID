@@ -9,7 +9,10 @@
 #include "tools-log.h"
 #include "globals.h"
 
+#include <treemenu.h>
+
 // C-style callbacks
+void menu_close_cb(MenuItem* item, void* data);
 
 /*** MAIN ************************************************************************************/
 class PidWidget
@@ -112,6 +115,28 @@ MainScreen::MainScreen(SooghGUI& g) : Screen(g)
 	    lv_chart_set_next_value(chart, ser1, v1);
 	    lv_chart_set_next_value(chart, ser2, v2);
 	};
+
+	menu.addSeparator("Temperature");
+	menu.addFloat("Setpoint", &settings.pid1.setpoint);
+	menu.addFloat("kP", &settings.pid1.Kp);
+	menu.addFloat("kI", &settings.pid1.Ki);
+	menu.addFloat("kD", &settings.pid1.Kd);
+
+	menu.addSeparator("Humidity");
+	menu.addFloat("Setpoint", &settings.pid1.setpoint);
+	menu.addFloat("kP", &settings.pid2.Kp);
+	menu.addFloat("kI", &settings.pid2.Ki);
+	menu.addFloat("kD", &settings.pid2.Kd);
+
+	menu.onClose(menu_close_cb);
+};
+
+void menu_close_cb(MenuItem* item, void* data)
+{
+	DBG("Menu closing!");
+	setman.saveDelayed();
+	pid1.set_tuning(settings.pid1);
+	pid2.set_tuning(settings.pid2);
 };
 
 bool MainScreen::loop()
@@ -141,22 +166,66 @@ bool MainScreen::loop()
 
 bool MainScreen::handle(soogh_event_t key)
 {
-	switch(key)
+	if(menu.isOpen())
 	{
-		case KEY_A_SHORT:
-			
-			break;
-		case KEY_B_SHORT:
-			break;
-		case KEY_C_SHORT:
-			break;
-		case KEY_B_LONG:
+		lv_group_t* g = menu.group;
+		lv_obj_t *obj = lv_group_get_focused(g);
+		bool editable_or_scrollable = lv_obj_is_editable(obj) || lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+
+		switch(key)
 		{
-			ScreenPtr scr = std::make_shared<MenuScreen>(_gui);
-	        _gui.pushScreen(scr);
-			return true;
+			case KEY_A_SHORT:
+		        if(lv_group_get_editing(g))
+					lv_group_send_data(g, LV_KEY_LEFT);
+				else
+					lv_group_focus_prev(g);
+				break;
+			case KEY_B_SHORT:
+				if(editable_or_scrollable)
+				{
+			        if(lv_group_get_editing(g))
+						lv_group_send_data(g, LV_KEY_ENTER);
+					else
+						lv_group_set_editing(g, true);
+				};
+				lv_event_send(obj, LV_EVENT_CLICKED, nullptr);
+				break;
+			case KEY_C_SHORT:
+		        if(lv_group_get_editing(g))
+					lv_group_send_data(g, LV_KEY_RIGHT);
+				else
+					lv_group_focus_next(menu.group);
+				// lv_group_send_data(menu.group, LV_KEY_RIGHT);
+				break;
+			case KEY_B_LONG:
+			{
+		        if(lv_group_get_editing(g))
+                	lv_group_set_editing(g, false);
+				else
+					lv_group_set_editing(g, true);
+				break;
+			};
+			case KEY_AC_LONG:
+				menu.close();
+				return true;
+
+			default: break;
 		};
-		default: break;
+	}else{
+		switch(key)
+		{
+			case KEY_A_SHORT:
+				break;
+			case KEY_B_SHORT:
+				DBG("open menu");
+				menu.open();
+				DBG("open menu done");
+				return true;
+			case KEY_C_SHORT:
+				break;
+			case KEY_B_LONG:
+			default: break;
+		};
 	};
-	return false;
+	return true;
 };
