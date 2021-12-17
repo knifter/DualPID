@@ -21,6 +21,7 @@ class MenuScreen : public Screen
 		virtual bool handle(soogh_event_t);
 	
 	private:
+		TreeMenu menu;
 };
 
 #endif // __SCREENS_MAIN_H

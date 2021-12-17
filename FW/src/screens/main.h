@@ -11,6 +11,7 @@
 
 /*** MAIN ************************************************************************************/
 class PidWidget;
+class GraphWidget;
 class MainScreen : public Screen
 {
     public:
@@ -24,12 +25,7 @@ class MainScreen : public Screen
 	private:
 		PidWidget* pw1 = nullptr;
 		PidWidget* pw2 = nullptr;
-	    lv_obj_t * chart;
-		lv_chart_series_t *ser1, *ser2;
-        // lv_obj_t    *_box_pid2;
-
-		TreeMenu menu;
-
+		GraphWidget* gw = nullptr;
 };
 
 #endif // __SCREENS_MAIN_H

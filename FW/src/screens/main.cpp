@@ -12,9 +12,8 @@
 #include <treemenu.h>
 
 // C-style callbacks
-void menu_close_cb(MenuItem* item, void* data);
 
-/*** MAIN ************************************************************************************/
+/*********************************************************************************************************************************/
 class PidWidget
 {
 	public:
@@ -74,17 +73,33 @@ void PidWidget::setSetPoint(float sp) { lv_label_set_text_fmt(lbl_sp, "sp = %0.0
 void PidWidget::setValue(float v) { 	lv_label_set_text_fmt(lbl_value, "%0.01f %s", v, unit.c_str()); };
 void PidWidget::setBar(float p) {     	lv_bar_set_value(bar_output, p, LV_ANIM_ON); };
 
-MainScreen::MainScreen(SooghGUI& g) : Screen(g)
-{
-	// pw1 = new PidWidget(_screen, "\xe2\x84\x83");
-	pw1 = new PidWidget(_screen, "\xc2\xb0""C");
-	pw2 = new PidWidget(_screen, "%RH");
-	lv_obj_align_to(pw2->box, pw1->box, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
 
+/*********************************************************************************************************************************/
+class GraphWidget
+{
+	public:
+		GraphWidget(lv_obj_t* parent);
+
+		void appendVals(float val1, float val2);
+		
+		lv_obj_t *box;
+	    lv_obj_t *chart;
+		lv_chart_series_t *ser1, *ser2;
+};
+
+GraphWidget::GraphWidget(lv_obj_t* parent)
+{
 	/*Create a chart*/	
-    chart = lv_chart_create(_screen);
-    lv_obj_set_size(chart, DISPLAY_WIDTH - 40, DISPLAY_HEIGHT - 80 - 20);	
-	lv_obj_align(chart, LV_ALIGN_TOP_MID, 0, 78);
+	box = lv_obj_create(parent);
+	lv_obj_set_size(box, DISPLAY_WIDTH/2, 80);
+	lv_obj_set_style_border_width(box, 2, 0);
+	lv_obj_set_style_pad_all(box, 0, 0);
+	lv_obj_set_size(box, DISPLAY_WIDTH, DISPLAY_HEIGHT - 78);
+
+    chart = lv_chart_create(box);
+    lv_obj_set_size(chart, DISPLAY_WIDTH - 50, DISPLAY_HEIGHT - 80 - 20);
+	lv_obj_align(chart, LV_ALIGN_TOP_MID, 0, 0);
+
     lv_chart_set_type(chart, LV_CHART_TYPE_LINE);
     lv_chart_set_div_line_count(chart, 5, 7);
     lv_obj_set_style_size(chart, 0, LV_PART_INDICATOR);
@@ -100,43 +115,38 @@ MainScreen::MainScreen(SooghGUI& g) : Screen(g)
 	lv_chart_set_update_mode(chart, LV_CHART_UPDATE_MODE_SHIFT );
 
     /*Add two data series*/
-#define HISTORY_POINTS		120
-#define HISTORY_DELTA_MS	60E3
-	lv_chart_set_point_count(chart, HISTORY_POINTS);
+	lv_chart_set_point_count(chart, HISTORY_GRAPH_POINTS);
     ser1 = lv_chart_add_series(chart, COLOR_RED, LV_CHART_AXIS_PRIMARY_Y);
     ser2 = lv_chart_add_series(chart, COLOR_BLUE, LV_CHART_AXIS_SECONDARY_Y);
 	
 	// pre-fill the chart
 	float v1 = pid1.get_input();
 	float v2 = pid2.get_input();
-	int p = HISTORY_POINTS;
+	int p = HISTORY_GRAPH_POINTS;
 	while(p--)
 	{
 	    lv_chart_set_next_value(chart, ser1, v1);
 	    lv_chart_set_next_value(chart, ser2, v2);
 	};
-
-	menu.addSeparator("Temperature");
-	menu.addFloat("Setpoint", &settings.pid1.setpoint);
-	menu.addFloat("kP", &settings.pid1.Kp);
-	menu.addFloat("kI", &settings.pid1.Ki);
-	menu.addFloat("kD", &settings.pid1.Kd);
-
-	menu.addSeparator("Humidity");
-	menu.addFloat("Setpoint", &settings.pid1.setpoint);
-	menu.addFloat("kP", &settings.pid2.Kp);
-	menu.addFloat("kI", &settings.pid2.Ki);
-	menu.addFloat("kD", &settings.pid2.Kd);
-
-	menu.onClose(menu_close_cb);
 };
 
-void menu_close_cb(MenuItem* item, void* data)
+void GraphWidget::appendVals(float val1, float val2)
 {
-	DBG("Menu closing!");
-	setman.saveDelayed();
-	pid1.set_tuning(settings.pid1);
-	pid2.set_tuning(settings.pid2);
+	lv_chart_set_next_value(chart, ser1, val1);
+	lv_chart_set_next_value(chart, ser2, val2);
+};
+
+
+/*********************************************************************************************************************************/
+MainScreen::MainScreen(SooghGUI& g) : Screen(g)
+{
+	// pw1 = new PidWidget(_screen, "\xe2\x84\x83");
+	pw1 = new PidWidget(_screen, "\xc2\xb0""C");
+	pw2 = new PidWidget(_screen, "%RH");
+	lv_obj_align_to(pw2->box, pw1->box, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
+
+	gw = new GraphWidget(_screen);
+	lv_obj_align(gw->box, LV_ALIGN_BOTTOM_MID, 0, 0);
 };
 
 bool MainScreen::loop()
@@ -155,10 +165,9 @@ bool MainScreen::loop()
 	time_t now = millis();
 	if(now > next_chart)
 	{
-	    lv_chart_set_next_value(chart, ser1, i1);
-	    lv_chart_set_next_value(chart, ser2, i2);
+		gw->appendVals(i1, i2);
 
-		next_chart = now + HISTORY_DELTA_MS;
+		next_chart = now + HISTORY_GRAPH_DELTA_MS;
 	};
     
     return false;
@@ -166,66 +175,17 @@ bool MainScreen::loop()
 
 bool MainScreen::handle(soogh_event_t key)
 {
-	if(menu.isOpen())
+	switch(key)
 	{
-		lv_group_t* g = menu.group;
-		lv_obj_t *obj = lv_group_get_focused(g);
-		bool editable_or_scrollable = lv_obj_is_editable(obj) || lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-
-		switch(key)
-		{
-			case KEY_A_SHORT:
-		        if(lv_group_get_editing(g))
-					lv_group_send_data(g, LV_KEY_LEFT);
-				else
-					lv_group_focus_prev(g);
-				break;
-			case KEY_B_SHORT:
-				if(editable_or_scrollable)
-				{
-			        if(lv_group_get_editing(g))
-						lv_group_send_data(g, LV_KEY_ENTER);
-					else
-						lv_group_set_editing(g, true);
-				};
-				lv_event_send(obj, LV_EVENT_CLICKED, nullptr);
-				break;
-			case KEY_C_SHORT:
-		        if(lv_group_get_editing(g))
-					lv_group_send_data(g, LV_KEY_RIGHT);
-				else
-					lv_group_focus_next(menu.group);
-				// lv_group_send_data(menu.group, LV_KEY_RIGHT);
-				break;
-			case KEY_B_LONG:
-			{
-		        if(lv_group_get_editing(g))
-                	lv_group_set_editing(g, false);
-				else
-					lv_group_set_editing(g, true);
-				break;
-			};
-			case KEY_AC_LONG:
-				menu.close();
-				return true;
-
-			default: break;
-		};
-	}else{
-		switch(key)
-		{
-			case KEY_A_SHORT:
-				break;
-			case KEY_B_SHORT:
-				DBG("open menu");
-				menu.open();
-				DBG("open menu done");
-				return true;
-			case KEY_C_SHORT:
-				break;
-			case KEY_B_LONG:
-			default: break;
-		};
+		case KEY_A_SHORT:
+			break;
+		case KEY_B_SHORT:
+		    gui.pushScreen(std::make_shared<MenuScreen>(gui));
+			return true;
+		case KEY_C_SHORT:
+			break;
+		case KEY_B_LONG:
+		default: break;
 	};
 	return true;
 };
