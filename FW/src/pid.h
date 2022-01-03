@@ -25,6 +25,7 @@ class PIDLoop // : protected MiniPID
         void loop();
         double get_input() { return _input; };
         double get_output() { return _output; };
+        double get_output_percent() { return _output*100/PID_WINDOWSIZE; };
         int get_output_state() { return _output_state; };
 
     private: 

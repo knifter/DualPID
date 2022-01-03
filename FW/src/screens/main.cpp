@@ -14,10 +14,12 @@
 // C-style callbacks
 
 /*********************************************************************************************************************************/
-class PidWidget
+class PidPanel
 {
 	public:
-		PidWidget(lv_obj_t* parent, const char* unit);
+		PidPanel(lv_obj_t* parent, const char* unit);
+		void selected(bool);
+
 		lv_obj_t	*box, *lbl_sp, *lbl_value, *bar_output;
 		lv_style_t 	style_font26;
 		String unit;
@@ -26,10 +28,11 @@ class PidWidget
 		void setBar(float p);   
 };
 
-PidWidget::PidWidget(lv_obj_t* parent, const char* unit_in)
+PidPanel::PidPanel(lv_obj_t* parent, const char* unit_in)
 {
 	unit = unit_in;
 	box = lv_obj_create(parent);
+
 	lv_obj_set_size(box, DISPLAY_WIDTH/2, 80);
 	lv_obj_set_style_border_width(box, 2, 0);
 	lv_obj_set_style_pad_all(box, 5, 0);
@@ -67,18 +70,29 @@ PidWidget::PidWidget(lv_obj_t* parent, const char* unit_in)
 		lv_obj_align(bar_output, LV_ALIGN_BOTTOM_MID, 0, 0);
 		lv_bar_set_range(bar_output, 0, 100);
 	};
-}; // PidWidget()
+}; // PidPanel()
 
-void PidWidget::setSetPoint(float sp) { lv_label_set_text_fmt(lbl_sp, "sp = %0.01f %s", sp, unit.c_str()); };
-void PidWidget::setValue(float v) { 	lv_label_set_text_fmt(lbl_value, "%0.01f %s", v, unit.c_str()); };
-void PidWidget::setBar(float p) {     	lv_bar_set_value(bar_output, p, LV_ANIM_ON); };
+void PidPanel::setSetPoint(float sp) { lv_label_set_text_fmt(lbl_sp, "sp = %0.01f %s", sp, unit.c_str()); };
+void PidPanel::setValue(float v) { 	lv_label_set_text_fmt(lbl_value, "%0.01f %s", v, unit.c_str()); };
+void PidPanel::setBar(float p) {     	lv_bar_set_value(bar_output, p, LV_ANIM_ON); };
+void PidPanel::selected(bool select)
+{
+	if(select)
+	{
+		lv_obj_set_style_border_width(box, 4, 0);
+		lv_obj_set_style_border_color(box, COLOR_BLACK, 0);
 
+	}else{
+		lv_obj_set_style_border_width(box, 2, 0);
+		lv_obj_set_style_border_color(box, COLOR_GREY, 0);
+	};
+}
 
 /*********************************************************************************************************************************/
-class GraphWidget
+class GraphPanel
 {
 	public:
-		GraphWidget(lv_obj_t* parent);
+		GraphPanel(lv_obj_t* parent);
 
 		void appendVals(float val1, float val2);
 		
@@ -87,7 +101,7 @@ class GraphWidget
 		lv_chart_series_t *ser1, *ser2;
 };
 
-GraphWidget::GraphWidget(lv_obj_t* parent)
+GraphPanel::GraphPanel(lv_obj_t* parent)
 {
 	/*Create a chart*/	
 	box = lv_obj_create(parent);
@@ -130,7 +144,7 @@ GraphWidget::GraphWidget(lv_obj_t* parent)
 	};
 };
 
-void GraphWidget::appendVals(float val1, float val2)
+void GraphPanel::appendVals(float val1, float val2)
 {
 	lv_chart_set_next_value(chart, ser1, val1);
 	lv_chart_set_next_value(chart, ser2, val2);
@@ -140,12 +154,12 @@ void GraphWidget::appendVals(float val1, float val2)
 /*********************************************************************************************************************************/
 MainScreen::MainScreen(SooghGUI& g) : Screen(g)
 {
-	// pw1 = new PidWidget(_screen, "\xe2\x84\x83");
-	pw1 = new PidWidget(_screen, "\xc2\xb0""C");
-	pw2 = new PidWidget(_screen, "%RH");
+	// pw1 = new PidPanel(_screen, "\xe2\x84\x83");
+	pw1 = new PidPanel(_screen, "\xc2\xb0""C");
+	pw2 = new PidPanel(_screen, "%RH");
 	lv_obj_align_to(pw2->box, pw1->box, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
 
-	gw = new GraphWidget(_screen);
+	gw = new GraphPanel(_screen);
 	lv_obj_align(gw->box, LV_ALIGN_BOTTOM_MID, 0, 0);
 };
 
@@ -155,11 +169,11 @@ bool MainScreen::loop()
 	float i2 = pid2.get_input();
 	pw1->setSetPoint(settings.pid1.setpoint);
 	pw1->setValue(i1);
-	pw1->setBar(pid1.get_output()*100/PID_WINDOWSIZE);
+	pw1->setBar(pid1.get_output_percent());
 
 	pw2->setSetPoint(settings.pid2.setpoint);
 	pw2->setValue(i2);
-	pw2->setBar(pid2.get_output()*100/PID_WINDOWSIZE);
+	pw2->setBar(pid2.get_output_percent());
 
 	static time_t next_chart = 0;
 	time_t now = millis();
@@ -178,11 +192,15 @@ bool MainScreen::handle(soogh_event_t key)
 	switch(key)
 	{
 		case KEY_A_SHORT:
+			pw1->selected(true);
+			pw2->selected(false);
 			break;
 		case KEY_B_SHORT:
 		    gui.pushScreen(std::make_shared<MenuScreen>(gui));
 			return true;
 		case KEY_C_SHORT:
+			pw1->selected(false);
+			pw2->selected(true);
 			break;
 		case KEY_B_LONG:
 		default: break;

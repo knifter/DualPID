@@ -10,8 +10,8 @@
 #include "gui.h"
 
 /*** MAIN ************************************************************************************/
-class PidWidget;
-class GraphWidget;
+class PidPanel;
+class GraphPanel;
 class MainScreen : public Screen
 {
     public:
@@ -23,9 +23,9 @@ class MainScreen : public Screen
 		virtual bool handle(soogh_event_t);
 	
 	private:
-		PidWidget* pw1 = nullptr;
-		PidWidget* pw2 = nullptr;
-		GraphWidget* gw = nullptr;
+		PidPanel* pw1 = nullptr;
+		PidPanel* pw2 = nullptr;
+		GraphPanel* gw = nullptr;
 };
 
 #endif // __SCREENS_MAIN_H
