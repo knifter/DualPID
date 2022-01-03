@@ -17,6 +17,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 {
 	menu.addSeparator("Temperature");
 	menu.addFloat("Setpoint", &settings.pid1.setpoint);
+	menu.addCheckbox("Active", &settings.pid1.active);
     auto sub1 = menu.addSubMenu("PID");
 	sub1->addFloat("kP", &settings.pid1.Kp);
 	sub1->addFloat("kI", &settings.pid1.Ki);
@@ -24,6 +25,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 
 	menu.addSeparator("Humidity");
 	menu.addFloat("Setpoint", &settings.pid1.setpoint);
+	menu.addSwitch("Active", &settings.pid2.active);
     auto sub2 = menu.addSubMenu("PID");
 	sub2->addFloat("kP", &settings.pid2.Kp);
 	sub2->addFloat("kI", &settings.pid2.Ki);
@@ -84,5 +86,5 @@ bool MenuScreen::handle(soogh_event_t e)
 			return true;
 		default: break;
 	};
-	return false;
+	return true;
 };

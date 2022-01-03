@@ -14,6 +14,7 @@ typedef	struct
 	float Ki;
 	float Kd;
 	float setpoint;
+	bool active;
 } pidsettings_t;
 
 typedef struct
