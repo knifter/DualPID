@@ -30,6 +30,8 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 	sub2->addFloat("kD", &settings.pid2.Kd);
 
 	menu.onClose(menu_close_cb);
+
+	menu.open();
 };
 
 void menu_close_cb(MenuItem* item, void* data)
@@ -55,68 +57,31 @@ bool MenuScreen::handle(soogh_event_t e)
 {
 	if(e>KEY_C)
 		DBG("e = %s", soogh_event_name(e));
-
-	lv_group_t* g = menu.group;
-	lv_obj_t *obj = lv_group_get_focused(g);
-	bool editable_or_scrollable = lv_obj_is_editable(obj) || lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+	
+	if(!menu.isOpen())
+	{
+		DBG("Menu is closed, end screen.");
+		gui.popScreen();
+		return true;
+	};
 
 	switch(e)
 	{
 		case KEY_A_SHORT:
-			if(lv_group_get_editing(g))
-			{
-				DBG("group.send(LEFT)");
-				lv_group_send_data(g, LV_KEY_LEFT);
-			}else{
-				DBG("group.prev");
-				lv_group_focus_prev(g);
-			};
+			menu.sendKey(TreeMenu::KEY_LEFT);
 			break;
 		case KEY_B_SHORT:
-			if(editable_or_scrollable)
-			{
-				DBG("obj.editable");
-				if(lv_group_get_editing(g))
-				{
-					DBG("send(ENTER)");
-					lv_group_send_data(g, LV_KEY_ENTER);
-				}else{
-					DBG("group.edit -> true");
-					lv_group_set_editing(g, true);
-				};
-			}else{
-				DBG("obj.send(SHORT_CLICKED)");
-				lv_event_send(obj, LV_EVENT_SHORT_CLICKED, nullptr);
-				DBG("obj.send(CLICKED)");
-				lv_event_send(obj, LV_EVENT_CLICKED, nullptr);
-			};
+			menu.sendKey(TreeMenu::KEY_ENTER);
 			break;
 		case KEY_C_SHORT:
-			if(lv_group_get_editing(g))
-			{
-				DBG("group.send(RIGHT)");
-				lv_group_send_data(g, LV_KEY_RIGHT);
-			}else{
-				DBG("group.next");
-				lv_group_focus_next(g);
-			};
+			menu.sendKey(TreeMenu::KEY_RIGHT);
 			break;
 		case KEY_B_LONG:
-		{
-			if(lv_group_get_editing(g))
-			{	
-				DBG("group.edit -> false");
-				lv_group_set_editing(g, false);
-			}else{
-				DBG("group.send(ESC)");
-				lv_group_send_data(g, LV_KEY_ESC);
-			};
+			menu.sendKey(TreeMenu::KEY_ESC);
 			break;
-		};
 		case KEY_AC_LONG:
-			menu.close();
+			gui.popScreen();
 			return true;
-
 		default: break;
 	};
 	return false;

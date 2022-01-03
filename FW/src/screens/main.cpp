@@ -86,7 +86,7 @@ void PidPanel::selected(bool select)
 		lv_obj_set_style_border_width(box, 2, 0);
 		lv_obj_set_style_border_color(box, COLOR_GREY, 0);
 	};
-}
+};
 
 /*********************************************************************************************************************************/
 class GraphPanel
