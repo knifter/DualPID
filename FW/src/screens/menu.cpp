@@ -16,9 +16,7 @@ void menu_close_cb(MenuItem* item, void* data);
 MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 {
 	menu.addSeparator("Temperature");
-	FloatField* f = menu.addFloat("Setpoint", &settings.pid1.setpoint);
-	// f->max_value = 60;
-	// f->min_value = -10;
+	FloatField* f = menu.addFloat("Setpoint", &settings.pid1.setpoint, 0, 60);
 	menu.addSwitch("Active", &settings.pid1.active);
     auto sub1 = menu.addSubMenu("PID");
 	sub1->addFloat("kP", &settings.pid1.Kp);
@@ -26,7 +24,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 	sub1->addFloat("kD", &settings.pid1.Kd);
 
 	menu.addSeparator("Humidity");
-	menu.addFloat("Setpoint", &settings.pid1.setpoint);
+	menu.addFloat("Setpoint", &settings.pid2.setpoint);
 	menu.addSwitch("Active", &settings.pid2.active);
     auto sub2 = menu.addSubMenu("PID");
 	sub2->addFloat("kP", &settings.pid2.Kp);
