@@ -42,6 +42,8 @@ void menu_close_cb(MenuItem* item, void* data)
 	setman.saveDelayed();
 	pid1.set_tuning(settings.pid1);
 	pid2.set_tuning(settings.pid2);
+
+	gui.popScreen();
 };
 
 void MenuScreen::load()
@@ -60,13 +62,6 @@ bool MenuScreen::handle(soogh_event_t e)
 	if(e>KEY_C)
 		DBG("e = %s", soogh_event_name(e));
 	
-	if(!menu.isOpen())
-	{
-		DBG("Menu is closed, end screen.");
-		gui.popScreen();
-		return true;
-	};
-
 	switch(e)
 	{
 		case KEY_A_SHORT:

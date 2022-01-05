@@ -13,9 +13,6 @@ class GUI : public SooghGUI
 {
 	public:
 		ScreenPtr	pushScreenType(ScreenType, void* data = nullptr);
-
-	private:
-		uint32_t _last_key = 0;
 };
 
 #endif // __GUI_H
