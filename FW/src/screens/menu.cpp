@@ -16,8 +16,10 @@ void menu_close_cb(MenuItem* item, void* data);
 MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 {
 	menu.addSeparator("Temperature");
-	menu.addFloat("Setpoint", &settings.pid1.setpoint);
-	menu.addCheckbox("Active", &settings.pid1.active);
+	FloatField* f = menu.addFloat("Setpoint", &settings.pid1.setpoint);
+	// f->max_value = 60;
+	// f->min_value = -10;
+	menu.addSwitch("Active", &settings.pid1.active);
     auto sub1 = menu.addSubMenu("PID");
 	sub1->addFloat("kP", &settings.pid1.Kp);
 	sub1->addFloat("kI", &settings.pid1.Ki);
@@ -65,12 +67,16 @@ bool MenuScreen::handle(soogh_event_t e)
 	switch(e)
 	{
 		case KEY_A_SHORT:
+		case KEY_A_LONG:
+		case KEY_A_LONG_REPEAT:
 			menu.sendKey(TreeMenu::KEY_LEFT);
 			break;
 		case KEY_B_SHORT:
 			menu.sendKey(TreeMenu::KEY_ENTER);
 			break;
 		case KEY_C_SHORT:
+		case KEY_C_LONG:
+		case KEY_C_LONG_REPEAT:
 			menu.sendKey(TreeMenu::KEY_RIGHT);
 			break;
 		case KEY_B_LONG:
