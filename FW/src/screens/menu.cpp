@@ -19,17 +19,17 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 	menu.addFloat("Setpoint", &settings.pid1.setpoint, TEMPERATURE_MIN, TEMPERATURE_MAX, TEMPERATURE_PRECISION);
 	menu.addSwitch("Active", &settings.pid1.active);
     auto sub1 = menu.addSubMenu("Settings");
-	sub1->addFloat("kP", &settings.pid1.Kp);
-	sub1->addFloat("kI", &settings.pid1.Ki);
-	sub1->addFloat("kD", &settings.pid1.Kd);
+	sub1->addFloat("kP", &settings.pid1.Kp, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+	sub1->addFloat("kI", &settings.pid1.Ki, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+	sub1->addFloat("kD", &settings.pid1.Kd, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
 
 	menu.addSeparator("Humidity");
 	menu.addFloat("Setpoint", &settings.pid2.setpoint, HUMIDITY_MIN, HUMIDITY_MAX, HUMIDITY_PRECISION);
 	menu.addSwitch("Active", &settings.pid2.active);
     auto sub2 = menu.addSubMenu("Settings");
-	sub2->addFloat("kP", &settings.pid2.Kp);
-	sub2->addFloat("kI", &settings.pid2.Ki);
-	sub2->addFloat("kD", &settings.pid2.Kd);
+	sub2->addFloat("kP", &settings.pid2.Kp, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+	sub2->addFloat("kI", &settings.pid2.Ki, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+	sub2->addFloat("kD", &settings.pid2.Kd, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
 
 	menu.onClose(menu_close_cb);
 
