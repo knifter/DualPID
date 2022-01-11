@@ -24,6 +24,16 @@
 #define PID1_UNIT_TEXT			"C"
 #define PID2_UNIT_TEXT			"%RH"
 
+#define TEMPERATURE_MIN			10
+#define TEMPERATURE_MAX			60
+#define TEMPERATURE_PRECISION	1
+#define HUMIDITY_MIN			0
+#define HUMIDITY_MAX			100
+#define HUMIDITY_PRECISION		0
+#define PID_PAR_MIN				0
+#define PID_PAR_MAX				1000
+#define PID_PAR_PRECISION		2
+
 // #define PIN_VALVE           11
 // #define ANALOG_SENSOR_RH    35
 //#define ANALOG_HUM_ADJUST   2

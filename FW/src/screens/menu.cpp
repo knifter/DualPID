@@ -16,17 +16,17 @@ void menu_close_cb(MenuItem* item, void* data);
 MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 {
 	menu.addSeparator("Temperature");
-	FloatField* f = menu.addFloat("Setpoint", &settings.pid1.setpoint, 0, 60);
+	menu.addFloat("Setpoint", &settings.pid1.setpoint, TEMPERATURE_MIN, TEMPERATURE_MAX, TEMPERATURE_PRECISION);
 	menu.addSwitch("Active", &settings.pid1.active);
-    auto sub1 = menu.addSubMenu("PID");
+    auto sub1 = menu.addSubMenu("Settings");
 	sub1->addFloat("kP", &settings.pid1.Kp);
 	sub1->addFloat("kI", &settings.pid1.Ki);
 	sub1->addFloat("kD", &settings.pid1.Kd);
 
 	menu.addSeparator("Humidity");
-	menu.addFloat("Setpoint", &settings.pid2.setpoint);
+	menu.addFloat("Setpoint", &settings.pid2.setpoint, HUMIDITY_MIN, HUMIDITY_MAX, HUMIDITY_PRECISION);
 	menu.addSwitch("Active", &settings.pid2.active);
-    auto sub2 = menu.addSubMenu("PID");
+    auto sub2 = menu.addSubMenu("Settings");
 	sub2->addFloat("kP", &settings.pid2.Kp);
 	sub2->addFloat("kI", &settings.pid2.Ki);
 	sub2->addFloat("kD", &settings.pid2.Kd);
@@ -59,26 +59,26 @@ bool MenuScreen::loop()
 
 bool MenuScreen::handle(soogh_event_t e)
 {
-	if(e>KEY_C)
-		DBG("e = %s", soogh_event_name(e));
+	// if(e>KEY_C)
+	// 	DBG("e = %s", soogh_event_name(e));
 	
 	switch(e)
 	{
 		case KEY_A_SHORT:
 		case KEY_A_LONG:
 		case KEY_A_LONG_REPEAT:
-			menu.sendKey(TreeMenu::KEY_LEFT);
+			menu.sendKey(LV_KEY_LEFT);
 			break;
 		case KEY_B_SHORT:
-			menu.sendKey(TreeMenu::KEY_ENTER);
+			menu.sendKey(LV_KEY_ENTER);
 			break;
 		case KEY_C_SHORT:
 		case KEY_C_LONG:
 		case KEY_C_LONG_REPEAT:
-			menu.sendKey(TreeMenu::KEY_RIGHT);
+			menu.sendKey(LV_KEY_RIGHT);
 			break;
 		case KEY_B_LONG:
-			menu.sendKey(TreeMenu::KEY_ESC);
+			menu.sendKey(LV_KEY_ESC);
 			break;
 		case KEY_AC_LONG:
 			gui.popScreen();
