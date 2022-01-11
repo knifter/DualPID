@@ -167,7 +167,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  *-----------*/
 
 /*Enable the log module*/
-#define LV_USE_LOG 0
+#ifdef DEBUG
+# define LV_USE_LOG 1
+#else
+# define LV_USE_LOG 0
+#endif
+
 #if LV_USE_LOG
 
 /*How important log should be added:
