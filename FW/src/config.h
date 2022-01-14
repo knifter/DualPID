@@ -8,8 +8,6 @@
 #define DEBUG_INTERVAL_MS		100
 #define BOOTSCREEN_TIMEOUT_MS	1000
 
-#define VERSION				    20211111
-
 #define NVS_NAMESPACE			"PidSettings"
 #define NVS_SETTINGS_IDENT		"EPIDSET"
 #define SETTINGS_DELAY_SAVE		60E3
@@ -49,10 +47,23 @@
 
 #define PIN_SDA					GPIO_NUM_21
 #define PIN_SCL					GPIO_NUM_22
+
+// Version 1
+
+// Begum
+
+// Version 3 Paul (edwin's bridge)
 #define PIN_HB1_A				GPIO_NUM_2
 #define PIN_HB1_B				GPIO_NUM_12
 #define PIN_HB2_A				GPIO_NUM_13
 #define PIN_HB2_B				GPIO_NUM_15
+
+// Mushy
+// #define PIN_HB1_A				GPIO_NUM_2
+// #define PIN_HB1_B				GPIO_NUM_13
+// #define PIN_HB2_A				GPIO_NUM_12
+// #define PIN_HB2_B				GPIO_NUM_15
+
 #define PIN_SPEAKER				GPIO_NUM_25
 #define PIN_BACKLIGHT			GPIO_NUM_32
 
