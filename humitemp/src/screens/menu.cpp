@@ -16,20 +16,20 @@ void menu_close_cb(MenuItem* item, void* data);
 MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 {
 	menu.addSeparator("Temperature");
-	menu.addFloat("Setpoint", &settings.pid1.setpoint, TEMPERATURE_MIN, TEMPERATURE_MAX, TEMPERATURE_PRECISION);
+	menu.addSpinbox("Setpoint", &settings.pid1.setpoint, TEMPERATURE_MIN, TEMPERATURE_MAX, TEMPERATURE_PRECISION);
 	menu.addSwitch("Active", &settings.pid1.active);
     auto sub1 = menu.addSubMenu("Settings");
-	sub1->addFloat("kP", &settings.pid1.Kp, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-	sub1->addFloat("kI", &settings.pid1.Ki, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-	sub1->addFloat("kD", &settings.pid1.Kd, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+	sub1->addSpinbox("kP", &settings.pid1.kP, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+	sub1->addSpinbox("kI", &settings.pid1.kI, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+	sub1->addSpinbox("kD", &settings.pid1.kD, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
 
 	menu.addSeparator("Humidity");
-	menu.addFloat("Setpoint", &settings.pid2.setpoint, HUMIDITY_MIN, HUMIDITY_MAX, HUMIDITY_PRECISION);
+	menu.addSpinbox("Setpoint", &settings.pid2.setpoint, HUMIDITY_MIN, HUMIDITY_MAX, HUMIDITY_PRECISION);
 	menu.addSwitch("Active", &settings.pid2.active);
     auto sub2 = menu.addSubMenu("Settings");
-	sub2->addFloat("kP", &settings.pid2.Kp, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-	sub2->addFloat("kI", &settings.pid2.Ki, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-	sub2->addFloat("kD", &settings.pid2.Kd, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+	sub2->addSpinbox("kP", &settings.pid2.kP, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+	sub2->addSpinbox("kI", &settings.pid2.kI, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+	sub2->addSpinbox("kD", &settings.pid2.kD, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
 
 	menu.onClose(menu_close_cb);
 
@@ -40,8 +40,6 @@ void menu_close_cb(MenuItem* item, void* data)
 {
 	DBG("Menu closing!");
 	setman.saveDelayed();
-	pid1.set_tuning(settings.pid1);
-	pid2.set_tuning(settings.pid2);
 
 	gui.popScreen();
 };

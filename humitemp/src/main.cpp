@@ -50,9 +50,7 @@ void setup()
 
 	setman.begin();
 	pid1.begin();
-	pid1.set_tuning(setman.settings.pid1);
 	pid2.begin();
-	pid2.set_tuning(setman.settings.pid2);
 
     ScreenPtr scr = std::make_shared<BootScreen>(gui);
     gui.pushScreen(scr);

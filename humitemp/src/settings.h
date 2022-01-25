@@ -4,23 +4,16 @@
 #include <stdint.h>
 #include <nvs.h>
 
+#include <FPID.h>
+
 #ifndef SETTINGS_DELAY_SAVE
 	#define SETTINGS_DELAY_SAVE		5000
 #endif
 
-typedef	struct 
-{
-	float Kp;
-	float Ki;
-	float Kd;
-	float setpoint;
-	bool active;
-} pidsettings_t;
-
 typedef struct
 {
-	pidsettings_t pid1;
-	pidsettings_t pid2;
+	FPID::fpid_settings_t pid1;
+	FPID::fpid_settings_t pid2;
 } settings_t;
 
 class SettingsManager

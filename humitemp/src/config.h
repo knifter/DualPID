@@ -12,6 +12,7 @@
 #define NVS_SETTINGS_IDENT		"EPIDSET"
 #define SETTINGS_DELAY_SAVE		60E3
 #define DEFAULT_SETPOINT		50.0
+#define DEFAULT_PID_F			0.0
 #define DEFAULT_PID_P			5.0
 #define DEFAULT_PID_I			2.0
 #define DEFAULT_PID_D			2.0
@@ -29,7 +30,7 @@
 #define HUMIDITY_MAX			100
 #define HUMIDITY_PRECISION		0
 #define PID_PAR_MIN				0
-#define PID_PAR_MAX				1000
+#define PID_PAR_MAX				100
 #define PID_PAR_PRECISION		2
 
 // #define PIN_VALVE           11

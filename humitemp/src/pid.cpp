@@ -2,7 +2,7 @@
 #include "pid.h"
 
 #include <Arduino.h>
-#include <MiniPID.h>
+#include <FPID.h>
 
 #include "config.h"
 #include "globals.h"
@@ -23,55 +23,32 @@ bool PIDLoop::begin()
 	_input = 50;
 	// _setpoint = DEFAULT_SETPOINT;
 	_output = PID_WINDOWSIZE / 2;
-    _pid_next = 0;
+    _pid_last = millis();
     _output_state = 0;
 
 	// Set the range between 0 and the full window size
-    _pid.reset();
 	_pid.setOutputLimits(0, PID_WINDOWSIZE);
-	_pid.setOutput(_output);
+    _pid.alignOutput();
 
+    DBG("begin output: %f", _output);
 	return true;
-};
-
-void PIDLoop::set_tuning(double p, double i, double d)
-{
-	DBG("Setting tunings: P = %02f, I = %02f, D = %02f", p, i, d);
-	_pid.setParameters(p, i, d);
-};
-
-void PIDLoop::set_setpoint(double sp)
-{
-	_pid.setSetpoint(sp);
-};
-
-void PIDLoop::set_tuning(pidsettings_t& s)
-{
-	_pid.setParameters(
-		s.Kp, 
-		s.Ki,
-		s.Kd);
-	_pid.setSetpoint(s.setpoint);
-	return;
 };
 
 void PIDLoop::loop()
 {
     // See if its time to do another PID iteration
     time_t now = millis();
-    if(now > _pid_next)
+    if(now > _pid_last + PID_LOOPTIME_MS)
     {
-        // Setpoint for the PID
-        // Setpoint = RH_setpoint;
-
         // Input for the PID
         _input = _cb_value();
-        _output = _pid.getOutput(_input);
+        double dt = (now - _pid_last) / PID_LOOPTIME_MS;
+        _pid.calculate(NAN);
 
-        // DBG("Output: %.0f", _output);
+        DBG("PID: Input = %.2f, Setpoint = %.2f, Output = %.2f (dt = %.9f)", _input, _pidsettings->setpoint, _output, dt);
 
         // Queue next iteration
-        _pid_next += PID_LOOPTIME_MS;
+        _pid_last = now;
     };
 
     // Process timewindow valve depending on PID Output
