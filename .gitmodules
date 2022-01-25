@@ -1,18 +1,18 @@
-[submodule "FW/lib/lib-TwoWireDevice"]
-	path = FW/lib/TwoWireDevice
-	url = https://github.com/knifter/lib-TwoWireDevice
-[submodule "FW/lib/lib-tools"]
-	path = FW/lib/lib-tools
-	url = https://github.com/knifter/lib-tools.git
 [submodule "FW/lib/SHT3x"]
 	path = FW/lib/SHT3x
 	url = https://github.com/knifter/lib-sht3x
-[submodule "FW/lib/MiniPID"]
-	path = FW/lib/MiniPID
-	url = https://github.com/knifter/MiniPID.git
-[submodule "FW/lib/lib-SHT3x"]
-	path = FW/lib/lib-SHT3x
-	url = https://github.com/knifter/lib-SHT3x
-[submodule "FW/lib/lib-soogh"]
-	path = FW/lib/lib-soogh
+[submodule "humitemp/lib/soogh"]
+	path = humitemp/lib/soogh
 	url = https://github.com/knifter/lib-soogh
+[submodule "humitemp/lib/SHT3x"]
+	path = humitemp/lib/SHT3x
+	url = https://github.com/knifter/lib-SHT3x
+[submodule "humitemp/lib/tools"]
+	path = humitemp/lib/tools
+	url = https://github.com/knifter/lib-tools
+[submodule "humitemp/lib/FPID"]
+	path = humitemp/lib/FPID
+	url = https://github.com/knifter/lib-FPID
+[submodule "humitemp/lib/TwoWireDevice"]
+	path = humitemp/lib/TwoWireDevice
+	url = https://github.com/knifter/lib-TwoWireDevice
