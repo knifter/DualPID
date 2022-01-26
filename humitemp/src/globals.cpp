@@ -3,7 +3,7 @@
 #include "gui.h"
 #include <SHT3x.h>
 #include "settings.h"
-#include "pid.h"
+#include "pidloop.h"
 
 SHT3X sht_sensor(Wire, SHT_ADDRESS);
 GUI gui;

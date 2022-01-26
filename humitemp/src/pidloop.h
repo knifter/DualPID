@@ -1,5 +1,5 @@
-#ifndef __PID_H
-#define __PID_H
+#ifndef __PIDLOOP_H
+#define __PIDLOOP_H
 
 #include <FPID.h>
 
@@ -43,4 +43,4 @@ class PIDLoop // : protected MiniPID
         time_t _pid_last;
 };
 
-#endif // __PID_H
+#endif // __PIDLOOP_H

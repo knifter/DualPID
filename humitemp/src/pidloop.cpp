@@ -1,5 +1,5 @@
 
-#include "pid.h"
+#include "pidloop.h"
 
 #include <Arduino.h>
 #include <FPID.h>

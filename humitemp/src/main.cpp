@@ -4,7 +4,7 @@
 #include "config.h"
 #include "globals.h"
 #include "settings.h"
-#include "pid.h"
+#include "pidloop.h"
 #include "screens.h"
 
 #include "tools-log.h"

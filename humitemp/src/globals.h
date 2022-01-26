@@ -4,7 +4,7 @@
 #include <SHT3x.h>
 #include "gui.h"
 #include "settings.h"
-#include "pid.h"
+#include "pidloop.h"
 
 extern GUI gui;
 
