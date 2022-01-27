@@ -6,14 +6,16 @@
 
 #include <FPID.h>
 
+#include "pidloop.h"
+
 #ifndef SETTINGS_DELAY_SAVE
 	#define SETTINGS_DELAY_SAVE		5000
 #endif
 
 typedef struct
 {
-	FPID::fpid_settings_t pid1;
-	FPID::fpid_settings_t pid2;
+	PIDLoop::pidloop_settings_t pid1;
+	PIDLoop::pidloop_settings_t pid2;
 } settings_t;
 
 class SettingsManager

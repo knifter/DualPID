@@ -17,6 +17,11 @@
 class PidPanel
 {
 	public:
+		typedef enum{
+			PS_DISABLED,
+			PS_ENABLED,
+		} state_t;
+
 		PidPanel(lv_obj_t* parent, const char* unit);
 		void selected(bool);
 
@@ -26,6 +31,7 @@ class PidPanel
 		void setSetPoint(float sp);
 		void setValue(float v);
 		void setBar(float p);   
+		void setState(state_t s);
 };
 
 PidPanel::PidPanel(lv_obj_t* parent, const char* unit_in)
@@ -72,6 +78,18 @@ PidPanel::PidPanel(lv_obj_t* parent, const char* unit_in)
 	};
 }; // PidPanel()
 
+void PidPanel::setState(PidPanel::state_t state)
+{
+	switch(state)
+	{
+		case PS_DISABLED:
+			lv_obj_set_style_bg_color(bar_output, COLOR_GREY, 0);
+			break;
+		case PS_ENABLED:
+			lv_obj_set_style_bg_color(bar_output, COLOR_LIGHT_BLUE, 0);
+			break;
+	};
+};
 void PidPanel::setSetPoint(float sp) { lv_label_set_text_fmt(lbl_sp, "sp = %0.01f %s", sp, unit.c_str()); };
 void PidPanel::setValue(float v) { 	lv_label_set_text_fmt(lbl_value, "%0.01f %s", v, unit.c_str()); };
 void PidPanel::setBar(float p) {     	lv_bar_set_value(bar_output, p, LV_ANIM_ON); };
@@ -167,11 +185,17 @@ bool MainScreen::loop()
 {
 	float i1 = pid1.get_input();
 	float i2 = pid2.get_input();
-	pw1->setSetPoint(settings.pid1.setpoint);
+	pw1->setSetPoint(settings.pid1.fpid.setpoint);
 	pw1->setValue(i1);
 	pw1->setBar(pid1.get_output_percent());
+	if(settings.pid1.active)
+	{
+		pw1->setState(PidPanel::PS_ENABLED);
+	}else{
+		pw1->setState(PidPanel::PS_DISABLED);
+	};
 
-	pw2->setSetPoint(settings.pid2.setpoint);
+	pw2->setSetPoint(settings.pid2.fpid.setpoint);
 	pw2->setValue(i2);
 	pw2->setBar(pid2.get_output_percent());
 

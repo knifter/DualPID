@@ -10,7 +10,7 @@
 
 #define NVS_NAMESPACE			"PidSettings"
 #define NVS_SETTINGS_IDENT		"EPIDSET"
-#define SETTINGS_DELAY_SAVE		60E3
+#define SETTINGS_DELAY_SAVE		20E3
 #define DEFAULT_SETPOINT		50.0
 #define DEFAULT_PID_F			0.0
 #define DEFAULT_PID_P			5.0
