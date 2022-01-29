@@ -34,10 +34,10 @@ bool PIDLoop::begin()
         	_pid.setOutputLimits(0,0);
             break;
         case MODE_NP:
-        	_pid.setOutputLimits(0, PID_WINDOWSIZE);
+        	_pid.setOutputLimits(0, PIDLOOP_WINDOWSIZE);
             break;
         case MODE_ZP:
-        	_pid.setOutputLimits(0, PID_WINDOWSIZE);
+        	_pid.setOutputLimits(0, PIDLOOP_WINDOWSIZE);
             break;
     };
 
@@ -55,7 +55,7 @@ void PIDLoop::reset_output()
         case MODE_NONE:
             break;
         case MODE_NP:
-        	_output = PID_WINDOWSIZE / 2;
+        	_output = PIDLOOP_WINDOWSIZE / 2;
             break;
         case MODE_ZP:
 	        _output = 0;
@@ -95,14 +95,14 @@ void PIDLoop::loop()
     // See if its time to do another PID iteration
     // in in-active mode just update input value for display purposes
     time_t now = millis();
-    if(now > _pid_last + PID_LOOPTIME_MS)
+    if(now > _pid_last + PIDLOOP_LOOP_MS)
     {
         // Input for the PID
         _input = _cb_value();
 
         if(_settings->active)
         {
-            double dt = (now - _pid_last) / PID_LOOPTIME_MS;
+            double dt = (now - _pid_last) / PIDLOOP_LOOP_MS;
             _pid.calculate(dt);
 
             // DBG("PID: Input = %.2f, Setpoint = %.2f, Output = %.2f (dt = %.9f)", _input, _settings->fpid.setpoint, _output, dt);
@@ -119,9 +119,9 @@ void PIDLoop::loop()
         return;
 
     // Process timewindow valve depending on PID Output
-    if (now - _windowstarttime > PID_WINDOWSIZE)
+    if (now - _windowstarttime > PIDLOOP_WINDOWSIZE)
     { //time to shift the Relay Window
-        _windowstarttime += PID_WINDOWSIZE;
+        _windowstarttime += PIDLOOP_WINDOWSIZE;
     };
 
     // Set output

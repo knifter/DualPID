@@ -57,6 +57,7 @@ PidPanel::PidPanel(lv_obj_t* parent, const char* unit_in)
 		lv_obj_set_style_text_color(lbl_sp, COLOR_GREY, LV_PART_ANY);
 		lv_obj_set_style_text_align(lbl_sp, LV_TEXT_ALIGN_CENTER, 0);
 		lv_label_set_text(lbl_sp, "<setpoint>");
+		// lv_obj_set_style_bg_opa(lbl_sp, LV_OPA_COVER, 0);
 	};
 	// Value label
 	{
@@ -68,6 +69,7 @@ PidPanel::PidPanel(lv_obj_t* parent, const char* unit_in)
 		lv_obj_set_style_text_color(lbl_value, COLOR_BLACK, LV_PART_ANY);
 		lv_obj_set_style_text_align(lbl_value, LV_TEXT_ALIGN_CENTER, 0);
 		lv_label_set_text(lbl_value, "<value>");
+		lv_obj_set_style_bg_opa(lbl_value, LV_OPA_COVER, 0);
 	};
 
 	// Output bar
@@ -83,7 +85,7 @@ PidPanel::PidPanel(lv_obj_t* parent, const char* unit_in)
     	lv_style_set_bg_grad_dir(&style_indic, LV_GRAD_DIR_HOR);
 
 		lv_obj_add_style(bar_output, &style_indic, LV_PART_INDICATOR);
-
+		lv_obj_set_style_bg_opa(bar_output, LV_OPA_COVER, 0);
 	};
 }; // PidPanel()
 
@@ -92,17 +94,23 @@ void PidPanel::setState(PidPanel::state_t state)
 	switch(state)
 	{
 		case PS_DISABLED:
-			lv_obj_set_style_bg_color(box, COLOR_GREY_LIGHT1, 0);
+			lv_obj_set_style_border_color(box, COLOR_GREY, 0);
+			lv_obj_set_style_bg_color(box, COLOR_GREY, 0);
+			// lv_obj_set_style_bg_color(lbl_sp, COLOR_WHITE, 0);
+			lv_obj_set_style_bg_color(lbl_value, COLOR_WHITE, 0);
 
 			lv_obj_set_style_bg_color(bar_output, COLOR_GREY, 0);
 			lv_style_set_bg_color(&style_indic, COLOR_GREY);
 			lv_style_set_bg_grad_color(&style_indic, COLOR_GREY);
-			
+
 			break;
 		case PS_OK:
+			lv_obj_set_style_border_color(box, COLOR_GREEN_LIGHT2, 0);
 			lv_obj_set_style_bg_color(box, COLOR_GREEN_LIGHT2, 0);
+			// lv_obj_set_style_bg_color(lbl_sp, COLOR_GREEN_LIGHT2, 0);
+			lv_obj_set_style_bg_color(lbl_value, COLOR_WHITE, 0);
 
-			lv_obj_set_style_bg_color(bar_output, COLOR_LIGHT_BLUE, 0);
+			lv_obj_set_style_bg_color(bar_output, COLOR_WHITE, 0);
 			lv_style_set_bg_color(&style_indic, COLOR_BLUE);
 			lv_style_set_bg_grad_color(&style_indic, COLOR_RED);
 			break;
@@ -116,11 +124,11 @@ void PidPanel::selected(bool select)
 	if(select)
 	{
 		lv_obj_set_style_border_width(box, 4, 0);
-		lv_obj_set_style_border_color(box, COLOR_BLACK, 0);
+		// lv_obj_set_style_border_color(box, COLOR_BLACK, 0);
 
 	}else{
 		lv_obj_set_style_border_width(box, 2, 0);
-		lv_obj_set_style_border_color(box, COLOR_GREY, 0);
+		// lv_obj_set_style_border_color(box, COLOR_GREY, 0);
 	};
 };
 
@@ -133,6 +141,7 @@ class GraphPanel
 		void appendVals(const float val1, const float val2);
 		void setScaleY(const lv_chart_axis_t, float min, float max);
 		void autoScale(const lv_chart_axis_t axis, const float inc1, const float inc2);
+		static void draw_lbl_cb(lv_event_t* e);
 
 		lv_obj_t *box;
 	    lv_obj_t *chart;
@@ -160,58 +169,87 @@ GraphPanel::GraphPanel(lv_obj_t* parent)
 	lv_chart_set_update_mode(chart, LV_CHART_UPDATE_MODE_SHIFT );
 
 	// Primary = Temp, secondary = Rh
-	setScaleY(LV_CHART_AXIS_PRIMARY_Y, -10, 30);
-	setScaleY(LV_CHART_AXIS_SECONDARY_Y, 0, 100);
+	// setScaleY(LV_CHART_AXIS_PRIMARY_Y, -10*GRAPH_MULTIPLIER, 30*GRAPH_MULTIPLIER);
+	// setScaleY(LV_CHART_AXIS_SECONDARY_Y, 0*GRAPH_MULTIPLIER, 100*GRAPH_MULTIPLIER);
+	// void lv_chart_set_axis_tick(obj, axis, 						major_len, minor_len, major_cnt, minor_cnt, label_en, draw_size)
+    lv_chart_set_axis_tick(		chart,  LV_CHART_AXIS_PRIMARY_Y, 	1,         0,         3,         1,         true,     20);
+    lv_chart_set_axis_tick(		chart,  LV_CHART_AXIS_SECONDARY_Y, 	1,         0,         3,         1,         true,     20);
 
     /*Add two data series*/
 	lv_chart_set_point_count(chart, HISTORY_GRAPH_POINTS);
     ser1 = lv_chart_add_series(chart, COLOR_RED, LV_CHART_AXIS_PRIMARY_Y);
     ser2 = lv_chart_add_series(chart, COLOR_BLUE, LV_CHART_AXIS_SECONDARY_Y);
 	
+	lv_obj_add_event_cb(chart, draw_lbl_cb, LV_EVENT_DRAW_PART_BEGIN, this);
+
 	// pre-fill the chart
 	float v1 = pid1.get_input();
 	float v2 = pid2.get_input();
 	int p = HISTORY_GRAPH_POINTS;
 	while(p--)
 	{
-	    lv_chart_set_next_value(chart, ser1, v1);
-	    lv_chart_set_next_value(chart, ser2, v2);
+		appendVals(v1, v2);
 	};
+};
+
+void GraphPanel::draw_lbl_cb(lv_event_t* e)
+{
+	lv_obj_draw_part_dsc_t * dsc = lv_event_get_draw_part_dsc(e);
+    if(!lv_obj_draw_part_check_type(dsc, &lv_chart_class, LV_CHART_DRAW_PART_TICK_LABEL)) 
+		return;
+
+	// GraphPanel* me = static_cast<GraphPanel*>(e->user_data);
+
+	if(dsc->id == LV_CHART_AXIS_PRIMARY_X)
+		return;
+	// must be axis PRIM_Y or SEC_Y
+
+	// Color
+	if(dsc->id == LV_CHART_AXIS_PRIMARY_Y)
+		dsc->label_dsc->color = COLOR_RED;
+	if(dsc->id == LV_CHART_AXIS_SECONDARY_Y)
+		dsc->label_dsc->color = COLOR_BLUE;
+
+	// Scale value
+	if(dsc->text)
+        lv_snprintf(dsc->text, dsc->text_length, "%d", dsc->value / 10);
 };
 
 void GraphPanel::appendVals(const float val1, const float val2)
 {
-	lv_chart_set_next_value(chart, ser1, val1);
-	lv_chart_set_next_value(chart, ser2, val2);
+	lv_chart_set_next_value(chart, ser1, val1*GRAPH_MULTIPLIER);
+	lv_chart_set_next_value(chart, ser2, val2*GRAPH_MULTIPLIER);
 };
 
 void GraphPanel::setScaleY(const lv_chart_axis_t axis, const float miny, const float maxy)
 {
 	// DBG("axis: %d min/max: %f %f", axis, miny, maxy);
 
-	lv_chart_set_range(chart, axis, miny, maxy);
+	lv_chart_set_range(chart, axis, miny*GRAPH_MULTIPLIER, maxy*GRAPH_MULTIPLIER);
 	// void lv_chart_set_axis_tick(obj, axis, major_len, minor_len, major_cnt, minor_cnt, label_en, draw_size)
     lv_chart_set_axis_tick(		chart,  axis, 1,         0,         3,         1,         true,     20);
 };
 
 void GraphPanel::autoScale(const lv_chart_axis_t axis, const float inc1, const float inc2)
 {
-	float miny = min(inc1, inc2);
-	float maxy = max(inc1, inc2);
+	float minyM = min(inc1, inc2) * GRAPH_MULTIPLIER;
+	float maxyM = max(inc1, inc2) * GRAPH_MULTIPLIER;
+
+	// note: instead of dividing all the points, we multiply the others with GRAPH_MULTIPLIER and then divide once
 
 	// find min/max
 	int cnt = lv_chart_get_point_count(chart);
 	lv_chart_series_t *ser = axis == LV_CHART_AXIS_PRIMARY_Y ? ser1 : ser2;
 	while(--cnt)
 	{
-		miny = min(miny, static_cast<float>(ser->y_points[cnt]));
-		maxy = max(maxy, static_cast<float>(ser->y_points[cnt]));
+		minyM = min(minyM, static_cast<float>(ser->y_points[cnt]));
+		maxyM = max(maxyM, static_cast<float>(ser->y_points[cnt]));
 	};
+	minyM = floor(minyM/(GRAPH_SCALE_ROOUND*GRAPH_MULTIPLIER)) *(GRAPH_SCALE_ROOUND*GRAPH_MULTIPLIER);
+	maxyM = ceil(maxyM/(GRAPH_SCALE_ROOUND*GRAPH_MULTIPLIER)) *(GRAPH_SCALE_ROOUND*GRAPH_MULTIPLIER);
 
-	miny = floor(miny/5)*5;
-	maxy = ceil(maxy/5)*5;
-
-	setScaleY(axis, miny - 5, maxy + 5);
+	// setScaleY(axis, (minyM/GRAPH_MULTIPLIER) - GRAPH_SCALE_ROOUND, (maxyM/GRAPH_MULTIPLIER) + GRAPH_SCALE_ROOUND);
+	lv_chart_set_range(chart, axis, minyM, maxyM);
 };
 
 /*********************************************************************************************************************************/

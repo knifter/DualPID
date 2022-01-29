@@ -16,16 +16,21 @@
 #define DEFAULT_PID_P			5.0
 #define DEFAULT_PID_I			2.0
 #define DEFAULT_PID_D			2.0
-#define MEASURE_INTERVAL_MS		1000
-#define HISTORY_GRAPH_POINTS	120
-#define HISTORY_GRAPH_DELTA_MS	60E3
 
+// #define MEASURE_INTERVAL_MS		1000
 #define MAIN_LOOP_MS			500
+#define PIDLOOP_LOOP_MS     	1000            // PID delta-T: 2 seconds as it was
+#define PIDLOOP_WINDOWSIZE      5000      		// time-windows size in ms
+
+#define HISTORY_GRAPH_POINTS	120
+#define HISTORY_GRAPH_DELTA_MS	60E3		// Time between graph points
+#define GRAPH_SCALE_ROOUND		5			// scale min/max is rounded to a multiple of this
+#define GRAPH_MULTIPLIER		10			// Graph scale precision
 
 #define PID1_UNIT_TEXT			"C"
 #define PID2_UNIT_TEXT			"%RH"
 
-#define TEMPERATURE_MIN			10
+#define TEMPERATURE_MIN			0
 #define TEMPERATURE_MAX			60
 #define TEMPERATURE_PRECISION	1
 #define HUMIDITY_MIN			0
@@ -33,14 +38,8 @@
 #define HUMIDITY_PRECISION		0
 #define PID_PAR_MIN				0
 #define PID_PAR_MAX				100
-#define PID_PAR_PRECISION		2
+#define PID_PAR_PRECISION		1
 
-// #define PIN_VALVE           11
-// #define ANALOG_SENSOR_RH    35
-//#define ANALOG_HUM_ADJUST   2
-#define PID_LOOPTIME_MS     	1000            // PID delta-T: 2 seconds as it was
-// #define DISPLAY_LOOPTIME_MS 	500             // Display update rate: every half a second
-#define PID_WINDOWSIZE        	5000      		// time-windows size in ms
 
 // #define DISPLAY_WIDTH			320
 // #define DISPLAY_HEIGHT			240

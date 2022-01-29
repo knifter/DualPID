@@ -30,13 +30,10 @@ class PIDLoop
         PIDLoop(gpio_num_t pin_a, gpio_num_t pin_b, pid_value_callback_ptr func, pidloop_settings_t* s);
 
         bool begin();
-        // void set_tuning(double P, double I, double D);
-        // void set_tuning(pidsettings_t&);
-        // void set_setpoint(double);
         void loop();
         double get_input() { return _input; };
         double get_output() { return _output; };
-        double get_output_percent() { return _output*100/PID_WINDOWSIZE; };
+        double get_output_percent() { return _output*100/PIDLOOP_WINDOWSIZE; };
         // int get_output_state() { return _output_state; };
         void set_active(bool);
         // bool active() { return _settings->active; };
