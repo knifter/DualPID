@@ -130,8 +130,9 @@ class GraphPanel
 	public:
 		GraphPanel(lv_obj_t* parent);
 
-		void appendVals(float val1, float val2);
-		void setScaleY(lv_chart_axis_t, int min, int max);
+		void appendVals(const float val1, const float val2);
+		void setScaleY(const lv_chart_axis_t, float min, float max);
+		void autoScale(const lv_chart_axis_t axis, const float inc1, const float inc2);
 
 		lv_obj_t *box;
 	    lv_obj_t *chart;
@@ -158,9 +159,8 @@ GraphPanel::GraphPanel(lv_obj_t* parent)
     lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_X, 1, 0, 7, 1, true, 20);
 	lv_chart_set_update_mode(chart, LV_CHART_UPDATE_MODE_SHIFT );
 
-	// Temp
+	// Primary = Temp, secondary = Rh
 	setScaleY(LV_CHART_AXIS_PRIMARY_Y, -10, 30);
-	// RH
 	setScaleY(LV_CHART_AXIS_SECONDARY_Y, 0, 100);
 
     /*Add two data series*/
@@ -179,17 +179,39 @@ GraphPanel::GraphPanel(lv_obj_t* parent)
 	};
 };
 
-void GraphPanel::appendVals(float val1, float val2)
+void GraphPanel::appendVals(const float val1, const float val2)
 {
 	lv_chart_set_next_value(chart, ser1, val1);
 	lv_chart_set_next_value(chart, ser2, val2);
 };
 
-void GraphPanel::setScaleY(lv_chart_axis_t axis, int min, int max)
+void GraphPanel::setScaleY(const lv_chart_axis_t axis, const float miny, const float maxy)
 {
-	lv_chart_set_range(chart, axis, min, max);
+	// DBG("axis: %d min/max: %f %f", axis, miny, maxy);
+
+	lv_chart_set_range(chart, axis, miny, maxy);
 	// void lv_chart_set_axis_tick(obj, axis, major_len, minor_len, major_cnt, minor_cnt, label_en, draw_size)
-    lv_chart_set_axis_tick(chart, axis, 1, 0, 3, 1, true, 20);
+    lv_chart_set_axis_tick(		chart,  axis, 1,         0,         3,         1,         true,     20);
+};
+
+void GraphPanel::autoScale(const lv_chart_axis_t axis, const float inc1, const float inc2)
+{
+	float miny = min(inc1, inc2);
+	float maxy = max(inc1, inc2);
+
+	// find min/max
+	int cnt = lv_chart_get_point_count(chart);
+	lv_chart_series_t *ser = axis == LV_CHART_AXIS_PRIMARY_Y ? ser1 : ser2;
+	while(--cnt)
+	{
+		miny = min(miny, static_cast<float>(ser->y_points[cnt]));
+		maxy = max(maxy, static_cast<float>(ser->y_points[cnt]));
+	};
+
+	miny = floor(miny/5)*5;
+	maxy = ceil(maxy/5)*5;
+
+	setScaleY(axis, miny - 5, maxy + 5);
 };
 
 /*********************************************************************************************************************************/
@@ -233,6 +255,10 @@ bool MainScreen::loop()
 	}else{
 		pw2->setState(PidPanel::PS_DISABLED);
 	};
+
+	// autoscale
+	gw->autoScale(LV_CHART_AXIS_PRIMARY_Y, pid1.get_input(), settings.pid1.fpid.setpoint);
+	gw->autoScale(LV_CHART_AXIS_SECONDARY_Y, pid2.get_input(), settings.pid2.fpid.setpoint);
 
 	if(now < _next_chart)
 		return true;

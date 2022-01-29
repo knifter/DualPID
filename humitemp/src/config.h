@@ -20,7 +20,7 @@
 #define HISTORY_GRAPH_POINTS	120
 #define HISTORY_GRAPH_DELTA_MS	60E3
 
-#define MAIN_LOOP_MS			100
+#define MAIN_LOOP_MS			500
 
 #define PID1_UNIT_TEXT			"C"
 #define PID2_UNIT_TEXT			"%RH"
@@ -56,16 +56,16 @@
 // Begum
 
 // Version 3 Paul (edwin's bridge)
-#define PIN_HB1_A				GPIO_NUM_2
-#define PIN_HB1_B				GPIO_NUM_12
-#define PIN_HB2_A				GPIO_NUM_13
-#define PIN_HB2_B				GPIO_NUM_15
+// #define PIN_HB1_A				GPIO_NUM_2
+// #define PIN_HB1_B				GPIO_NUM_12
+// #define PIN_HB2_A				GPIO_NUM_13
+// #define PIN_HB2_B				GPIO_NUM_15
 
 // Mushy
-// #define PIN_HB1_A				GPIO_NUM_2
-// #define PIN_HB1_B				GPIO_NUM_13
-// #define PIN_HB2_A				GPIO_NUM_12
-// #define PIN_HB2_B				GPIO_NUM_15
+#define PIN_HB1_A				GPIO_NUM_2
+#define PIN_HB1_B				GPIO_NUM_13
+#define PIN_HB2_A				GPIO_NUM_12
+#define PIN_HB2_B				GPIO_NUM_15
 
 #define PIN_SPEAKER				GPIO_NUM_25
 #define PIN_BACKLIGHT			GPIO_NUM_32
