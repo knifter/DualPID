@@ -40,6 +40,7 @@ class PIDLoop
         // int get_output_state() { return _output_state; };
         void set_active(bool);
         // bool active() { return _settings->active; };
+        void reset_output();
 
     private: 
         FPID _pid;

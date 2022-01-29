@@ -27,7 +27,6 @@ bool PIDLoop::begin()
 	_input = NAN;
     _pid_last = millis();
 
-    _settings->mode = MODE_ZP;
     switch(_settings->mode)
     {
         case MODE_NONE:
@@ -35,18 +34,33 @@ bool PIDLoop::begin()
         	_pid.setOutputLimits(0,0);
             break;
         case MODE_NP:
-        	_output = PID_WINDOWSIZE / 2;
         	_pid.setOutputLimits(0, PID_WINDOWSIZE);
             break;
         case MODE_ZP:
-	        _output = 0;
         	_pid.setOutputLimits(0, PID_WINDOWSIZE);
             break;
     };
 
+    reset_output();
+
     set_active(_settings->active);
 
 	return true;
+};
+
+void PIDLoop::reset_output()
+{
+    switch(_settings->mode)
+    {
+        case MODE_NONE:
+            break;
+        case MODE_NP:
+        	_output = PID_WINDOWSIZE / 2;
+            break;
+        case MODE_ZP:
+	        _output = 0;
+            break;
+    };
 };
 
 void PIDLoop::set_active(bool active)
@@ -62,6 +76,7 @@ void PIDLoop::set_active(bool active)
     if(active)
     {
         _pid.alignOutput();
+        reset_output();
     } else {
         digitalWrite(_pin_a, LOW);
         digitalWrite(_pin_b, LOW);

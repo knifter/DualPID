@@ -19,7 +19,7 @@ class PidPanel
 	public:
 		typedef enum{
 			PS_DISABLED,
-			PS_ENABLED,
+			PS_OK,
 		} state_t;
 
 		PidPanel(lv_obj_t* parent, const char* unit);
@@ -28,6 +28,8 @@ class PidPanel
 		lv_obj_t	*box, *lbl_sp, *lbl_value, *bar_output;
 		lv_style_t 	style_font26;
 		String unit;
+		lv_style_t style_indic;
+
 		void setSetPoint(float sp);
 		void setValue(float v);
 		void setBar(float p);   
@@ -75,6 +77,13 @@ PidPanel::PidPanel(lv_obj_t* parent, const char* unit_in)
 		lv_obj_set_size(bar_output, LV_PCT(100), 10);
 		lv_obj_align(bar_output, LV_ALIGN_BOTTOM_MID, 0, 0);
 		lv_bar_set_range(bar_output, 0, 100);
+		
+    	lv_style_init(&style_indic);
+    	lv_style_set_bg_opa(&style_indic, LV_OPA_COVER);
+    	lv_style_set_bg_grad_dir(&style_indic, LV_GRAD_DIR_HOR);
+
+		lv_obj_add_style(bar_output, &style_indic, LV_PART_INDICATOR);
+
 	};
 }; // PidPanel()
 
@@ -83,10 +92,19 @@ void PidPanel::setState(PidPanel::state_t state)
 	switch(state)
 	{
 		case PS_DISABLED:
+			lv_obj_set_style_bg_color(box, COLOR_GREY_LIGHT1, 0);
+
 			lv_obj_set_style_bg_color(bar_output, COLOR_GREY, 0);
+			lv_style_set_bg_color(&style_indic, COLOR_GREY);
+			lv_style_set_bg_grad_color(&style_indic, COLOR_GREY);
+			
 			break;
-		case PS_ENABLED:
+		case PS_OK:
+			lv_obj_set_style_bg_color(box, COLOR_GREEN_LIGHT2, 0);
+
 			lv_obj_set_style_bg_color(bar_output, COLOR_LIGHT_BLUE, 0);
+			lv_style_set_bg_color(&style_indic, COLOR_BLUE);
+			lv_style_set_bg_grad_color(&style_indic, COLOR_RED);
 			break;
 	};
 };
@@ -113,7 +131,8 @@ class GraphPanel
 		GraphPanel(lv_obj_t* parent);
 
 		void appendVals(float val1, float val2);
-		
+		void setScaleY(lv_chart_axis_t, int min, int max);
+
 		lv_obj_t *box;
 	    lv_obj_t *chart;
 		lv_chart_series_t *ser1, *ser2;
@@ -136,15 +155,13 @@ GraphPanel::GraphPanel(lv_obj_t* parent)
     lv_chart_set_div_line_count(chart, 5, 7);
     lv_obj_set_style_size(chart, 0, LV_PART_INDICATOR);
 
-	// Temp
-	lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, -10, 30);
-    lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_Y, 1, 0, 3, 1, true, 20);
     lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_X, 1, 0, 7, 1, true, 20);
-
-	// RH
-	lv_chart_set_range(chart, LV_CHART_AXIS_SECONDARY_Y, 0, 100);
-    lv_chart_set_axis_tick(chart, LV_CHART_AXIS_SECONDARY_Y, 1, 0, 3, 1, true, 20);
 	lv_chart_set_update_mode(chart, LV_CHART_UPDATE_MODE_SHIFT );
+
+	// Temp
+	setScaleY(LV_CHART_AXIS_PRIMARY_Y, -10, 30);
+	// RH
+	setScaleY(LV_CHART_AXIS_SECONDARY_Y, 0, 100);
 
     /*Add two data series*/
 	lv_chart_set_point_count(chart, HISTORY_GRAPH_POINTS);
@@ -168,6 +185,12 @@ void GraphPanel::appendVals(float val1, float val2)
 	lv_chart_set_next_value(chart, ser2, val2);
 };
 
+void GraphPanel::setScaleY(lv_chart_axis_t axis, int min, int max)
+{
+	lv_chart_set_range(chart, axis, min, max);
+	// void lv_chart_set_axis_tick(obj, axis, major_len, minor_len, major_cnt, minor_cnt, label_en, draw_size)
+    lv_chart_set_axis_tick(chart, axis, 1, 0, 3, 1, true, 20);
+};
 
 /*********************************************************************************************************************************/
 MainScreen::MainScreen(SooghGUI& g) : Screen(g)
@@ -183,6 +206,12 @@ MainScreen::MainScreen(SooghGUI& g) : Screen(g)
 
 bool MainScreen::loop()
 {
+	time_t now = millis();
+	if(now < _next_update)
+		return true;
+
+	_next_update = now + MAIN_LOOP_MS;
+
 	float i1 = pid1.get_input();
 	float i2 = pid2.get_input();
 	pw1->setSetPoint(settings.pid1.fpid.setpoint);
@@ -190,7 +219,7 @@ bool MainScreen::loop()
 	pw1->setBar(pid1.get_output_percent());
 	if(settings.pid1.active)
 	{
-		pw1->setState(PidPanel::PS_ENABLED);
+		pw1->setState(PidPanel::PS_OK);
 	}else{
 		pw1->setState(PidPanel::PS_DISABLED);
 	};
@@ -198,15 +227,18 @@ bool MainScreen::loop()
 	pw2->setSetPoint(settings.pid2.fpid.setpoint);
 	pw2->setValue(i2);
 	pw2->setBar(pid2.get_output_percent());
-
-	static time_t next_chart = 0;
-	time_t now = millis();
-	if(now > next_chart)
+	if(settings.pid2.active)
 	{
-		gw->appendVals(i1, i2);
-
-		next_chart = now + HISTORY_GRAPH_DELTA_MS;
+		pw2->setState(PidPanel::PS_OK);
+	}else{
+		pw2->setState(PidPanel::PS_DISABLED);
 	};
+
+	if(now < _next_chart)
+		return true;
+
+	gw->appendVals(i1, i2);
+	_next_chart = now + HISTORY_GRAPH_DELTA_MS;
     
     return false;
 };

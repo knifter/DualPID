@@ -20,6 +20,8 @@
 #define HISTORY_GRAPH_POINTS	120
 #define HISTORY_GRAPH_DELTA_MS	60E3
 
+#define MAIN_LOOP_MS			100
+
 #define PID1_UNIT_TEXT			"C"
 #define PID2_UNIT_TEXT			"%RH"
 
