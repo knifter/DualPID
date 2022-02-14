@@ -42,7 +42,7 @@ PidPanel::PidPanel(lv_obj_t* parent, const char* unit_in)
 	box = lv_obj_create(parent);
 
 	lv_obj_set_size(box, DISPLAY_WIDTH/2, 80);
-	lv_obj_set_style_border_width(box, 2, 0);
+	lv_obj_set_style_border_width(box, 3, 0);
 	lv_obj_set_style_pad_all(box, 5, 0);
 
 	lv_style_init(&style_font26);
@@ -57,7 +57,7 @@ PidPanel::PidPanel(lv_obj_t* parent, const char* unit_in)
 		lv_obj_set_style_text_color(lbl_sp, COLOR_GREY, LV_PART_ANY);
 		lv_obj_set_style_text_align(lbl_sp, LV_TEXT_ALIGN_CENTER, 0);
 		lv_label_set_text(lbl_sp, "<setpoint>");
-		// lv_obj_set_style_bg_opa(lbl_sp, LV_OPA_COVER, 0);
+		lv_obj_set_style_bg_opa(lbl_sp, LV_OPA_COVER, 0);
 	};
 	// Value label
 	{
@@ -69,7 +69,7 @@ PidPanel::PidPanel(lv_obj_t* parent, const char* unit_in)
 		lv_obj_set_style_text_color(lbl_value, COLOR_BLACK, LV_PART_ANY);
 		lv_obj_set_style_text_align(lbl_value, LV_TEXT_ALIGN_CENTER, 0);
 		lv_label_set_text(lbl_value, "<value>");
-		lv_obj_set_style_bg_opa(lbl_value, LV_OPA_COVER, 0);
+		// lv_obj_set_style_bg_opa(lbl_value, LV_OPA_COVER, 0);
 	};
 
 	// Output bar
@@ -94,21 +94,22 @@ void PidPanel::setState(PidPanel::state_t state)
 	switch(state)
 	{
 		case PS_DISABLED:
-			lv_obj_set_style_border_color(box, COLOR_GREY, 0);
-			lv_obj_set_style_bg_color(box, COLOR_GREY, 0);
-			// lv_obj_set_style_bg_color(lbl_sp, COLOR_WHITE, 0);
-			lv_obj_set_style_bg_color(lbl_value, COLOR_WHITE, 0);
+			lv_obj_set_style_border_color(box, COLOR_WHITE, 0);
+			lv_obj_set_style_bg_color(box, COLOR_WHITE, 0);
+
+			lv_obj_set_style_bg_color(lbl_sp, COLOR_GREY, 0);
+			// lv_obj_set_style_bg_color(lbl_value, COLOR_WHITE, 0);
 
 			lv_obj_set_style_bg_color(bar_output, COLOR_GREY, 0);
 			lv_style_set_bg_color(&style_indic, COLOR_GREY);
 			lv_style_set_bg_grad_color(&style_indic, COLOR_GREY);
-
 			break;
 		case PS_OK:
-			lv_obj_set_style_border_color(box, COLOR_GREEN_LIGHT2, 0);
-			lv_obj_set_style_bg_color(box, COLOR_GREEN_LIGHT2, 0);
-			// lv_obj_set_style_bg_color(lbl_sp, COLOR_GREEN_LIGHT2, 0);
-			lv_obj_set_style_bg_color(lbl_value, COLOR_WHITE, 0);
+			lv_obj_set_style_border_color(box, COLOR_WHITE, 0);
+			lv_obj_set_style_bg_color(box, COLOR_WHITE, 0);
+
+			lv_obj_set_style_bg_color(lbl_sp, COLOR_GREEN_LIGHT2, 0);
+			// lv_obj_set_style_bg_color(lbl_value, COLOR_WHITE, 0);
 
 			lv_obj_set_style_bg_color(bar_output, COLOR_WHITE, 0);
 			lv_style_set_bg_color(&style_indic, COLOR_BLUE);
@@ -123,12 +124,9 @@ void PidPanel::selected(bool select)
 {
 	if(select)
 	{
-		lv_obj_set_style_border_width(box, 4, 0);
-		// lv_obj_set_style_border_color(box, COLOR_BLACK, 0);
-
+		lv_obj_set_style_border_color(box, COLOR_BLACK, 0);
 	}else{
-		lv_obj_set_style_border_width(box, 2, 0);
-		// lv_obj_set_style_border_color(box, COLOR_GREY, 0);
+		lv_obj_set_style_border_color(box, COLOR_GREY, 0);
 	};
 };
 
