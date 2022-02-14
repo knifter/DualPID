@@ -99,6 +99,14 @@ void PIDLoop::loop()
     {
         // Input for the PID
         _input = _cb_value();
+        if(isnan(_input))
+        {
+            // Sensor error
+            WARNING("Sensor error. Going back to fail-safe.");
+            digitalWrite(_pin_a, LOW);
+            digitalWrite(_pin_b, LOW);
+            return;
+        };
 
         if(_settings->active)
         {
