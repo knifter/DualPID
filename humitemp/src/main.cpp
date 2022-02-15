@@ -43,9 +43,12 @@ void setup()
 	gui.begin();
 
 	Wire.begin(PIN_SDA, PIN_SCL);
-	if(!sht_sensor.begin())
+	if(!sht_sensor.begin(SHT3X_ADDRESS_DEFAULT))
 	{
-		halt("SHT3X sensor error");
+        if(!sht_sensor.begin(SHT3X_ADDRESS_ALT))
+        {
+		    halt("SHT3X sensor error 0x44/0x45: not found");
+        };
 	};
 
 	setman.begin();
