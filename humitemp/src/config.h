@@ -40,31 +40,12 @@
 #define PID_PAR_MAX				100
 #define PID_PAR_PRECISION		1
 
-
 // #define DISPLAY_WIDTH			320
 // #define DISPLAY_HEIGHT			240
 // #define LV_BUF_SIZE				(DISPLAY_WIDTH*DISPLAY_WIDTH/10)
 
-#define SHT_ADDRESS             0x45
-
 #define PIN_SDA					GPIO_NUM_21
 #define PIN_SCL					GPIO_NUM_22
-
-// Version 1
-
-// Begum
-
-// Version 3 Paul (edwin's bridge)
-// #define PIN_HB1_A				GPIO_NUM_2
-// #define PIN_HB1_B				GPIO_NUM_12
-// #define PIN_HB2_A				GPIO_NUM_13
-// #define PIN_HB2_B				GPIO_NUM_15
-
-// Mushy
-#define PIN_HB1_A				GPIO_NUM_2
-#define PIN_HB1_B				GPIO_NUM_13
-#define PIN_HB2_A				GPIO_NUM_12
-#define PIN_HB2_B				GPIO_NUM_15
 
 #define PIN_SPEAKER				GPIO_NUM_25
 #define PIN_BACKLIGHT			GPIO_NUM_32
@@ -72,5 +53,25 @@
 #define PIN_BTN_A				GPIO_NUM_39
 #define PIN_BTN_B				GPIO_NUM_38
 #define PIN_BTN_C				GPIO_NUM_37
+
+// Version 1, TIP142 [1]
+// #define PIN_HB1_A				GPIO_NUM_2      // Not used
+// #define PIN_HB1_B				GPIO_NUM_13     // Not used
+// #define PIN_HB2_A				GPIO_NUM_12     // Not used
+// #define PIN_HB2_B				GPIO_NUM_26     // Not used
+
+// Begum. TIP142
+
+// Version 3 Paul (edwin's bridge)
+// #define PIN_HB1_A				GPIO_NUM_2      
+// #define PIN_HB1_B				GPIO_NUM_12
+// #define PIN_HB2_A				GPIO_NUM_13     
+// #define PIN_HB2_B				GPIO_NUM_15
+
+// Mushy
+#define PIN_HB1_A				GPIO_NUM_2          // Not used
+#define PIN_HB1_B				GPIO_NUM_13
+#define PIN_HB2_A				GPIO_NUM_12         // Not used
+#define PIN_HB2_B				GPIO_NUM_15         // Not used
 
 #endif // __CONFIG_H

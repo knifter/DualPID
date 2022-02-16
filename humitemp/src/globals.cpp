@@ -5,7 +5,7 @@
 #include "settings.h"
 #include "pidloop.h"
 
-SHT3X sht_sensor(Wire, SHT_ADDRESS);
+SHT3X sht_sensor(Wire);
 GUI gui;
 SettingsManager setman;
 settings_t& settings = setman.settings;
