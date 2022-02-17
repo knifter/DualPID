@@ -21,13 +21,15 @@ class PIDLoop
 
         typedef struct
         {
-            gpio_num_t pin_a, pin_b;
+            uint32_t pin_n;
+            uint32_t pin_p;
             bool active;
             PIDLoop::output_mode_t	mode;
             FPID::fpid_settings_t fpid;
+            double max_dc;
         } pidloop_settings_t;
 
-        PIDLoop(gpio_num_t pin_a, gpio_num_t pin_b, pid_value_callback_ptr func, pidloop_settings_t* s);
+        PIDLoop(pidloop_settings_t* s, pid_value_callback_ptr func);
 
         bool begin();
         void loop();
@@ -47,7 +49,7 @@ class PIDLoop
         // double Input, Output, Setpoint;
         double _input, _output;
         time_t _windowstarttime;
-        gpio_num_t _pin_a, _pin_b;
+        gpio_num_t _pin_n, _pin_p;
         time_t _pid_last;
         bool _active_last;
 };

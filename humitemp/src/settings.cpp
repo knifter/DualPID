@@ -49,6 +49,13 @@ void SettingsManager::loop()
 	};
 };
 
+void SettingsManager::save()
+{
+	_saveat = 0;
+	_dirty = true;
+	DBG("%lu: Save settings now", millis());
+};
+
 void SettingsManager::saveDelayed(time_t later)
 {
 	time_t when = millis() + later;
@@ -76,6 +83,8 @@ void SettingsManager::setDefaults()
 	settings.pid2.fpid.kI = DEFAULT_PID_I;
 	settings.pid2.fpid.kD = DEFAULT_PID_D;
 	settings.pid2.fpid.setpoint = DEFAULT_SETPOINT;
+
+	_dirty = true;
 
 	return;
 };

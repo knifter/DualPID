@@ -18,14 +18,6 @@ void setup()
 	Serial.begin(115200);
 
     // Init IO
-    digitalWrite(PIN_HB1_A, LOW);
-    digitalWrite(PIN_HB1_B, LOW);
-    digitalWrite(PIN_HB2_A, LOW);
-    digitalWrite(PIN_HB2_B, LOW);
-  	pinMode(PIN_HB1_A, OUTPUT);
-  	pinMode(PIN_HB1_B, OUTPUT);
-  	pinMode(PIN_HB2_A, OUTPUT);
-  	pinMode(PIN_HB2_B, OUTPUT);
 	digitalWrite(PIN_SPEAKER, LOW);
 	pinMode(PIN_SPEAKER, OUTPUT);
 
@@ -47,7 +39,7 @@ void setup()
 	{
         if(!sht_sensor.begin(SHT3X_ADDRESS_ALT))
         {
-		    halt("SHT3X sensor error 0x44/0x45: not found");
+			// gui.showMessage("ERROR:", "SHT3X(0x44/0x45): not found");
         };
 	};
 
@@ -72,7 +64,6 @@ void loop()
 
 void halt(const char* error)
 {
-	gui.showMessage("ERROR:", error);
 	DBG("HALT: %s", error);
 	while(true)
 		gui.loop();

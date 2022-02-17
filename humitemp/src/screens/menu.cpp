@@ -11,29 +11,49 @@
 #include <treemenu.h>
 
 // C-style callbacks
+void save_settings_cb(MenuItem* item, void* data);
 void menu_close_cb(MenuItem* item, void* data);
+
+SelectorField::item_t pidloop_ports[] = {
+	{0, "-", "unused"},
+	PIDLOOP_PORTS_LIST
+	,{0, 0, 0}
+	};
 
 MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 {
 	menu.addSeparator("Temperature");
 	menu.addSpinbox("Setpoint", &settings.pid1.fpid.setpoint, TEMPERATURE_MIN, TEMPERATURE_MAX, TEMPERATURE_PRECISION);
 	menu.addSwitch("Active", &settings.pid1.active);
-    auto sub1 = menu.addSubMenu("Settings");
-	sub1->addSpinbox("kP", &settings.pid1.fpid.kP, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-	sub1->addSpinbox("kI", &settings.pid1.fpid.kI, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-	sub1->addSpinbox("kD", &settings.pid1.fpid.kD, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+    auto sub = menu.addSubMenu("PID Settings");
+	sub->addSpinbox("kP", &settings.pid1.fpid.kP, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+	sub->addSpinbox("kI", &settings.pid1.fpid.kI, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+	sub->addSpinbox("kD", &settings.pid1.fpid.kD, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
 
 	menu.addSeparator("Humidity");
 	menu.addSpinbox("Setpoint", &settings.pid2.fpid.setpoint, HUMIDITY_MIN, HUMIDITY_MAX, HUMIDITY_PRECISION);
 	menu.addSwitch("Active", &settings.pid2.active);
-    auto sub2 = menu.addSubMenu("Settings");
-	sub2->addSpinbox("kP", &settings.pid2.fpid.kP, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-	sub2->addSpinbox("kI", &settings.pid2.fpid.kI, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-	sub2->addSpinbox("kD", &settings.pid2.fpid.kD, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+    sub = menu.addSubMenu("Settings");
+	sub->addSpinbox("kP", &settings.pid2.fpid.kP, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+	sub->addSpinbox("kI", &settings.pid2.fpid.kI, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+	sub->addSpinbox("kD", &settings.pid2.fpid.kD, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);	// sub->addCheckbox("Take-Back-Half", &settings.pid1.fpid.takebackhalf);
+
+	menu.addSeparator("Setup");
+    sub = menu.addSubMenu("Pins");
+	sub->addSelector("Temp Pin N", &settings.pid1.pin_n, pidloop_ports);
+	sub->addSelector("Temp Pin P", &settings.pid1.pin_p, pidloop_ports);
+	sub->addSelector("RH% Pin N", &settings.pid2.pin_n, pidloop_ports);
+	sub->addSelector("RH% Pin P", &settings.pid2.pin_p, pidloop_ports);
+	menu.addAction("Save settings now", save_settings_cb);
 
 	menu.onClose(menu_close_cb);
 
 	menu.open();
+};
+
+void save_settings_cb(MenuItem* item, void* data)
+{
+	setman.save();
 };
 
 void menu_close_cb(MenuItem* item, void* data)
@@ -57,8 +77,8 @@ bool MenuScreen::loop()
 
 bool MenuScreen::handle(soogh_event_t e)
 {
-	// if(e>KEY_C)
-	// 	DBG("e = %s", soogh_event_name(e));
+	if(e>KEY_C)
+		DBG("e = %s", soogh_event_name(e));
 	
 	switch(e)
 	{

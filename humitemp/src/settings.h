@@ -23,6 +23,7 @@ class SettingsManager
 	public:
 		bool begin();
 		void loop();
+		void save();
 		void saveDelayed(time_t when = SETTINGS_DELAY_SAVE);
 		void setDefaults();
 

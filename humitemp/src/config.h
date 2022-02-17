@@ -69,9 +69,16 @@
 // #define PIN_HB2_B				GPIO_NUM_15
 
 // Mushy
-#define PIN_HB1_A				GPIO_NUM_2          // Not used
-#define PIN_HB1_B				GPIO_NUM_13
-#define PIN_HB2_A				GPIO_NUM_12         // Not used
-#define PIN_HB2_B				GPIO_NUM_15         // Not used
+// #define PIN_HB1_A				GPIO_NUM_2          // Not used
+// #define PIN_HB1_B				GPIO_NUM_13
+// #define PIN_HB2_A				GPIO_NUM_12         // Not used
+// #define PIN_HB2_B				GPIO_NUM_15         // Not used
+
+#define PIDLOOP_PORTS_LIST	\
+	{GPIO_NUM_2, 	"IO2", 	"GPIO2"},	\
+	{GPIO_NUM_12, 	"IO12", "GPIO12"},	\
+	{GPIO_NUM_13, 	"IO13", "GPIO13"},	\
+	{GPIO_NUM_15, 	"IO15", "GPIO15"},	\
+	{GPIO_NUM_26, 	"IO26", "GPIO26"}
 
 #endif // __CONFIG_H

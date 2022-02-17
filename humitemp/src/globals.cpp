@@ -13,5 +13,5 @@ settings_t& settings = setman.settings;
 double get_value1() { return sht_sensor.newMeasurement()->temperature; };
 double get_value2() { return sht_sensor.getHumidity(); };
 
-PIDLoop pid1(PIN_HB1_A, PIN_HB1_B, &get_value1, &(settings.pid1));
-PIDLoop pid2(PIN_HB2_A, PIN_HB2_B, &get_value2, &(settings.pid2));
+PIDLoop pid1(&(settings.pid1), &get_value1);
+PIDLoop pid2(&(settings.pid2), &get_value2);

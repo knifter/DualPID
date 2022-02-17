@@ -9,19 +9,29 @@
 #include "settings.h"
 #include "tools-log.h"
 
-PIDLoop::PIDLoop(gpio_num_t pin_a, gpio_num_t pin_b, pid_value_callback_ptr func, pidloop_settings_t* s) :
-    _pid(&(s->fpid), &_input, &_output),
+PIDLoop::PIDLoop(pidloop_settings_t* s, pid_value_callback_ptr func) :
+_pid(&(s->fpid), &_input, &_output),
     _settings(s),
-    _cb_value(func),
-    _pin_a(pin_a), 
-    _pin_b(pin_b)
+    _cb_value(func)
 {
 };
 
 bool PIDLoop::begin()
 {
-	digitalWrite(_pin_a, LOW);
-	digitalWrite(_pin_b, LOW);
+
+    _pin_n = static_cast<gpio_num_t>(_settings->pin_n);
+    _pin_p = static_cast<gpio_num_t>(_settings->pin_p);
+    // settings pin to >35 will make the digitalWrite do nothing
+    if(!_pin_n)
+        _pin_n = GPIO_NUM_MAX;
+    if(!_pin_p)
+        _pin_p = GPIO_NUM_MAX;
+
+    // config hardware
+  	pinMode(_pin_n, OUTPUT);
+  	pinMode(_pin_p, OUTPUT);
+	digitalWrite(_pin_n, LOW);
+	digitalWrite(_pin_p, LOW);
 
 	_windowstarttime = millis();
 	_input = NAN;
@@ -78,8 +88,8 @@ void PIDLoop::set_active(bool active)
         _pid.alignOutput();
         reset_output();
     } else {
-        digitalWrite(_pin_a, LOW);
-        digitalWrite(_pin_b, LOW);
+        digitalWrite(_pin_n, LOW);
+        digitalWrite(_pin_p, LOW);
     };
     _settings->active = active;
     _active_last = active;
@@ -102,9 +112,9 @@ void PIDLoop::loop()
         if(isnan(_input))
         {
             // Sensor error
-            WARNING("Sensor error. Going back to fail-safe.");
-            digitalWrite(_pin_a, LOW);
-            digitalWrite(_pin_b, LOW);
+            // WARNING("Sensor error. Going back to fail-safe.");
+            digitalWrite(_pin_n, LOW);
+            digitalWrite(_pin_p, LOW);
             return;
         };
 
@@ -150,6 +160,6 @@ void PIDLoop::loop()
                 B = HIGH;
             break;
     };
-    digitalWrite(_pin_a, A);
-    digitalWrite(_pin_b, B);
+    digitalWrite(_pin_n, A);
+    digitalWrite(_pin_p, B);
 };
