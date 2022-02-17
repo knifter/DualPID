@@ -11,14 +11,16 @@
 #include <treemenu.h>
 
 // C-style callbacks
-void save_settings_cb(MenuItem* item, void* data);
+void check_reboot_cb(MenuItem* item, void* data);
 void menu_close_cb(MenuItem* item, void* data);
 
 SelectorField::item_t pidloop_ports[] = {
-	{0, "-", "unused"},
+	{0, "none", "none/unused"},
 	PIDLOOP_PORTS_LIST
 	,{0, 0, 0}
 	};
+
+bool need_reboot;
 
 MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 {
@@ -40,20 +42,23 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 
 	menu.addSeparator("Setup");
     sub = menu.addSubMenu("Pins");
-	sub->addSelector("Temp -, Pin N", &settings.pid1.pin_n, pidloop_ports);
-	sub->addSelector("Temp +, Pin P", &settings.pid1.pin_p, pidloop_ports);
-	sub->addSelector("RH% -, Pin N", &settings.pid2.pin_n, pidloop_ports);
-	sub->addSelector("RH% +, Pin P", &settings.pid2.pin_p, pidloop_ports);
-	menu.addAction("Save settings now", save_settings_cb);
+	sub->addSelector("Temp -, Pin N", &settings.pid1.pin_n, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
+	sub->addSelector("Temp +, Pin P", &settings.pid1.pin_p, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
+	sub->addSelector("RH% -, Pin N", &settings.pid2.pin_n, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
+	sub->addSelector("RH% +, Pin P", &settings.pid2.pin_p, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
+	sub->onClose(check_reboot_cb);
 
 	menu.onClose(menu_close_cb);
-
 	menu.open();
 };
 
-void save_settings_cb(MenuItem* item, void* data)
+void check_reboot_cb(MenuItem* item, void* data)
 {
-	setman.save();
+	if(need_reboot)
+	{
+		setman.save();
+		gui.showMessage("INFO", "Settings changed. Need to reboot!", [](lv_event_t* e){ ESP.restart(); });
+	};
 };
 
 void menu_close_cb(MenuItem* item, void* data)

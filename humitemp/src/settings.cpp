@@ -51,9 +51,7 @@ void SettingsManager::loop()
 
 void SettingsManager::save()
 {
-	_saveat = 0;
-	_dirty = true;
-	DBG("%lu: Save settings now", millis());
+	write_flash();
 };
 
 void SettingsManager::saveDelayed(time_t later)
@@ -75,6 +73,8 @@ void SettingsManager::setDefaults()
 	settings.pid1.fpid.kI = DEFAULT_PID_I;
 	settings.pid1.fpid.kD = DEFAULT_PID_D;
 	settings.pid1.fpid.setpoint = DEFAULT_SETPOINT;
+	settings.pid1.pin_n = 0;
+	settings.pid1.pin_p = 0;
 
 	settings.pid2.active = false;
 	settings.pid2.mode = PIDLoop::MODE_ZP;
@@ -83,6 +83,8 @@ void SettingsManager::setDefaults()
 	settings.pid2.fpid.kI = DEFAULT_PID_I;
 	settings.pid2.fpid.kD = DEFAULT_PID_D;
 	settings.pid2.fpid.setpoint = DEFAULT_SETPOINT;
+	settings.pid2.pin_n = 0;
+	settings.pid2.pin_p = 0;
 
 	_dirty = true;
 

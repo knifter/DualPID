@@ -39,7 +39,7 @@ void setup()
 	{
         if(!sht_sensor.begin(SHT3X_ADDRESS_ALT))
         {
-			// gui.showMessage("ERROR:", "SHT3X(0x44/0x45): not found");
+			gui.showMessage("WARNING:", "SHT3X(0x44/0x45): not found");
         };
 	};
 
