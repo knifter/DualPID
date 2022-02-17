@@ -108,7 +108,7 @@ void PidPanel::setState(PidPanel::state_t state)
 			lv_obj_set_style_border_color(box, COLOR_WHITE, 0);
 			lv_obj_set_style_bg_color(box, COLOR_WHITE, 0);
 
-			lv_obj_set_style_bg_color(lbl_sp, COLOR_GREEN_LIGHT2, 0);
+			lv_obj_set_style_bg_color(lbl_sp, COLOR_GREEN_LIGHT(2), 0);
 			// lv_obj_set_style_bg_color(lbl_value, COLOR_WHITE, 0);
 
 			lv_obj_set_style_bg_color(bar_output, COLOR_WHITE, 0);

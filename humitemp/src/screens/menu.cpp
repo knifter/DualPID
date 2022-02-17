@@ -40,10 +40,10 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 
 	menu.addSeparator("Setup");
     sub = menu.addSubMenu("Pins");
-	sub->addSelector("Temp Pin N", &settings.pid1.pin_n, pidloop_ports);
-	sub->addSelector("Temp Pin P", &settings.pid1.pin_p, pidloop_ports);
-	sub->addSelector("RH% Pin N", &settings.pid2.pin_n, pidloop_ports);
-	sub->addSelector("RH% Pin P", &settings.pid2.pin_p, pidloop_ports);
+	sub->addSelector("Temp -, Pin N", &settings.pid1.pin_n, pidloop_ports);
+	sub->addSelector("Temp +, Pin P", &settings.pid1.pin_p, pidloop_ports);
+	sub->addSelector("RH% -, Pin N", &settings.pid2.pin_n, pidloop_ports);
+	sub->addSelector("RH% +, Pin P", &settings.pid2.pin_p, pidloop_ports);
 	menu.addAction("Save settings now", save_settings_cb);
 
 	menu.onClose(menu_close_cb);
