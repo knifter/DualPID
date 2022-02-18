@@ -82,8 +82,8 @@ bool MenuScreen::loop()
 
 bool MenuScreen::handle(soogh_event_t e)
 {
-	if(e>KEY_C)
-		DBG("e = %s", soogh_event_name(e));
+	// if(e>KEY_C)
+	// 	DBG("e = %s", soogh_event_name(e));
 	
 	switch(e)
 	{
