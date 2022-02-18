@@ -183,15 +183,6 @@ GraphPanel::GraphPanel(lv_obj_t* parent)
     ser2 = lv_chart_add_series(chart, COLOR_BLUE, LV_CHART_AXIS_SECONDARY_Y);
 	
 	lv_obj_add_event_cb(chart, draw_lbl_cb, LV_EVENT_DRAW_PART_BEGIN, this);
-
-	// pre-fill the chart
-	float v1 = pid1.get_input();
-	float v2 = pid2.get_input();
-	int p = GRAPH_POINTS;
-	while(p--)
-	{
-		appendVals(v1, v2);
-	};
 };
 
 void GraphPanel::draw_lbl_cb(lv_event_t* e)
