@@ -57,26 +57,6 @@
 #define PIN_BTN_B				GPIO_NUM_38
 #define PIN_BTN_C				GPIO_NUM_37
 
-// Version 1, TIP142 [1]
-// #define PIN_HB1_A				GPIO_NUM_2      // Not used
-// #define PIN_HB1_B				GPIO_NUM_13     // Not used
-// #define PIN_HB2_A				GPIO_NUM_12     // Not used
-// #define PIN_HB2_B				GPIO_NUM_26     // Not used
-
-// Begum. TIP142
-
-// Version 3 Paul (edwin's bridge)
-// #define PIN_HB1_A				GPIO_NUM_2      
-// #define PIN_HB1_B				GPIO_NUM_12
-// #define PIN_HB2_A				GPIO_NUM_13     
-// #define PIN_HB2_B				GPIO_NUM_15
-
-// Mushy
-// #define PIN_HB1_A				GPIO_NUM_2          // Not used
-// #define PIN_HB1_B				GPIO_NUM_13
-// #define PIN_HB2_A				GPIO_NUM_12         // Not used
-// #define PIN_HB2_B				GPIO_NUM_15         // Not used
-
 #define PIDLOOP_PORTS_LIST	\
 	{GPIO_NUM_2, 	"IO2", 	"GPIO2"},	\
 	{GPIO_NUM_12, 	"IO12", "GPIO12"},	\
