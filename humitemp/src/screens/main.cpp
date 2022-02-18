@@ -11,6 +11,9 @@
 
 #include <treemenu.h>
 
+#define GRAPH_TOTAL_SEC         ((int)(GRAPH_POINTS * GRAPH_DELTA_MS / 1000))
+#define GRAPH_SEC_PER_DEV       (GRAPH_TOTAL_SEC / (GRAPH_XTICKS-1))
+
 // C-style callbacks
 
 /*********************************************************************************************************************************/
@@ -144,6 +147,7 @@ class GraphPanel
 		lv_obj_t *box;
 	    lv_obj_t *chart;
 		lv_chart_series_t *ser1, *ser2;
+        bool redraw = true;
 };
 
 GraphPanel::GraphPanel(lv_obj_t* parent)
@@ -151,7 +155,7 @@ GraphPanel::GraphPanel(lv_obj_t* parent)
 	/*Create a chart*/	
 	box = lv_obj_create(parent);
 	lv_obj_set_size(box, DISPLAY_WIDTH/2, 80);
-	lv_obj_set_style_border_width(box, 2, 0);
+	lv_obj_set_style_border_width(box, 0, 0);
 	lv_obj_set_style_pad_all(box, 0, 0);
 	lv_obj_set_size(box, DISPLAY_WIDTH, DISPLAY_HEIGHT - 78);
 
@@ -160,10 +164,10 @@ GraphPanel::GraphPanel(lv_obj_t* parent)
 	lv_obj_align(chart, LV_ALIGN_TOP_MID, 0, 0);
 
     lv_chart_set_type(chart, LV_CHART_TYPE_LINE);
-    lv_chart_set_div_line_count(chart, 5, 7);
+    lv_chart_set_div_line_count(chart, GRAPH_YDIVS, GRAPH_XDIVS);
     lv_obj_set_style_size(chart, 0, LV_PART_INDICATOR);
 
-    lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_X, 1, 0, 7, 1, true, 20);
+    lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_X, 1, 0, GRAPH_XTICKS, 1, true, 20);
 	lv_chart_set_update_mode(chart, LV_CHART_UPDATE_MODE_SHIFT );
 
 	// Primary = Temp, secondary = Rh
@@ -174,7 +178,7 @@ GraphPanel::GraphPanel(lv_obj_t* parent)
     lv_chart_set_axis_tick(		chart,  LV_CHART_AXIS_SECONDARY_Y, 	1,         0,         3,         1,         true,     20);
 
     /*Add two data series*/
-	lv_chart_set_point_count(chart, HISTORY_GRAPH_POINTS);
+	lv_chart_set_point_count(chart, GRAPH_POINTS);
     ser1 = lv_chart_add_series(chart, COLOR_RED, LV_CHART_AXIS_PRIMARY_Y);
     ser2 = lv_chart_add_series(chart, COLOR_BLUE, LV_CHART_AXIS_SECONDARY_Y);
 	
@@ -183,7 +187,7 @@ GraphPanel::GraphPanel(lv_obj_t* parent)
 	// pre-fill the chart
 	float v1 = pid1.get_input();
 	float v2 = pid2.get_input();
-	int p = HISTORY_GRAPH_POINTS;
+	int p = GRAPH_POINTS;
 	while(p--)
 	{
 		appendVals(v1, v2);
@@ -196,21 +200,35 @@ void GraphPanel::draw_lbl_cb(lv_event_t* e)
     if(!lv_obj_draw_part_check_type(dsc, &lv_chart_class, LV_CHART_DRAW_PART_TICK_LABEL)) 
 		return;
 
+    // if no target buffer, forget about it
+    if(!dsc->text)
+    {
+        WARNING("No target buffer for tick-label?");
+        return;
+    };
+
+
+    // tmp value, don't allocate
+    static int this_sec;
+
 	// GraphPanel* me = static_cast<GraphPanel*>(e->user_data);
-
-	if(dsc->id == LV_CHART_AXIS_PRIMARY_X)
-		return;
-	// must be axis PRIM_Y or SEC_Y
-
-	// Color
-	if(dsc->id == LV_CHART_AXIS_PRIMARY_Y)
-		dsc->label_dsc->color = COLOR_RED;
-	if(dsc->id == LV_CHART_AXIS_SECONDARY_Y)
-		dsc->label_dsc->color = COLOR_BLUE;
-
-	// Scale value
-	if(dsc->text)
-        lv_snprintf(dsc->text, dsc->text_length, "%d", dsc->value / 10);
+    switch(dsc->id)
+    {
+        case LV_CHART_AXIS_PRIMARY_X:
+            this_sec = GRAPH_SEC_PER_DEV * (GRAPH_XTICKS-1-dsc->value);
+            lv_snprintf(dsc->text, dsc->text_length, "-%d:%02d", this_sec / 3600, (this_sec % 3600) / 60);
+    		return;
+        case LV_CHART_AXIS_PRIMARY_Y:
+		    dsc->label_dsc->color = COLOR_RED;
+            lv_snprintf(dsc->text, dsc->text_length, "%d", dsc->value / 10);
+            return;
+	    case LV_CHART_AXIS_SECONDARY_Y:
+		    dsc->label_dsc->color = COLOR_BLUE;
+            lv_snprintf(dsc->text, dsc->text_length, "%d", dsc->value / 10);
+            return;
+        default:
+            return;  
+    };
 };
 
 void GraphPanel::appendVals(const float val1, const float val2)
@@ -226,6 +244,7 @@ void GraphPanel::setScaleY(const lv_chart_axis_t axis, const float miny, const f
 	lv_chart_set_range(chart, axis, miny*GRAPH_MULTIPLIER, maxy*GRAPH_MULTIPLIER);
 	// void lv_chart_set_axis_tick(obj, axis, major_len, minor_len, major_cnt, minor_cnt, label_en, draw_size)
     lv_chart_set_axis_tick(		chart,  axis, 1,         0,         3,         1,         true,     20);
+    // redraw = true;
 };
 
 void GraphPanel::autoScale(const lv_chart_axis_t axis, const float inc1, const float inc2)
@@ -300,7 +319,7 @@ bool MainScreen::loop()
 		return true;
 
 	gw->appendVals(i1, i2);
-	_next_chart = now + HISTORY_GRAPH_DELTA_MS;
+	_next_chart = now + GRAPH_DELTA_MS;
     
     return false;
 };
