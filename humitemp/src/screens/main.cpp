@@ -126,8 +126,8 @@ void PidPanel::setBar(float p) {     	lv_bar_set_value(bar_output, p, LV_ANIM_ON
 void PidPanel::selected(bool select)
 {
 	if(select)
-	{
-		lv_obj_set_style_border_color(box, COLOR_BLACK, 0);
+    {
+        lv_obj_set_style_border_color(box, COLOR_BLACK, 0);
 	}else{
 		lv_obj_set_style_border_color(box, COLOR_GREY, 0);
 	};
@@ -141,7 +141,7 @@ class GraphPanel
 
 		void appendVals(const float val1, const float val2);
 		void setScaleY(const lv_chart_axis_t, float min, float max);
-		void autoScale(const lv_chart_axis_t axis, const float inc1, const float inc2);
+		void autoScale(const lv_chart_axis_t axis, const float inc_sp);
 		static void draw_lbl_cb(lv_event_t* e);
 
 		lv_obj_t *box;
@@ -154,13 +154,12 @@ GraphPanel::GraphPanel(lv_obj_t* parent)
 {
 	/*Create a chart*/	
 	box = lv_obj_create(parent);
-	lv_obj_set_size(box, DISPLAY_WIDTH/2, 80);
 	lv_obj_set_style_border_width(box, 0, 0);
 	lv_obj_set_style_pad_all(box, 0, 0);
 	lv_obj_set_size(box, DISPLAY_WIDTH, DISPLAY_HEIGHT - 78);
 
     chart = lv_chart_create(box);
-    lv_obj_set_size(chart, DISPLAY_WIDTH - 50, DISPLAY_HEIGHT - 80 - 20);
+    lv_obj_set_size(chart, DISPLAY_WIDTH - 55, DISPLAY_HEIGHT - 80 - 20);
 	lv_obj_align(chart, LV_ALIGN_TOP_MID, 0, 0);
 
     lv_chart_set_type(chart, LV_CHART_TYPE_LINE);
@@ -174,8 +173,8 @@ GraphPanel::GraphPanel(lv_obj_t* parent)
 	// setScaleY(LV_CHART_AXIS_PRIMARY_Y, -10*GRAPH_MULTIPLIER, 30*GRAPH_MULTIPLIER);
 	// setScaleY(LV_CHART_AXIS_SECONDARY_Y, 0*GRAPH_MULTIPLIER, 100*GRAPH_MULTIPLIER);
 	// void lv_chart_set_axis_tick(obj, axis, 						major_len, minor_len, major_cnt, minor_cnt, label_en, draw_size)
-    lv_chart_set_axis_tick(		chart,  LV_CHART_AXIS_PRIMARY_Y, 	1,         0,         3,         1,         true,     20);
-    lv_chart_set_axis_tick(		chart,  LV_CHART_AXIS_SECONDARY_Y, 	1,         0,         3,         1,         true,     20);
+    lv_chart_set_axis_tick(		chart,  LV_CHART_AXIS_PRIMARY_Y, 	1,         0,         3,         1,         true,     40);
+    lv_chart_set_axis_tick(		chart,  LV_CHART_AXIS_SECONDARY_Y, 	1,         0,         3,         1,         true,     40);
 
     /*Add two data series*/
 	lv_chart_set_point_count(chart, GRAPH_POINTS);
@@ -211,11 +210,11 @@ void GraphPanel::draw_lbl_cb(lv_event_t* e)
     		return;
         case LV_CHART_AXIS_PRIMARY_Y:
 		    dsc->label_dsc->color = COLOR_RED;
-            lv_snprintf(dsc->text, dsc->text_length, "%d", dsc->value / 10);
+            lv_snprintf(dsc->text, dsc->text_length, "%d", dsc->value / GRAPH_MULTIPLIER);
             return;
 	    case LV_CHART_AXIS_SECONDARY_Y:
 		    dsc->label_dsc->color = COLOR_BLUE;
-            lv_snprintf(dsc->text, dsc->text_length, "%d", dsc->value / 10);
+            lv_snprintf(dsc->text, dsc->text_length, "%d", dsc->value / GRAPH_MULTIPLIER);
             return;
         default:
             return;  
@@ -224,8 +223,11 @@ void GraphPanel::draw_lbl_cb(lv_event_t* e)
 
 void GraphPanel::appendVals(const float val1, const float val2)
 {
-	lv_chart_set_next_value(chart, ser1, val1*GRAPH_MULTIPLIER);
-	lv_chart_set_next_value(chart, ser2, val2*GRAPH_MULTIPLIER);
+	lv_chart_set_next_value(chart, ser1, isnan(val1) ? LV_CHART_POINT_NONE : val1*GRAPH_MULTIPLIER);
+	lv_chart_set_next_value(chart, ser2, isnan(val2) ? LV_CHART_POINT_NONE : val2*GRAPH_MULTIPLIER);
+
+	autoScale(LV_CHART_AXIS_PRIMARY_Y, settings.pid1.fpid.setpoint);
+	autoScale(LV_CHART_AXIS_SECONDARY_Y, settings.pid2.fpid.setpoint);
 };
 
 void GraphPanel::setScaleY(const lv_chart_axis_t axis, const float miny, const float maxy)
@@ -238,23 +240,28 @@ void GraphPanel::setScaleY(const lv_chart_axis_t axis, const float miny, const f
     // redraw = true;
 };
 
-void GraphPanel::autoScale(const lv_chart_axis_t axis, const float inc1, const float inc2)
+void GraphPanel::autoScale(const lv_chart_axis_t axis, const float inc_sp)
 {
-	float minyM = min(inc1, inc2) * GRAPH_MULTIPLIER;
-	float maxyM = max(inc1, inc2) * GRAPH_MULTIPLIER;
+	float minyM = inc_sp * GRAPH_MULTIPLIER;
+	float maxyM = inc_sp * GRAPH_MULTIPLIER;
 
 	// note: instead of dividing all the points, we multiply the others with GRAPH_MULTIPLIER and then divide once
 
 	// find min/max
 	int cnt = lv_chart_get_point_count(chart);
 	lv_chart_series_t *ser = axis == LV_CHART_AXIS_PRIMARY_Y ? ser1 : ser2;
-	while(--cnt)
+	while(cnt--)
 	{
-		minyM = min(minyM, static_cast<float>(ser->y_points[cnt]));
-		maxyM = max(maxyM, static_cast<float>(ser->y_points[cnt]));
+        if(ser->y_points[cnt] == LV_CHART_POINT_NONE)
+            continue;
+
+        float point = static_cast<float>(ser->y_points[cnt]);
+
+		minyM = min(minyM, point);
+		maxyM = max(maxyM, point);
 	};
-	minyM = floor(minyM/(GRAPH_SCALE_ROOUND*GRAPH_MULTIPLIER)) *(GRAPH_SCALE_ROOUND*GRAPH_MULTIPLIER);
-	maxyM = ceil(maxyM/(GRAPH_SCALE_ROOUND*GRAPH_MULTIPLIER)) *(GRAPH_SCALE_ROOUND*GRAPH_MULTIPLIER);
+	minyM = floor(minyM/(GRAPH_SCALE_ROUND*GRAPH_MULTIPLIER)) *(GRAPH_SCALE_ROUND*GRAPH_MULTIPLIER);
+	maxyM = ceil(maxyM/(GRAPH_SCALE_ROUND*GRAPH_MULTIPLIER)) *(GRAPH_SCALE_ROUND*GRAPH_MULTIPLIER);
 
 	// setScaleY(axis, (minyM/GRAPH_MULTIPLIER) - GRAPH_SCALE_ROOUND, (maxyM/GRAPH_MULTIPLIER) + GRAPH_SCALE_ROOUND);
 	lv_chart_set_range(chart, axis, minyM, maxyM);
@@ -270,6 +277,8 @@ MainScreen::MainScreen(SooghGUI& g) : Screen(g)
 
 	gw = new GraphPanel(_screen);
 	lv_obj_align(gw->box, LV_ALIGN_BOTTOM_MID, 0, 0);
+
+   	// gw->appendVals(settings.pid1.fpid.setpoint, settings.pid2.fpid.setpoint);
 };
 
 bool MainScreen::loop()
@@ -302,14 +311,11 @@ bool MainScreen::loop()
 		pw2->setState(PidPanel::PS_DISABLED);
 	};
 
-	// autoscale
-	gw->autoScale(LV_CHART_AXIS_PRIMARY_Y, pid1.get_input(), settings.pid1.fpid.setpoint);
-	gw->autoScale(LV_CHART_AXIS_SECONDARY_Y, pid2.get_input(), settings.pid2.fpid.setpoint);
-
 	if(now < _next_chart)
 		return true;
 
 	gw->appendVals(i1, i2);
+
 	_next_chart = now + GRAPH_DELTA_MS;
     
     return false;

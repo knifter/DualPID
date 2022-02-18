@@ -22,10 +22,10 @@
 #define PIDLOOP_LOOP_MS     	1000            // PID delta-T: 2 seconds as it was
 #define PIDLOOP_WINDOWSIZE      5000      		// time-windows size in ms
 
-#define GRAPH_DELTA_MS	        60E3		// Time between graph points
-#define GRAPH_POINTS	        240
-#define GRAPH_SCALE_ROOUND		5			// scale min/max is rounded to a multiple of this
-#define GRAPH_MULTIPLIER		10			// Graph scale precision
+#define GRAPH_DELTA_MS	        60E3		    // Time between graph points
+#define GRAPH_POINTS	        240             // Amount of points in graph
+#define GRAPH_SCALE_ROUND		5			    // scale min/max is rounded to a multiple of this
+#define GRAPH_MULTIPLIER		10			    // Graph scale precision for calculation(10 = 1 decimal)
 #define GRAPH_XDIVS             9
 #define GRAPH_YDIVS             5
 #define GRAPH_XTICKS            5
