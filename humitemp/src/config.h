@@ -8,16 +8,14 @@
 #define DEBUG_INTERVAL_MS		100
 #define BOOTSCREEN_TIMEOUT_MS	1000
 
-#define NVS_NAMESPACE			"PidSettings"
-#define NVS_SETTINGS_IDENT		"EPIDSET"
 #define SETTINGS_DELAY_SAVE		20E3
+// #define DEFAULT_SENSOR_LOOP_MS  1000
 #define DEFAULT_SETPOINT		50.0
 #define DEFAULT_PID_F			0.0
 #define DEFAULT_PID_P			5.0
 #define DEFAULT_PID_I			2.0
 #define DEFAULT_PID_D			2.0
 
-// #define MEASURE_INTERVAL_MS		1000
 #define MAIN_LOOP_MS			500
 #define PIDLOOP_LOOP_MS     	1000            // PID delta-T: 2 seconds as it was
 #define PIDLOOP_WINDOWSIZE      5000      		// time-windows size in ms

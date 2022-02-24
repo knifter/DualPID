@@ -21,12 +21,11 @@ class PIDLoop
 
         typedef struct
         {
-            uint32_t pin_n;
-            uint32_t pin_p;
             bool active;
             PIDLoop::output_mode_t	mode;
+            uint32_t pin_n;
+            uint32_t pin_p;
             FPID::fpid_settings_t fpid;
-            double max_dc;
         } pidloop_settings_t;
 
         PIDLoop(pidloop_settings_t* s, pid_value_callback_ptr func);

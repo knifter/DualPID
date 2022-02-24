@@ -24,6 +24,7 @@ bool need_reboot;
 
 MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 {
+
 	menu.addSeparator("Temperature");
 	menu.addSpinbox("Setpoint", &settings.pid1.fpid.setpoint, TEMPERATURE_MIN, TEMPERATURE_MAX, TEMPERATURE_PRECISION);
 	menu.addSwitch("Active", &settings.pid1.active);
@@ -38,7 +39,8 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
     sub = menu.addSubMenu("Settings");
 	sub->addSpinbox("kP", &settings.pid2.fpid.kP, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
 	sub->addSpinbox("kI", &settings.pid2.fpid.kI, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-	sub->addSpinbox("kD", &settings.pid2.fpid.kD, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);	// sub->addCheckbox("Take-Back-Half", &settings.pid1.fpid.takebackhalf);
+	sub->addSpinbox("kD", &settings.pid2.fpid.kD, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);	
+	// sub->addCheckbox("Take-Back-Half", &settings.pid1.fpid.takebackhalf);
 
 	menu.addSeparator("Setup");
     sub = menu.addSubMenu("Pins");
@@ -47,6 +49,9 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 	sub->addSelector("RH% -, Pin N", &settings.pid2.pin_n, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
 	sub->addSelector("RH% +, Pin P", &settings.pid2.pin_p, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
 	sub->onClose(check_reboot_cb);
+    // sub->addAction("Begin", [](MenuItem*, void*){ setman.begin(true); });
+    sub->addAction("Save settings", [](MenuItem*, void*){ setman.save(); });
+    sub->addAction("Erase settings", [](MenuItem*, void*){ setman.erase(); });
 
 	menu.onClose(menu_close_cb);
 	menu.open();

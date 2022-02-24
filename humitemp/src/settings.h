@@ -1,45 +1,28 @@
 #ifndef __SETTINGS_H
 #define __SETTINGS_H
 
-#include <stdint.h>
-#include <nvs.h>
+#include <tools-nvs.h>
 
-#include <FPID.h>
-
+// #include "config.h"
+// #include "globals.h"
 #include "pidloop.h"
-
-#ifndef SETTINGS_DELAY_SAVE
-	#define SETTINGS_DELAY_SAVE		5000
-#endif
 
 typedef struct
 {
+    // int sensor_loop_ms;         // Sensor poll loop-time
 	PIDLoop::pidloop_settings_t pid1;
 	PIDLoop::pidloop_settings_t pid2;
 } settings_t;
 
-class SettingsManager
+class SettingsManager : public NVSettings
 {
 	public:
-		bool begin();
-		void loop();
-		void save();
-		void saveDelayed(time_t when = SETTINGS_DELAY_SAVE);
-		void setDefaults();
+        SettingsManager(settings_t&);
 
-		settings_t settings;
-		
-	private:
-		bool write_flash();
-		bool read_flash();
-		bool initialize_flash();
-		bool erase();
+    private:
+        bool set_defaults_since(const uint32_t data_version);
+        bool read_blob(void* blob, const size_t blob_size, const uint32_t blob_version);
 
-		esp_err_t _err = ESP_OK;
-		bool _init = false;
-		nvs_handle _handle = 0;
-		time_t _saveat = 0;
-		bool _dirty = true;
 };
 
 #endif //__SETTINGS_H

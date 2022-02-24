@@ -7,8 +7,8 @@
 
 SHT3X sht_sensor(Wire);
 GUI gui;
-SettingsManager setman;
-settings_t& settings = setman.settings;
+settings_t settings;
+SettingsManager setman(settings);
 
 double get_value1() { return sht_sensor.newMeasurement()->temperature; };
 double get_value2() { return sht_sensor.getHumidity(); };

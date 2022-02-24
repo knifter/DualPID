@@ -4,155 +4,69 @@
 #include <nvs.h>
 
 #include "config.h"
+#include "globals.h"
 #include "tools-log.h"
 
-typedef struct
+SettingsManager::SettingsManager(settings_t& settings) : NVSettings(&settings, sizeof(settings_t))
 {
-	uint32_t version;
-	settings_t data;
-} settingswrapper_t;
 
-bool SettingsManager::begin()
-{  
-	_err = nvs_open(NVS_NAMESPACE, NVS_READWRITE, &_handle);
-	if (_err != ESP_OK) 
-	{
-		ERROR("Unable to open NVS namespace: %s", esp_err_to_name(_err));
-		return false;
-	};
-
-	if(!read_flash())
-	{
-		INFO("Reading settings from flash failed, initializing NVS");
-		setDefaults();
-		if(!write_flash())
-		{
-			ERROR("Writing initial settings to flash failed: %s", esp_err_to_name(_err));
-			return _init = false;
-		};
-		return _init = true;
-	};
-
-	INFO("Read settings from flash.");
-	return _init = true;
 };
 
-void SettingsManager::loop()
+bool SettingsManager::set_defaults_since(const uint32_t data_version)
 {
-	if(!_init)
-		return;
-	time_t now = millis();
-	if(now > _saveat && _dirty)
-	{
-		INFO("Saving settings to NVS");
-		write_flash();
-	};
-};
+    settings_t *settings = static_cast<settings_t*>(_data);
 
-void SettingsManager::save()
-{
-	write_flash();
-};
+    switch(data_version)
+    {
+        default:
+            ERROR("Unknown data version: %d", data_version);
+            return false;
+        case 0: // empty blob
+            DBG("Init settings v0: defaults");
+            memset(_data, 0, _data_size);
+            settings->pid1.active = false;
+            settings->pid1.mode = PIDLoop::MODE_ZP;
+            settings->pid1.pin_n = 0;
+            settings->pid1.pin_p = 0;
+            settings->pid1.fpid.kF = DEFAULT_PID_F;
+            settings->pid1.fpid.kP = DEFAULT_PID_P;
+            settings->pid1.fpid.kI = DEFAULT_PID_I;
+            settings->pid1.fpid.kD = DEFAULT_PID_D;
+            settings->pid1.fpid.setpoint = DEFAULT_SETPOINT;
 
-void SettingsManager::saveDelayed(time_t later)
-{
-	time_t when = millis() + later;
-	if(when > _saveat)
-		_saveat = when;
-	_dirty = true;
-	DBG("%lu: Will save settings at %lu", millis(), when);
-};
+            settings->pid2.active = false;
+            settings->pid2.mode = PIDLoop::MODE_ZP;
+            settings->pid2.pin_n = 0;
+            settings->pid2.pin_p = 0;
+            settings->pid2.fpid.kF = DEFAULT_PID_F;
+            settings->pid2.fpid.kP = DEFAULT_PID_P;
+            settings->pid2.fpid.kI = DEFAULT_PID_I;
+            settings->pid2.fpid.kD = DEFAULT_PID_D;
+            settings->pid2.fpid.setpoint = DEFAULT_SETPOINT;
 
-void SettingsManager::setDefaults()
-{
-	DBG("Initializing defaults.");
-	settings.pid1.active = false;
-	settings.pid1.mode = PIDLoop::MODE_ZP;
-	settings.pid1.fpid.kF = DEFAULT_PID_F;
-	settings.pid1.fpid.kP = DEFAULT_PID_P;
-	settings.pid1.fpid.kI = DEFAULT_PID_I;
-	settings.pid1.fpid.kD = DEFAULT_PID_D;
-	settings.pid1.fpid.setpoint = DEFAULT_SETPOINT;
-	settings.pid1.pin_n = 0;
-	settings.pid1.pin_p = 0;
+            _data_version = 1;
+            _dirty = true;
 
-	settings.pid2.active = false;
-	settings.pid2.mode = PIDLoop::MODE_ZP;
-	settings.pid2.fpid.kF = DEFAULT_PID_F;
-	settings.pid2.fpid.kP = DEFAULT_PID_P;
-	settings.pid2.fpid.kI = DEFAULT_PID_I;
-	settings.pid2.fpid.kD = DEFAULT_PID_D;
-	settings.pid2.fpid.setpoint = DEFAULT_SETPOINT;
-	settings.pid2.pin_n = 0;
-	settings.pid2.pin_p = 0;
-
-	_dirty = true;
-
-	return;
-};
-
-bool SettingsManager::write_flash()
-{
-	settingswrapper_t wrapper;
-	wrapper.version = VERSION;
-	memcpy(&(wrapper.data), &settings, sizeof(settings));
-	_err = nvs_set_blob(_handle, NVS_SETTINGS_IDENT, &wrapper, sizeof(settingswrapper_t));
-	if(_err != OK)
-	{
-		ERROR("Failed to save settings to NVS: %s", esp_err_to_name(_err));
-		return false;
-	};
-
-	nvs_commit(_handle);
-	INFO("Settings saved to NVS.");
-	_dirty = false;
-	return true;
-};
-
-bool SettingsManager::read_flash()
-{
-	// get settings
-	settingswrapper_t wrapper;
-	size_t blobsize = sizeof(settingswrapper_t);
-	_err = nvs_get_blob(_handle, NVS_SETTINGS_IDENT, &wrapper, &blobsize);
-	if(_err == ESP_ERR_NVS_NOT_FOUND) 
-	{
-		WARNING("Pristine flash. Can't read settings.");
-		return false;
-	};
-	if(_err != ESP_OK) 
-	{
-		ERROR("Unable to read settings: %s", esp_err_to_name(_err));
-		return false;
-  	};
-	if(blobsize != sizeof(settingswrapper_t))
-	{
-		ERROR("NVS blobsize(%u) != my wrapper size(%u).", blobsize, sizeof(settingswrapper_t));
-		return false;
-	};
-	// if(wrapper.version != VERSION)
-	// {
-	// 	INFO("NVS Settings wrong version.");
-	// 	return false;
-	// };
-
-	// settings were read from flash
-	memcpy(&settings, &(wrapper.data), sizeof(settings_t));
-	_dirty = false;
+            return true;
+    };
 
 	return true;
 };
 
-bool SettingsManager::erase()
+bool SettingsManager::read_blob(void* blob, const size_t blob_size, const uint32_t blob_version)
 {
-	esp_err_t err = nvs_erase_key(_handle, NVS_SETTINGS_IDENT);
-	if(err == ESP_ERR_NVS_NOT_FOUND)
-	{
-		WARNING("NVS key '%s' not present. Nothing to erase.", NVS_SETTINGS_IDENT);
-		return false;
-	};
-	ESP_ERROR_CHECK(err);
-	nvs_commit(_handle);
-	INFO("NVM Settings erased.");
+    switch(blob_version)
+    {
+        default:
+            ERROR("Unknown blob version: %d", blob_version);
+            return false;
+        
+        case 1: //valid, up-to-date settings
+            memcpy(_data, blob, blob_size);
+            _data_version = 1;
+            _dirty = false;
+            return true;
+    };
+
 	return true;
 };
