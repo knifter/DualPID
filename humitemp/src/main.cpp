@@ -9,9 +9,11 @@
 
 #include "tools-log.h"
 
+SHT3X sht_sensor(Wire);
+
 void halt(const char*);
-void loop_measure();
 uint32_t scan_keys();
+void sensor_loop();
 
 void setup()
 {
@@ -25,12 +27,8 @@ void setup()
 	pinMode(PIN_BTN_B, INPUT);
 	pinMode(PIN_BTN_C, INPUT);
 
-    // while(1)
-    // {
-    //     static bool tmp;
-    //     digitalWrite(PIN_HB2_B, tmp=!tmp);
-    //     delay(500);
-    // };
+	// Hold startup, for debugging purposes
+	while(scan_keys() == KEY_A);
 
 	gui.begin();
 
@@ -42,6 +40,9 @@ void setup()
 			gui.showMessage("WARNING:", "SHT3X(0x44/0x45): not found");
         };
 	};
+
+	input_value1 = NAN;
+	input_value2 = NAN;
 
 	setman.begin();
 	pid1.begin();
@@ -57,9 +58,30 @@ void loop()
 	gui.handle(e);
 
 	setman.loop();
+	sensor_loop();
 	pid1.loop();
 	pid2.loop();
 	gui.loop();
+};
+
+void sensor_loop()
+{
+	static time_t next = 0;
+	time_t now = millis();
+	if(next > now)
+		return;
+	next = now + settings.sensor_loop_ms;
+
+	SHT3X::measurement_t* m = sht_sensor.newMeasurement();
+	if(m->error)
+	{
+		input_value1 = NAN;
+		input_value2 = NAN;
+		return;
+	};
+
+	input_value1 = m->temperature;
+	input_value2 = m->humidity;
 };
 
 void halt(const char* error)

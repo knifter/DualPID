@@ -44,8 +44,8 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
             settings->pid2.fpid.kD = DEFAULT_PID_D;
             settings->pid2.fpid.setpoint = DEFAULT_SETPOINT;
 
-            _data_version = 1;
-            _dirty = true;
+        case 1:
+            settings->sensor_loop_ms = DEFAULT_SENSOR_LOOP_MS;
 
             return true;
     };
@@ -60,10 +60,17 @@ bool SettingsManager::read_blob(void* blob, const size_t blob_size, const uint32
         default:
             ERROR("Unknown blob version: %d", blob_version);
             return false;
-        
-        case 1: //valid, up-to-date settings
+
+        case 1:
             memcpy(_data, blob, blob_size);
-            _data_version = 1;
+            set_defaults_since(1);
+            _data_version = 2;
+            _dirty = true;
+            return true;
+
+        case 2: //valid, up-to-date settings
+            memcpy(_data, blob, blob_size);
+            _data_version = 2;
             _dirty = false;
             return true;
     };

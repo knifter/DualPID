@@ -20,6 +20,13 @@ SelectorField::item_t pidloop_ports[] = {
 	,{0, 0, 0}
 	};
 
+SelectorField::item_t sensor_loop_times [] = {
+	{100, "100ms", "100ms"},
+	{1000, "1s", "1s"},
+	{5000, "5s", "5s"},
+	{0, 0, 0}
+	};
+
 bool need_reboot;
 
 MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
@@ -43,9 +50,11 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 	// sub->addCheckbox("Take-Back-Half", &settings.pid1.fpid.takebackhalf);
 
 	menu.addSeparator("Setup");
-    sub = menu.addSubMenu("Pins");
+	menu.addSelector("Measure time", &settings.sensor_loop_ms, sensor_loop_times);
+    sub = menu.addSubMenu("PID1");
 	sub->addSelector("Temp -, Pin N", &settings.pid1.pin_n, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
 	sub->addSelector("Temp +, Pin P", &settings.pid1.pin_p, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
+    sub = menu.addSubMenu("PID2");
 	sub->addSelector("RH% -, Pin N", &settings.pid2.pin_n, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
 	sub->addSelector("RH% +, Pin P", &settings.pid2.pin_p, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
 	sub->onClose(check_reboot_cb);

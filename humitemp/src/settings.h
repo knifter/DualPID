@@ -9,7 +9,7 @@
 
 typedef struct
 {
-    // int sensor_loop_ms;         // Sensor poll loop-time
+    uint32_t sensor_loop_ms;         // Sensor poll loop-time
 	PIDLoop::pidloop_settings_t pid1;
 	PIDLoop::pidloop_settings_t pid2;
 } settings_t;

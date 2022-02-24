@@ -278,7 +278,6 @@ MainScreen::MainScreen(SooghGUI& g) : Screen(g)
 	gw = new GraphPanel(_screen);
 	lv_obj_align(gw->box, LV_ALIGN_BOTTOM_MID, 0, 0);
 
-   	// gw->appendVals(settings.pid1.fpid.setpoint, settings.pid2.fpid.setpoint);
 };
 
 bool MainScreen::loop()
@@ -289,10 +288,8 @@ bool MainScreen::loop()
 
 	_next_update = now + MAIN_LOOP_MS;
 
-	float i1 = pid1.get_input();
-	float i2 = pid2.get_input();
 	pw1->setSetPoint(settings.pid1.fpid.setpoint);
-	pw1->setValue(i1);
+	pw1->setValue(input_value1);
 	pw1->setBar(pid1.get_output_percent());
 	if(settings.pid1.active)
 	{
@@ -302,7 +299,7 @@ bool MainScreen::loop()
 	};
 
 	pw2->setSetPoint(settings.pid2.fpid.setpoint);
-	pw2->setValue(i2);
+	pw2->setValue(input_value2);
 	pw2->setBar(pid2.get_output_percent());
 	if(settings.pid2.active)
 	{
@@ -314,7 +311,7 @@ bool MainScreen::loop()
 	if(now < _next_chart)
 		return true;
 
-	gw->appendVals(i1, i2);
+	gw->appendVals(input_value1, input_value2);
 
 	_next_chart = now + GRAPH_DELTA_MS;
     

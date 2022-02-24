@@ -8,13 +8,12 @@
 
 extern settings_t settings;
 
+extern double input_value1;
+extern double input_value2;
+
 extern GUI gui;
-extern SHT3X sht_sensor;
 extern SettingsManager setman;
 extern PIDLoop pid1;
 extern PIDLoop pid2;
-
-double get_value1();
-double get_value2();
 
 #endif //__GLOBALS_H

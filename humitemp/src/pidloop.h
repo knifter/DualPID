@@ -7,8 +7,6 @@
 // #include "settings.h"
 #include "driver/gpio.h"
 
-typedef double (*pid_value_callback_ptr)();
-
 class PIDLoop
 {
     public:
@@ -28,11 +26,11 @@ class PIDLoop
             FPID::fpid_settings_t fpid;
         } pidloop_settings_t;
 
-        PIDLoop(pidloop_settings_t* s, pid_value_callback_ptr func);
+        PIDLoop(pidloop_settings_t* s, const double* input);
 
         bool begin();
         void loop();
-        double get_input() { return _input; };
+        // double get_input() { return *_input; };
         double get_output() { return _output; };
         double get_output_percent() { return _output*100/PIDLOOP_WINDOWSIZE; };
         // int get_output_state() { return _output_state; };
@@ -43,10 +41,10 @@ class PIDLoop
     private: 
         FPID _pid;
         pidloop_settings_t *_settings;
-        pid_value_callback_ptr _cb_value;
 
         // double Input, Output, Setpoint;
-        double _input, _output;
+        const double *_input;
+        double _output;
         time_t _windowstarttime;
         gpio_num_t _pin_n, _pin_p;
         time_t _pid_last;

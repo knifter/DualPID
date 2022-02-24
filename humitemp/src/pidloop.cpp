@@ -9,10 +9,9 @@
 #include "settings.h"
 #include "tools-log.h"
 
-PIDLoop::PIDLoop(pidloop_settings_t* s, pid_value_callback_ptr func) :
-_pid(&(s->fpid), &_input, &_output),
-    _settings(s),
-    _cb_value(func)
+PIDLoop::PIDLoop(pidloop_settings_t* s, const double* input) :
+_pid(&(s->fpid), _input, &_output),
+    _settings(s), _input(input)
 {
 };
 
@@ -34,7 +33,6 @@ bool PIDLoop::begin()
 	digitalWrite(_pin_p, LOW);
 
 	_windowstarttime = millis();
-	_input = NAN;
     _pid_last = millis();
 
     switch(_settings->mode)
@@ -108,8 +106,7 @@ void PIDLoop::loop()
     if(now > _pid_last + PIDLOOP_LOOP_MS)
     {
         // Input for the PID
-        _input = _cb_value();
-        if(isnan(_input))
+        if(isnan(*_input))
         {
             // Sensor error
             // WARNING("Sensor error. Going back to fail-safe.");
