@@ -1,11 +1,27 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
+#define _STRINGIFY(x)      #x
+#define STRINGIFY(x)      _STRINGIFY(x)
+
 #define DEBUG                   1
-#define TOOLS_LOG_DEBUG
+#ifdef DEBUG
+	// Enable DBG(...) globally:
+	#define TOOLS_LOG_DEBUG
+
+	// Or per file:
+
+	// Specific parts:
+	#define DEBUG_INTERVAL_MS		250
+#endif
+
 #define GUI_KEYPAD
 
-#define DEBUG_INTERVAL_MS		100
+#define VERSION                BUILD_DATETIME
+#define VERSIONSTR_LONG        STRINGIFY(GIT_BRANCH-VERSION)
+#define VERSIONSTR_SHORT       STRINGIFY(VERSION)
+
+// #define DEBUG_INTERVAL_MS		100
 #define BOOTSCREEN_TIMEOUT_MS	1000
 
 #define SETTINGS_DELAY_SAVE		20E3
