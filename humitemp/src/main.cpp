@@ -28,7 +28,7 @@ void setup()
 	pinMode(PIN_BTN_C, INPUT);
 
 	// Hold startup, for debugging purposes
-	while(scan_keys() == KEY_A);
+	while(scan_keys() == KEY_AC);
 
 	gui.begin();
 
