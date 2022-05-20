@@ -12,5 +12,5 @@ SettingsManager setman(settings);
 double input_value1;
 double input_value2;
 
-PIDLoop pid1(&(settings.pid1), &input_value1);
-PIDLoop pid2(&(settings.pid2), &input_value2);
+PIDLoop pid1((settings.pid1), input_value1);
+PIDLoop pid2((settings.pid2), input_value2);

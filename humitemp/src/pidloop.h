@@ -26,7 +26,7 @@ class PIDLoop
             FPID::fpid_settings_t fpid;
         } pidloop_settings_t;
 
-        PIDLoop(pidloop_settings_t* s, const double* input);
+        PIDLoop(pidloop_settings_t& s, const double& input);
 
         bool begin();
         void loop();

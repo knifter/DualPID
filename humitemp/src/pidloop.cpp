@@ -9,17 +9,16 @@
 #include "settings.h"
 #include "tools-log.h"
 
-PIDLoop::PIDLoop(pidloop_settings_t* s, const double* input) :
-_pid(&(s->fpid), _input, &_output),
-    _settings(s), _input(input)
+PIDLoop::PIDLoop(pidloop_settings_t& s, const double& input) :
+    _pid(&(s.fpid), (&input), (&_output)),
+    _settings(s), _input_ref(input)
 {
 };
 
 bool PIDLoop::begin()
 {
-
-    _pin_n = static_cast<gpio_num_t>(_settings->pin_n);
-    _pin_p = static_cast<gpio_num_t>(_settings->pin_p);
+    _pin_n = static_cast<gpio_num_t>(_settings.pin_n);
+    _pin_p = static_cast<gpio_num_t>(_settings.pin_p);
     // settings pin to >35 will make the digitalWrite do nothing
     if(!_pin_n)
         _pin_n = GPIO_NUM_MAX;
@@ -35,7 +34,7 @@ bool PIDLoop::begin()
 	_windowstarttime = millis();
     _pid_last = millis();
 
-    switch(_settings->mode)
+    switch(_settings.mode)
     {
         case MODE_NONE:
             set_active(false);
@@ -51,14 +50,14 @@ bool PIDLoop::begin()
 
     reset_output();
 
-    set_active(_settings->active);
+    set_active(_settings.active);
 
 	return true;
 };
 
 void PIDLoop::reset_output()
 {
-    switch(_settings->mode)
+    switch(_settings.mode)
     {
         case MODE_NONE:
             break;
@@ -75,7 +74,7 @@ void PIDLoop::set_active(bool active)
 {
     DBG("set_active(%s)", active ? "true":"false");
 
-    if(_settings->mode == MODE_NONE)
+    if(_settings.mode == MODE_NONE)
     {
         WARNING("No pid output mode set: pid remains in-active.");
         active = false;
@@ -89,15 +88,15 @@ void PIDLoop::set_active(bool active)
         digitalWrite(_pin_n, LOW);
         digitalWrite(_pin_p, LOW);
     };
-    _settings->active = active;
+    _settings.active = active;
     _active_last = active;
 };
 
 void PIDLoop::loop()
 {
-    if(_active_last != _settings->active)
+    if(_active_last != _settings.active)
     {
-        set_active(_settings->active);
+        set_active(_settings.active);
     };
 
     // See if its time to do another PID iteration
@@ -114,13 +113,12 @@ void PIDLoop::loop()
             digitalWrite(_pin_p, LOW);
             return;
         };
-
-        if(_settings->active)
+        if(_settings.active)
         {
             double dt = (now - _pid_last) / PIDLOOP_LOOP_MS;
             _pid.calculate(dt);
 
-            // DBG("PID: Input = %.2f, Setpoint = %.2f, Output = %.2f (dt = %.9f)", _input, _settings->fpid.setpoint, _output, dt);
+            // DBG("PID: Input = %.2f, Setpoint = %.2f, Output = %.2f (dt = %.9f)", _input_ref, _settings.fpid.setpoint, _output, dt);
         }else{
             // DBG("PID: Input = %.2f, In-Active, Output = %.2f", _input, _output);
         };
@@ -129,8 +127,8 @@ void PIDLoop::loop()
         _pid_last = now;
     };
 
-    // dont update output if inactive
-    if(!_settings->active)
+    // turn of output if not active or if PID loop had an error
+    if(!_settings.active || isnan(_output))
         return;
 
     // Process timewindow valve depending on PID Output
@@ -142,7 +140,7 @@ void PIDLoop::loop()
     // Set output
     uint A = LOW;
     uint B = LOW;
-    switch(_settings->mode)
+    switch(_settings.mode)
     {
         case MODE_NONE:
             break;
