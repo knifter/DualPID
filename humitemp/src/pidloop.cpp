@@ -104,19 +104,11 @@ void PIDLoop::loop()
     time_t now = millis();
     if(now > _pid_last + PIDLOOP_LOOP_MS)
     {
-        // Input for the PID
-        if(isnan(*_input))
-        {
-            // Sensor error
-            // WARNING("Sensor error. Going back to fail-safe.");
-            digitalWrite(_pin_n, LOW);
-            digitalWrite(_pin_p, LOW);
-            return;
-        };
         if(_settings.active)
         {
             double dt = (now - _pid_last) / PIDLOOP_LOOP_MS;
-            _pid.calculate(dt);
+            if(!_pid.calculate(dt))
+                _output = NAN;
 
             // DBG("PID: Input = %.2f, Setpoint = %.2f, Output = %.2f (dt = %.9f)", _input_ref, _settings.fpid.setpoint, _output, dt);
         }else{
@@ -129,7 +121,11 @@ void PIDLoop::loop()
 
     // turn of output if not active or if PID loop had an error
     if(!_settings.active || isnan(_output))
+    {
+        digitalWrite(_pin_n, LOW);
+        digitalWrite(_pin_p, LOW);
         return;
+    };
 
     // Process timewindow valve depending on PID Output
     if (now - _windowstarttime > PIDLOOP_WINDOWSIZE)
