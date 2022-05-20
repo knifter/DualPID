@@ -40,10 +40,10 @@ class PIDLoop
 
     private: 
         FPID _pid;
-        pidloop_settings_t *_settings;
+        pidloop_settings_t &_settings;
 
         // double Input, Output, Setpoint;
-        const double *_input;
+        const double &_input_ref;
         double _output;
         time_t _windowstarttime;
         gpio_num_t _pin_n, _pin_p;
