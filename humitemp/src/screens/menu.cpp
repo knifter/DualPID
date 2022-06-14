@@ -31,6 +31,7 @@ SelectorField::item_t pid_loop_times [] = {
 	{100, 	"100ms","100 ms"},
 	{1000, 	"1s",   "1 sec"},
 	{5000, 	"5s",   "5 sec"},
+	{10000, "10s",  "10 sec"},
 	{60000, "1m",   "1 min"},
 	{0, 0, 0}
 	};
@@ -38,7 +39,7 @@ SelectorField::item_t pid_loop_times [] = {
 SelectorField::item_t window_loop_times [] = {
 	{1000, 	"1s",   "1 sec"},
 	{5000, 	"5s",   "5 sec"},
-	{60000, "10s",  "10 sec"},
+	{10000, "10s",  "10 sec"},
 	{60000, "1m",   "1 min"},
 	{0, 0, 0}
 	};
