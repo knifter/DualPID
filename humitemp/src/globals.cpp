@@ -9,6 +9,7 @@ GUI gui;
 settings_t settings;
 SettingsManager setman(settings);
 
+uint32_t developer_mode;
 double input_value1;
 double input_value2;
 

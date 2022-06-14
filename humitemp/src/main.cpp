@@ -27,8 +27,10 @@ void setup()
 	pinMode(PIN_BTN_B, INPUT);
 	pinMode(PIN_BTN_C, INPUT);
 
-	// Hold startup, for debugging purposes
-	while(scan_keys() == KEY_AC);
+	// Hold startup, and registere debugging purposes
+    developer_mode = 0;
+	while(scan_keys() == KEY_AC)
+        developer_mode = 1;
 
 	gui.begin();
 

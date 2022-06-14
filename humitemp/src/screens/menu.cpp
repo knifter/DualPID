@@ -68,20 +68,27 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 
 	menu.addSeparator("Setup");
 	menu.addSelector("Measure time", &settings.sensor_loop_ms, sensor_loop_times);
+    
     sub = menu.addSubMenu("PID1");
 	sub->addSelector("Temp -, Pin N", &settings.pid1.pin_n, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
 	sub->addSelector("Temp +, Pin P", &settings.pid1.pin_p, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
 	sub->addSelector("Looptime", &settings.pid1.looptime, pid_loop_times);
 	sub->addSelector("Windowtime", &settings.pid1.windowtime, window_loop_times)->onChange( [](MenuItem*, void*){ pid1.begin(); });
+    
     sub = menu.addSubMenu("PID2");
 	sub->addSelector("RH% -, Pin N", &settings.pid2.pin_n, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
 	sub->addSelector("RH% +, Pin P", &settings.pid2.pin_p, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
 	sub->addSelector("Looptime", &settings.pid2.looptime, pid_loop_times);
 	sub->addSelector("Windowtime", &settings.pid2.windowtime, window_loop_times)->onChange( [](MenuItem*, void*){ pid2.begin(); });
 	sub->onClose(check_reboot_cb);
+    
     // sub->addAction("Begin", [](MenuItem*, void*){ setman.begin(true); });
-    menu.addAction("Save settings", [](MenuItem*, void*){ setman.save(); });
-    menu.addAction("Erase settings", [](MenuItem*, void*){ setman.erase(); });
+    if(developer_mode)
+    {
+        menu.addSeparator("Developer Mode");
+        menu.addAction("Save NVM", [](MenuItem*, void*){ setman.save(); });
+        menu.addAction("Erase NVM", [](MenuItem*, void*){ setman.erase(); });
+    };
 
 	menu.onClose(menu_close_cb);
 	menu.open();
