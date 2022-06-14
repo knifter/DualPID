@@ -27,6 +27,23 @@ SelectorField::item_t sensor_loop_times [] = {
 	{0, 0, 0}
 	};
 
+SelectorField::item_t pid_loop_times [] = {
+	{100, 	"100ms","100 ms"},
+	{1000, 	"1s",   "1 sec"},
+	{5000, 	"5s",   "5 sec"},
+	{60000, "1m",   "1 min"},
+	{0, 0, 0}
+	};
+
+SelectorField::item_t window_loop_times [] = {
+	{1000, 	"1s",   "1 sec"},
+	{5000, 	"5s",   "5 sec"},
+	{60000, "10s",  "10 sec"},
+	{60000, "1m",   "1 min"},
+	{0, 0, 0}
+	};
+
+
 bool need_reboot;
 
 MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
@@ -54,9 +71,13 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
     sub = menu.addSubMenu("PID1");
 	sub->addSelector("Temp -, Pin N", &settings.pid1.pin_n, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
 	sub->addSelector("Temp +, Pin P", &settings.pid1.pin_p, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
+	sub->addSelector("Looptime", &settings.pid1.looptime, pid_loop_times);
+	sub->addSelector("Windowtime", &settings.pid1.windowtime, window_loop_times)->onChange( [](MenuItem*, void*){ pid1.begin(); });
     sub = menu.addSubMenu("PID2");
 	sub->addSelector("RH% -, Pin N", &settings.pid2.pin_n, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
 	sub->addSelector("RH% +, Pin P", &settings.pid2.pin_p, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
+	sub->addSelector("Looptime", &settings.pid2.looptime, pid_loop_times);
+	sub->addSelector("Windowtime", &settings.pid2.windowtime, window_loop_times)->onChange( [](MenuItem*, void*){ pid2.begin(); });
 	sub->onClose(check_reboot_cb);
     // sub->addAction("Begin", [](MenuItem*, void*){ setman.begin(true); });
     menu.addAction("Save settings", [](MenuItem*, void*){ setman.save(); });

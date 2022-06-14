@@ -24,6 +24,7 @@ class PIDLoop
             uint32_t pin_n;
             uint32_t pin_p;
             uint32_t looptime;
+            uint32_t windowtime;
             double max_output;
             FPID::fpid_settings_t fpid;
         } pidloop_settings_t;
@@ -34,7 +35,7 @@ class PIDLoop
         void loop();
         // double get_input() { return *_input; };
         double get_output() { return _output; };
-        double get_output_percent() { return _output*100/PIDLOOP_WINDOWSIZE; };
+        double get_output_percent() { return _output*100/_settings.windowtime; };
         // int get_output_state() { return _output_state; };
         void set_active(bool);
         // bool active() { return _settings->active; };

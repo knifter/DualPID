@@ -36,6 +36,7 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
             settings->pid1.pin_p = 0;
             settings->pid1.looptime = DEFAULT_LOOPTIME_MS;
             settings->pid1.max_output = DEFAULT_MAX_OUTPUT;
+            settings->pid1.windowtime = DEFAULT_WINDOWTIME;
             settings->pid1.fpid.kF = DEFAULT_PID_F;
             settings->pid1.fpid.kP = DEFAULT_PID_P;
             settings->pid1.fpid.kI = DEFAULT_PID_I;

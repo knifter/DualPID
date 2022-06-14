@@ -26,7 +26,8 @@
 
 #define SETTINGS_DELAY_SAVE		20E3
 #define DEFAULT_SENSOR_LOOP_MS  1000
-#define DEFAULT_LOOPTIME_MS     5000
+#define DEFAULT_LOOPTIME_MS     1000            // time between each pid-loop iteration
+#define DEFAULT_WINDOWTIME      5000      		// soft-pwm time-window size in ms
 #define DEFAULT_GRAPH_LEN       0               // Length of graph on display
 #define DEFAULT_MAX_OUTPUT      1.0             // Factor max output, between 0..1
 #define DEFAULT_PID_SETPOINT1	20.0
@@ -40,8 +41,6 @@
 #define DEFAULT_PID_TBH         0
 
 #define MAIN_LOOP_MS			100
-#define PIDLOOP_LOOP_MS     	1000            // PID delta-T: 2 seconds as it was
-#define PIDLOOP_WINDOWSIZE      5000      		// time-windows size in ms
 
 #define GRAPH_DELTA_MS	        60E3		    // Time between graph points
 #define GRAPH_POINTS	        240             // Amount of points in graph
