@@ -32,7 +32,7 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
             settings->pid1.fpid.kP = DEFAULT_PID_P;
             settings->pid1.fpid.kI = DEFAULT_PID_I;
             settings->pid1.fpid.kD = DEFAULT_PID_D;
-            settings->pid1.fpid.setpoint = DEFAULT_SETPOINT;
+            settings->pid1.fpid.setpoint = DEFAULT_PID_SETPOINT;
 
             settings->pid2.active = false;
             settings->pid2.mode = PIDLoop::MODE_ZP;
