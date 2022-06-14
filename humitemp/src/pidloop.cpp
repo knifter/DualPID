@@ -19,11 +19,6 @@ bool PIDLoop::begin()
 {
     _pin_n = static_cast<gpio_num_t>(_settings.pin_n);
     _pin_p = static_cast<gpio_num_t>(_settings.pin_p);
-    // settings pin to >35 will make the digitalWrite do nothing
-    if(!_pin_n)
-        _pin_n = GPIO_NUM_MAX;
-    if(!_pin_p)
-        _pin_p = GPIO_NUM_MAX;
 
     // config hardware
   	pinMode(_pin_n, OUTPUT);
@@ -85,8 +80,10 @@ void PIDLoop::set_active(bool active)
         _pid.alignOutput();
         reset_output();
     } else {
-        digitalWrite(_pin_n, LOW);
-        digitalWrite(_pin_p, LOW);
+        if(_pin_n)
+            digitalWrite(_pin_n, LOW);
+        if(_pin_p)
+            digitalWrite(_pin_p, LOW);
     };
     _settings.active = active;
     _active_last = active;
