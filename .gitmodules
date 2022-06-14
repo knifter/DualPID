@@ -1,6 +1,3 @@
-[submodule "FW/lib/SHT3x"]
-	path = FW/lib/SHT3x
-	url = https://github.com/knifter/lib-sht3x
 [submodule "humitemp/lib/soogh"]
 	path = humitemp/lib/soogh
 	url = https://github.com/knifter/lib-soogh
