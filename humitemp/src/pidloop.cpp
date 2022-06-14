@@ -107,9 +107,9 @@ void PIDLoop::loop()
             if(!_pid.calculate(dt))
                 _output = NAN;
 
-            // DBG("PID: Input = %.2f, Setpoint = %.2f, Output = %.2f (dt = %.9f)", _input_ref, _settings.fpid.setpoint, _output, dt);
+            // DBG("PID: Input = %.2f, Setpoint = %.2f, Output = %.2f", _input_ref, _settings.fpid.setpoint, _output);
         }else{
-            // DBG("PID: Input = %.2f, In-Active, Output = %.2f", _input, _output);
+            // DBG("PID: Input = %.2f, In-Active, Output = %.2f", _input_ref, _output);
         };
 
         // Queue next iteration
