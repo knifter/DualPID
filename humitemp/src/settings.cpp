@@ -78,10 +78,22 @@ bool SettingsManager::read_blob(void* blob, const size_t blob_size, const uint32
             ERROR("Unknown blob version: %d", blob_version);
             return false;
 
-        case 1: // updateable
-        case 2: // valid, up-to-date settings
+        // old, non convertible settings
+        case 1: // 
+        case 2: 
+            set_defaults_since(0);
+            _dirty = true;
+            return true;
+
+        // latest
+        case 3: 
+            if(blob_size != sizeof(settings_t))
+            {
+                ERROR("Settings blob size mismatch (version is ok).");
+                return false;
+            };
             memcpy(_data, blob, blob_size);
-            set_defaults_since(blob_version);
+            _data_version = 3;
             _dirty = false;
             return true;
     };
