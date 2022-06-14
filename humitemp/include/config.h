@@ -27,8 +27,10 @@
 #define SETTINGS_DELAY_SAVE		20E3
 #define DEFAULT_SENSOR_LOOP_MS  1000
 #define DEFAULT_LOOPTIME_MS     5000
+#define DEFAULT_GRAPH_LEN       0               // Length of graph on display
 #define DEFAULT_MAX_OUTPUT      1.0             // Factor max output, between 0..1
-#define DEFAULT_PID_SETPOINT	20.0
+#define DEFAULT_PID_SETPOINT1	20.0
+#define DEFAULT_PID_SETPOINT2	50.0
 #define DEFAULT_PID_F			0.0
 #define DEFAULT_PID_P			5.0
 #define DEFAULT_PID_I			2.0
