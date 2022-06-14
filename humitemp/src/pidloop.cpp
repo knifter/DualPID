@@ -103,8 +103,7 @@ void PIDLoop::loop()
     {
         if(_settings.active)
         {
-            double dt = (now - _pid_last) / PIDLOOP_LOOP_MS;
-            if(!_pid.calculate(dt))
+            if(!_pid.calculate())
                 _output = NAN;
 
             // DBG("PID: Input = %.2f, Setpoint = %.2f, Output = %.2f", _input_ref, _settings.fpid.setpoint, _output);
