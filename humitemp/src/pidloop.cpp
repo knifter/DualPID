@@ -122,8 +122,10 @@ void PIDLoop::loop()
     // turn of output if not active or if PID loop had an error
     if(!_settings.active || isnan(_output))
     {
-        digitalWrite(_pin_n, LOW);
-        digitalWrite(_pin_p, LOW);
+        if(_pin_n)
+            digitalWrite(_pin_n, LOW);
+        if(_pin_p)
+            digitalWrite(_pin_p, LOW);
         return;
     };
 
@@ -151,6 +153,8 @@ void PIDLoop::loop()
                 B = HIGH;
             break;
     };
-    digitalWrite(_pin_n, A);
-    digitalWrite(_pin_p, B);
+    if(_pin_n)
+        digitalWrite(_pin_n, A);
+    if(_pin_p)
+        digitalWrite(_pin_p, B);
 };
