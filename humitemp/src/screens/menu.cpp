@@ -59,8 +59,8 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 	sub->addSelector("RH% +, Pin P", &settings.pid2.pin_p, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
 	sub->onClose(check_reboot_cb);
     // sub->addAction("Begin", [](MenuItem*, void*){ setman.begin(true); });
-    sub->addAction("Save settings", [](MenuItem*, void*){ setman.save(); });
-    sub->addAction("Erase settings", [](MenuItem*, void*){ setman.erase(); });
+    menu.addAction("Save settings", [](MenuItem*, void*){ setman.save(); });
+    menu.addAction("Erase settings", [](MenuItem*, void*){ setman.erase(); });
 
 	menu.onClose(menu_close_cb);
 	menu.open();
