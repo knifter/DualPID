@@ -26,11 +26,16 @@
 
 #define SETTINGS_DELAY_SAVE		20E3
 #define DEFAULT_SENSOR_LOOP_MS  1000
+#define DEFAULT_LOOPTIME_MS     5000
+#define DEFAULT_MAX_OUTPUT      1.0             // Factor max output, between 0..1
 #define DEFAULT_PID_SETPOINT	20.0
 #define DEFAULT_PID_F			0.0
 #define DEFAULT_PID_P			5.0
 #define DEFAULT_PID_I			2.0
 #define DEFAULT_PID_D			2.0
+#define DEFAULT_PID_OFILTER     0.0             // PID Output filter, 0 = no filter
+#define DEFAULT_PID_DFILTER     0.0             // PID D-Term filter
+#define DEFAULT_PID_TBH         0
 
 #define MAIN_LOOP_MS			100
 #define PIDLOOP_LOOP_MS     	1000            // PID delta-T: 2 seconds as it was

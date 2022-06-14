@@ -24,6 +24,8 @@ class PIDLoop
             uint32_t pin_n;
             uint32_t pin_p;
             FPID::fpid_settings_t fpid;
+            uint32_t looptime;
+            double max_output;
         } pidloop_settings_t;
 
         PIDLoop(pidloop_settings_t& s, const double& input);
