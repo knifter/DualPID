@@ -103,10 +103,9 @@ void PIDLoop::loop()
     {
         if(_settings.active)
         {
-            if(!_pid.calculate())
-                _output = NAN;
+            bool status = _pid.calculate();
 
-            DBG("PID: Input = %.2f, Setpoint = %.2f, Output = %.2f", _input_ref, _settings.fpid.setpoint, _output);
+            DBG("PID = %s: Input = %.2f, Setpoint = %.2f, Output = %.2f", status?"loop":"frozen", _input_ref, _settings.fpid.setpoint, _output);
         }else{
             // DBG("PID: Input = %.2f, In-Active, Output = %.2f", _input_ref, _output);
         };
