@@ -13,6 +13,3 @@
 [submodule "humitemp/lib/TwoWireDevice"]
 	path = humitemp/lib/TwoWireDevice
 	url = https://github.com/knifter/lib-TwoWireDevice
-[submodule "humitemp/lib/lvgl"]
-	path = humitemp/lib/lvgl
-	url = https://github.com/lvgl/lvgl
