@@ -15,7 +15,7 @@ class BootScreen : public Screen
 		BootScreen(SooghGUI &g);
 		virtual ScreenType type() { return ScreenType::BOOT; };
 
-		virtual bool loop();
+		virtual void loop();
 		virtual void load();
 		virtual bool handle(soogh_event_t);
 

@@ -27,7 +27,7 @@ void BootScreen::load()
     _start = millis();
 };
 
-bool BootScreen::loop()
+void BootScreen::loop()
 {
     uint32_t now = millis();
     if((now - _start) > BOOTSCREEN_TIMEOUT_MS)
@@ -35,7 +35,7 @@ bool BootScreen::loop()
 		ScreenPtr scr = std::make_shared<MainScreen>(_gui);
         _gui.pushScreen(scr);
     };
-	return false;
+	return;
 };
 
 bool BootScreen::handle(soogh_event_t e)

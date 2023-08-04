@@ -117,10 +117,9 @@ void MenuScreen::load()
 	// Do not load my screen, menu is overlayed
 };
 
-bool MenuScreen::loop()
+void MenuScreen::loop()
 {
-    
-    return false;
+    return;
 };
 
 bool MenuScreen::handle(soogh_event_t e)

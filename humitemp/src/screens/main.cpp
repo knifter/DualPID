@@ -280,11 +280,11 @@ MainScreen::MainScreen(SooghGUI& g) : Screen(g)
 
 };
 
-bool MainScreen::loop()
+void MainScreen::loop()
 {
 	time_t now = millis();
 	if(now < _next_update)
-		return true;
+		return;
 
 	_next_update = now + MAIN_LOOP_MS;
 
@@ -309,13 +309,13 @@ bool MainScreen::loop()
 	};
 
 	if(now < _next_chart)
-		return true;
+		return;
 
 	gw->appendVals(input_value1, input_value2);
 
 	_next_chart = now + GRAPH_DELTA_MS;
     
-    return false;
+    return;
 };
 
 bool MainScreen::handle(soogh_event_t key)
