@@ -27,40 +27,40 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
             DBG("Init settings v3: defaults");
             memset(_data, 0, _data_size);
 
-            settings->sensor_loop_ms = DEFAULT_SENSOR_LOOP_MS;
-            settings->graph_len = DEFAULT_GRAPH_LEN;
+            settings->sensor_loop_ms =              DEFAULT_SENSOR_LOOP_MS;
+            settings->graph_len =                   DEFAULT_GRAPH_LEN;
 
-            settings->pid1.active = false;
-            settings->pid1.mode = PIDLoop::MODE_ZP;
-            settings->pid1.pin_n = 0;
-            settings->pid1.pin_p = 0;
-            settings->pid1.looptime = DEFAULT_LOOPTIME_MS;
-            settings->pid1.max_output = DEFAULT_MAX_OUTPUT;
-            settings->pid1.windowtime = DEFAULT_WINDOWTIME;
-            settings->pid1.fpid.kF = DEFAULT_PID_F;
-            settings->pid1.fpid.kP = DEFAULT_PID_P;
-            settings->pid1.fpid.kI = DEFAULT_PID_I;
-            settings->pid1.fpid.kD = DEFAULT_PID_D;
-            settings->pid1.fpid.setpoint = DEFAULT_PID_SETPOINT1;
-            settings->pid1.fpid.output_filter = DEFAULT_PID_OFILTER;
-            settings->pid1.fpid.dterm_filter = DEFAULT_PID_DFILTER;
-            settings->pid1.fpid.takebackhalf = DEFAULT_PID_TBH;
+            settings->pid1.active =                 false;
+            settings->pid1.mode =                   PID1_DEFAULT_MODE;
+            settings->pid1.pin_n =                  0;
+            settings->pid1.pin_p =                  0;
+            settings->pid1.looptime =               PID1_DEFAULT_LOOPTIME_MS;
+            settings->pid1.max_output =             PID1_DEFAULT_MAX_OUTPUT;
+            settings->pid1.windowtime =             PID1_DEFAULT_WINDOWTIME;
+            settings->pid1.fpid.kF =                PID1_DEFAULT_F;
+            settings->pid1.fpid.kP =                PID1_DEFAULT_P;
+            settings->pid1.fpid.kI =                PID1_DEFAULT_I;
+            settings->pid1.fpid.kD =                PID1_DEFAULT_D;
+            settings->pid1.fpid.setpoint =          PID1_DEFAULT_SETPOINT;
+            settings->pid1.fpid.output_filter =     PID1_DEFAULT_OFILTER;
+            settings->pid1.fpid.dterm_filter =      PID1_DEFAULT_DFILTER;
+            settings->pid1.fpid.takebackhalf =      PID1_DEFAULT_TBH;
 
-            settings->pid2.active = false;
-            settings->pid2.mode = PIDLoop::MODE_ZP;
-            settings->pid2.pin_n = 0;
-            settings->pid2.pin_p = 0;
-            settings->pid2.looptime = DEFAULT_LOOPTIME_MS;
-            settings->pid2.max_output = DEFAULT_MAX_OUTPUT;
-            settings->pid2.windowtime = DEFAULT_WINDOWTIME;
-            settings->pid2.fpid.kF = DEFAULT_PID_F;
-            settings->pid2.fpid.kP = DEFAULT_PID_P;
-            settings->pid2.fpid.kI = DEFAULT_PID_I;
-            settings->pid2.fpid.kD = DEFAULT_PID_D;
-            settings->pid2.fpid.setpoint = DEFAULT_PID_SETPOINT2;
-            settings->pid2.fpid.output_filter = DEFAULT_PID_OFILTER;
-            settings->pid2.fpid.dterm_filter = DEFAULT_PID_DFILTER;
-            settings->pid2.fpid.takebackhalf = DEFAULT_PID_TBH;
+            settings->pid2.active =                 false;
+            settings->pid2.mode =                   PID2_DEFAULT_MODE;
+            settings->pid2.pin_n =                  0;
+            settings->pid2.pin_p =                  0;
+            settings->pid2.looptime =               PID2_DEFAULT_LOOPTIME_MS;
+            settings->pid2.max_output =             PID2_DEFAULT_MAX_OUTPUT;
+            settings->pid2.windowtime =             PID2_DEFAULT_WINDOWTIME;
+            settings->pid2.fpid.kF =                PID2_DEFAULT_F;
+            settings->pid2.fpid.kP =                PID2_DEFAULT_P;
+            settings->pid2.fpid.kI =                PID2_DEFAULT_I;
+            settings->pid2.fpid.kD =                PID2_DEFAULT_D;
+            settings->pid2.fpid.setpoint =          PID2_DEFAULT_SETPOINT;
+            settings->pid2.fpid.output_filter =     PID2_DEFAULT_OFILTER;
+            settings->pid2.fpid.dterm_filter =      PID2_DEFAULT_DFILTER;
+            settings->pid2.fpid.takebackhalf =      PID2_DEFAULT_TBH;
 
 
         // End with the current version:

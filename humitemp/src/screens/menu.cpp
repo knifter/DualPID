@@ -49,39 +49,40 @@ bool need_reboot;
 
 MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 {
-
-	menu.addSeparator("Temperature");
-	menu.addSpinbox("Setpoint", &settings.pid1.fpid.setpoint, TEMPERATURE_MIN, TEMPERATURE_MAX, TEMPERATURE_PRECISION);
+    // Channel 1
+	menu.addSeparator(PID1_NAME);
+	menu.addSpinbox("Setpoint", &settings.pid1.fpid.setpoint, PID1_MIN, PID1_MAX, PID1_PRECISION);
 	menu.addSwitch("Active", &settings.pid1.active);
     auto sub = menu.addSubMenu("PID Settings");
-	sub->addSpinbox("kP", &settings.pid1.fpid.kP, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-	sub->addSpinbox("kI", &settings.pid1.fpid.kI, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-	sub->addSpinbox("kD", &settings.pid1.fpid.kD, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+	sub->addSpinbox("kP", &settings.pid1.fpid.kP, PID1_PAR_MIN, PID1_PAR_MAX, PID1_PAR_PRECISION);
+	sub->addSpinbox("kI", &settings.pid1.fpid.kI, PID1_PAR_MIN, PID1_PAR_MAX, PID1_PAR_PRECISION);
+	sub->addSpinbox("kD", &settings.pid1.fpid.kD, PID1_PAR_MIN, PID1_PAR_MAX, PID1_PAR_PRECISION);
+    sub = menu.addSubMenu("Setup");
+	sub->addSelector("Pin N (-)", &settings.pid1.pin_n, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
+	sub->addSelector("Pin P (+)", &settings.pid1.pin_p, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
+	menu.addSelector("Measure time", &settings.sensor_loop_ms, sensor_loop_times);    
+	sub->addSelector("Looptime", &settings.pid1.looptime, pid_loop_times);
+	sub->addSelector("Windowtime", &settings.pid1.windowtime, window_loop_times)->onChange( [](MenuItem*, void*){ pid1.begin(); });    
+	sub->onClose(check_reboot_cb);
 
-	menu.addSeparator("Humidity");
-	menu.addSpinbox("Setpoint", &settings.pid2.fpid.setpoint, HUMIDITY_MIN, HUMIDITY_MAX, HUMIDITY_PRECISION);
+    // Channel 2
+	menu.addSeparator(PID2_NAME);
+	menu.addSpinbox("Setpoint", &settings.pid2.fpid.setpoint, PID2_MIN, PID2_MAX, PID2_PRECISION);
 	menu.addSwitch("Active", &settings.pid2.active);
     sub = menu.addSubMenu("Settings");
-	sub->addSpinbox("kP", &settings.pid2.fpid.kP, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-	sub->addSpinbox("kI", &settings.pid2.fpid.kI, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-	sub->addSpinbox("kD", &settings.pid2.fpid.kD, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);	
-	// sub->addCheckbox("Take-Back-Half", &settings.pid1.fpid.takebackhalf);
-
-	menu.addSeparator("Setup");
-	menu.addSelector("Measure time", &settings.sensor_loop_ms, sensor_loop_times);
-    
-    sub = menu.addSubMenu("PID1");
-	sub->addSelector("Temp -, Pin N", &settings.pid1.pin_n, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
-	sub->addSelector("Temp +, Pin P", &settings.pid1.pin_p, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
-	sub->addSelector("Looptime", &settings.pid1.looptime, pid_loop_times);
-	sub->addSelector("Windowtime", &settings.pid1.windowtime, window_loop_times)->onChange( [](MenuItem*, void*){ pid1.begin(); });
-    
-    sub = menu.addSubMenu("PID2");
-	sub->addSelector("RH% -, Pin N", &settings.pid2.pin_n, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
-	sub->addSelector("RH% +, Pin P", &settings.pid2.pin_p, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
+	sub->addSpinbox("kP", &settings.pid2.fpid.kP, PID2_PAR_MIN, PID2_PAR_MAX, PID1_PAR_PRECISION);
+	sub->addSpinbox("kI", &settings.pid2.fpid.kI, PID2_PAR_MIN, PID2_PAR_MAX, PID1_PAR_PRECISION);
+	sub->addSpinbox("kD", &settings.pid2.fpid.kD, PID2_PAR_MIN, PID2_PAR_MAX, PID1_PAR_PRECISION);	
+    sub = menu.addSubMenu("Setup");
+	sub->addSelector("Pin N (-)", &settings.pid2.pin_n, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
+	sub->addSelector("Pin P (+)", &settings.pid2.pin_p, pidloop_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
+	menu.addSelector("Measure time", &settings.sensor_loop_ms, sensor_loop_times);    
 	sub->addSelector("Looptime", &settings.pid2.looptime, pid_loop_times);
 	sub->addSelector("Windowtime", &settings.pid2.windowtime, window_loop_times)->onChange( [](MenuItem*, void*){ pid2.begin(); });
 	sub->onClose(check_reboot_cb);
+
+	// sub->addCheckbox("Take-Back-Half", &settings.pid1.fpid.takebackhalf);
+    
     
     // sub->addAction("Begin", [](MenuItem*, void*){ setman.begin(true); });
     if(developer_mode)
