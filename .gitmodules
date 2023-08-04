@@ -13,3 +13,6 @@
 [submodule "humitemp/lib/TwoWireDevice"]
 	path = humitemp/lib/TwoWireDevice
 	url = https://github.com/knifter/lib-TwoWireDevice
+[submodule "humitemp/lib/lib-SprintIR"]
+	path = humitemp/lib/lib-SprintIR
+	url = https://github.com/knifter/lib-SprintIR
