@@ -51,7 +51,7 @@
 #define GRAPH_XTICKS            5
 
 #define PID1_UNIT_TEXT			"C"
-#define PID2_UNIT_TEXT			"%RH"
+#define PID2_UNIT_TEXT			"ppm"
 
 #define TEMPERATURE_MIN			0
 #define TEMPERATURE_MAX			60
@@ -76,6 +76,9 @@
 #define PIN_BTN_A				GPIO_NUM_39
 #define PIN_BTN_B				GPIO_NUM_38
 #define PIN_BTN_C				GPIO_NUM_37
+
+#define PIN_CO2_RX				GPIO_NUM_16
+#define PIN_CO2_TX				GPIO_NUM_17
 
 #define PIDLOOP_PORTS_LIST	\
 	{GPIO_NUM_2, 	"IO2", 	"GPIO2"},	\

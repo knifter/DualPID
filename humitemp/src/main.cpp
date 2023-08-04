@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <SHT3X.h>
+#include <SprintIR.h>
 
 #include "config.h"
 #include "globals.h"
@@ -10,6 +11,7 @@
 #include "tools-log.h"
 
 SHT3X sht_sensor(Wire);
+SprintIR sprint(Serial2);
 
 void halt(const char*);
 uint32_t scan_keys();
@@ -27,6 +29,9 @@ void setup()
 	pinMode(PIN_BTN_B, INPUT);
 	pinMode(PIN_BTN_C, INPUT);
 
+	Serial2.begin(9600, SERIAL_8N1, PIN_CO2_RX, PIN_CO2_TX);
+	
+	
 	// Hold startup, and registere debugging purposes
     developer_mode = 0;
 	while(scan_keys() == KEY_AC)
@@ -41,6 +46,11 @@ void setup()
         {
 			gui.showMessage("WARNING:", "SHT3X(0x44/0x45): not found");
         };
+	};
+
+	if(!sprint.begin())
+	{
+		gui.showMessage("WARNING:", "CO2 Sensor not found.");
 	};
 
 	input_value1 = NAN;
@@ -74,16 +84,24 @@ void sensor_loop()
 		return;
 	next = now + settings.sensor_loop_ms;
 
+	// Temperature (from SHT31)
 	SHT3X::measurement_t* m = sht_sensor.newMeasurement();
 	if(m->error)
 	{
 		input_value1 = NAN;
-		input_value2 = NAN;
 		return;
 	};
 
 	input_value1 = m->temperature;
-	input_value2 = m->humidity;
+
+	// CO2 from SprintIR-WX-20
+	int ppm = sprint.getPPM();
+	if(ppm < 0)
+	{
+		input_value2 = NAN;
+		return;
+	};
+	input_value2 = ppm;
 };
 
 void halt(const char* error)
