@@ -131,25 +131,25 @@ void PIDLoop::loop()
     };
 
     // Set output
-    uint A = LOW;
-    uint B = LOW;
+    uint N = LOW;
+    uint P = LOW;
     switch(_settings.mode)
     {
         case MODE_NONE:
             break;
         case MODE_NP:
             if (_output > (now - _windowstarttime))
-                B = HIGH;
+                P = HIGH;
             else
-                A = HIGH;
+                N = HIGH;
             break;
         case MODE_ZP:
             if (_output > (now - _windowstarttime))
-                B = HIGH;
+                P = HIGH;
             break;
     };
     if(_pin_n)
-        digitalWrite(_pin_n, A);
+        digitalWrite(_pin_n, N);
     if(_pin_p)
-        digitalWrite(_pin_p, B);
+        digitalWrite(_pin_p, P);
 };
