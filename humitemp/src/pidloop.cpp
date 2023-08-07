@@ -117,6 +117,7 @@ void PIDLoop::loop()
     // turn of output if not active or if PID loop had an error
     if(!_settings.active || isnan(_output))
     {
+        // TODO: Set in-active - depending on mode what that is
         if(_pin_n)
             digitalWrite(_pin_n, LOW);
         if(_pin_p)
@@ -131,8 +132,8 @@ void PIDLoop::loop()
     };
 
     // Set output
-    uint N = LOW;
-    uint P = LOW;
+    uint8_t N = LOW;
+    uint8_t P = LOW;
     switch(_settings.mode)
     {
         case MODE_NONE:
@@ -149,7 +150,13 @@ void PIDLoop::loop()
             break;
     };
     if(_pin_n)
+    {
+        DBG("pin(%d) = %s", _pin_n, N == HIGH ? "H" : "L");
         digitalWrite(_pin_n, N);
+    };
     if(_pin_p)
+    {
+        DBG("pin(%d) = %s", _pin_p, P == HIGH ? "H" : "L");
         digitalWrite(_pin_p, P);
+    };
 };

@@ -45,7 +45,7 @@ SelectorField::item_t window_loop_times [] = {
 	};
 
 
-bool need_reboot;
+bool need_reboot = false;
 
 MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 {
