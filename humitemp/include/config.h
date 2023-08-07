@@ -23,20 +23,18 @@
 
 // #define DEBUG_INTERVAL_MS		100
 #define BOOTSCREEN_TIMEOUT_MS	1000
-
-#define SETTINGS_DELAY_SAVE		20E3
-#define DEFAULT_SENSOR_LOOP_MS  1000
-#define DEFAULT_GRAPH_LEN       0               // Length of graph on display
-
 #define MAIN_LOOP_MS			100
-
-#define GRAPH_DELTA_MS	        60E3		    // Time between graph points
+#define SETTINGS_DELAY_SAVE		10E3            // Settings will automatically be saved to NVM after 10 sec
 #define GRAPH_POINTS	        240             // Amount of points in graph
 #define GRAPH_SCALE_ROUND		5			    // scale min/max is rounded to a multiple of this
 #define GRAPH_MULTIPLIER		10			    // Graph scale precision for calculation(10 = 1 decimal)
 #define GRAPH_XDIVS             9
 #define GRAPH_YDIVS             5
 #define GRAPH_XTICKS            5
+
+// Settings defaults
+#define DEFAULT_SENSOR_LOOP_MS  1000
+#define DEFAULT_GRAPH_DELTA_MS	60E3		    // Time between graph points
 
 #define PID1_NAME               "Temperature"
 #define PID1_UNIT_TEXT			"C"

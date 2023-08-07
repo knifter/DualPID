@@ -11,8 +11,6 @@
 
 #include <treemenu.h>
 
-#define GRAPH_TOTAL_SEC         ((int)(GRAPH_POINTS * GRAPH_DELTA_MS / 1000))
-#define GRAPH_SEC_PER_DEV       (GRAPH_TOTAL_SEC / (GRAPH_XTICKS-1))
 
 // C-style callbacks
 
@@ -201,11 +199,16 @@ void GraphPanel::draw_lbl_cb(lv_event_t* e)
     // tmp value, don't allocate
     static int this_sec;
 
+// #define GRAPH_TOTAL_SEC         ((int)(GRAPH_POINTS * GRAPH_DELTA_MS / 1000))
+// #define GRAPH_SEC_PER_DEV       (GRAPH_TOTAL_SEC / (GRAPH_XTICKS-1))
+    uint32_t graph_total_sec = (GRAPH_POINTS * settings.graph_delta) / 1000;
+    uint32_t graph_sec_per_div = graph_total_sec / (GRAPH_XTICKS-1);
+
 	// GraphPanel* me = static_cast<GraphPanel*>(e->user_data);
     switch(dsc->id)
     {
         case LV_CHART_AXIS_PRIMARY_X:
-            this_sec = GRAPH_SEC_PER_DEV * (GRAPH_XTICKS-1-dsc->value);
+            this_sec = graph_sec_per_div * (GRAPH_XTICKS-1-dsc->value);
             lv_snprintf(dsc->text, dsc->text_length, "-%d:%02d", this_sec / 3600, (this_sec % 3600) / 60);
     		return;
         case LV_CHART_AXIS_PRIMARY_Y:
@@ -313,7 +316,7 @@ void MainScreen::loop()
 
 	gw->appendVals(input_value1, input_value2);
 
-	_next_chart = now + GRAPH_DELTA_MS;
+	_next_chart = now + settings.graph_delta;
     
     return;
 };

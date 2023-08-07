@@ -28,7 +28,7 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
             memset(_data, 0, _data_size);
 
             settings->sensor_loop_ms =              DEFAULT_SENSOR_LOOP_MS;
-            settings->graph_len =                   DEFAULT_GRAPH_LEN;
+            settings->graph_delta =                 DEFAULT_GRAPH_DELTA_MS;
 
             settings->pid1.active =                 false;
             settings->pid1.mode =                   PID1_DEFAULT_MODE;

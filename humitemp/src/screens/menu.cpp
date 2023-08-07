@@ -21,20 +21,20 @@ SelectorField::item_t hardware_ports[] = {
 	};
 
 SelectorField::item_t sensor_loop_times [] = {
-	{100, "100ms", "100ms"},
-	{1000, "1s", "1s"},
-	{5000, "5s", "5s"},
+	{100, "100ms", "100 ms"},
+	{1000, "1s", "1 sec"},
+	{5000, "5s", "5 sec"},
 	{0, 0, 0}
 	};
 
 SelectorField::item_t pid_loop_times [] = {
-	{100, 	"100ms","100 ms"},
-	{100, 	"200ms","200 ms"},
-	{100, 	"500ms","500 ms"},
-	{1000, 	"1s",   "1 sec"},
-	{5000, 	"5s",   "5 sec"},
-	{10000, "10s",  "10 sec"},
-	{60000, "1m",   "1 min"},
+	{100, 	"100ms", "100 ms"},
+	{200, 	"200ms", "200 ms"},
+	{500, 	"500ms", "500 ms"},
+	{1000, 	"1s",    "1 sec"},
+	{5000, 	"5s",    "5 sec"},
+	{10000, "10s",   "10 sec"},
+	{60000, "1m",    "1 min"},
 	{0, 0, 0}
 	};
 
@@ -48,13 +48,23 @@ SelectorField::item_t window_loop_times [] = {
 	};
 
 SelectorField::item_t pid_modes [] = {
-    {PIDLoop::MODE_NONE, "*", "Sensor"},
+    {PIDLoop::MODE_NONE, "-", "Sensor"},
     {PIDLoop::MODE_ZP,   "ZP", "ZeroPos"},
     // {PIDLoop::MODE_NZP,     "NZP", "NegZeroPos"},
     {PIDLoop::MODE_NP,   "NP", "NegPos"},
     // {PIDLoop::MODE_NZ,   }; "NZ", "NegZero"},
     {0, 0, 0}
 };
+
+SelectorField::item_t graph_delta_times [] = {
+	{100, "100ms", "100 ms"},
+	{200, "200ms", "200 ms"},
+	{1000, "1s", "1 sec"},
+	{5000, "5s", "5 sec"},
+	{60000, "1m", "1 min"},
+	{600000, "10m", "10 min"},
+	{0, 0, 0}
+	};
 
 bool need_reboot = false;
 
@@ -127,10 +137,12 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
         };
     };
 
+    menu.addSeparator("Config");
+    menu.addSelector("Graph Delta", &settings.graph_delta, graph_delta_times);
+
     // General
     if(expert_mode)
     {
-        menu.addSeparator("Config");
         auto sub = menu.addSubMenu("General");
         sub->addSelector("Measure time", &settings.sensor_loop_ms, sensor_loop_times);
         sub = menu.addSubMenu("NVM");
@@ -138,7 +150,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
         sub->addAction("Erase NVM", [](MenuItem*, void*){ setman.erase(); });    
         // sub->addAction("Begin", [](MenuItem*, void*){ setman.begin(true); });
     };
-    
+
 	menu.onClose(menu_close_cb);
 	menu.open();
 };
