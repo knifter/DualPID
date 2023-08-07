@@ -88,7 +88,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
                 menu.addSeparator(PID1_NAME);
             auto sub = menu.addSubMenu("Setup");
             sub->addSelector("Mode", &set.mode, pid_modes)->onChange( [](MenuItem*, void*){ need_reboot = true; });
-            switch(settings.pid1.mode)
+            switch(set.mode)
             {
                 case PIDLoop::MODE_NP:
                     sub->addSelector("Pin N (-)", &set.pin_n, hardware_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
@@ -96,7 +96,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
                     sub->addSelector("Pin P (+)", &set.pin_p, hardware_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
                 default: break;
             };
-        	// sub->addCheckbox("Take-Back-Half", &settings.pid1.fpid.takebackhalf);
+        	// sub->addCheckbox("Take-Back-Half", &set.fpid.takebackhalf);
             sub->addSelector("Looptime", &set.looptime, pid_loop_times);
             sub->addSelector("Windowtime", &set.windowtime, window_loop_times)->onChange( [](MenuItem*, void*){ pid1.begin(); });    
             sub->onClose(check_reboot_cb);
@@ -105,7 +105,6 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 
     {// Channel 2
         auto &set = settings.pid2;
-
         if(set.mode != PIDLoop::MODE_NONE)
         {
             menu.addSeparator(PID2_NAME);
@@ -122,7 +121,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
                 menu.addSeparator(PID2_NAME);
             auto sub = menu.addSubMenu("Setup");
             sub->addSelector("Mode", &set.mode, pid_modes)->onChange( [](MenuItem*, void*){ need_reboot = true; });
-            switch(settings.pid1.mode)
+            switch(set.mode)
             {
                 case PIDLoop::MODE_NP:
                     sub->addSelector("Pin N (-)", &set.pin_n, hardware_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
@@ -130,7 +129,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
                     sub->addSelector("Pin P (+)", &set.pin_p, hardware_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
                 default: break;
             };
-        	// sub->addCheckbox("Take-Back-Half", &settings.pid1.fpid.takebackhalf);
+        	// sub->addCheckbox("Take-Back-Half", &set.fpid.takebackhalf);
             sub->addSelector("Looptime", &set.looptime, pid_loop_times);
             sub->addSelector("Windowtime", &set.windowtime, window_loop_times)->onChange( [](MenuItem*, void*){ pid2.begin(); });
             sub->onClose(check_reboot_cb);
