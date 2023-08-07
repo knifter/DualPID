@@ -24,7 +24,8 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
         case 0: // empty blob
         case 1: // 
         case 2: //
-            DBG("Init settings v3: defaults");
+        case 3: //
+            DBG("Init settings v4: defaults");
             memset(_data, 0, _data_size);
 
             settings->sensor_loop_ms =              DEFAULT_SENSOR_LOOP_MS;
@@ -62,10 +63,9 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
             settings->pid2.fpid.dterm_filter =      PID2_DEFAULT_DFILTER;
             settings->pid2.fpid.takebackhalf =      PID2_DEFAULT_TBH;
 
-
         // End with the current version:
-        case 3:
-            _data_version = 3;
+        case 4:
+            _data_version = 4;
             return true;
     };
 
@@ -83,12 +83,13 @@ bool SettingsManager::read_blob(void* blob, const size_t blob_size, const uint32
         // old, non convertible settings
         case 1: // 
         case 2: 
+        case 3: 
             set_defaults_since(0);
             _dirty = true;
             return true;
 
         // latest
-        case 3: 
+        case 4: 
             if(blob_size != sizeof(settings_t))
             {
                 ERROR("Settings blob size mismatch (version is ok).");
