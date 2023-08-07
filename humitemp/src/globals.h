@@ -9,7 +9,7 @@
 
 extern settings_t settings;
 
-extern uint32_t developer_mode;
+extern bool expert_mode;
 extern double input_value1;
 extern double input_value2;
 

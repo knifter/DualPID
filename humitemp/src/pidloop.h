@@ -12,15 +12,17 @@ class PIDLoop
     public:
         typedef enum
         {
-            MODE_NONE,      // Unconfigured
+            MODE_NONE,      // Unconfigured, Display sensor only
             MODE_ZP,        // Zero/Positive: heater
+            // MODE_NZP,       // Negative/Zero/Positive: peltier off when in setpoint window
             MODE_NP,        // Negative/Positive: peltier
+            // MODE_NZ,        // Negative/Zero: cool only
         } output_mode_t;
 
         typedef struct
         {
             bool active;
-            PIDLoop::output_mode_t	mode;
+            uint32_t mode;
             uint32_t pin_n;
             uint32_t pin_p;
             uint32_t looptime;
