@@ -105,7 +105,8 @@ void PIDLoop::loop()
         {
             bool status = _pid.calculate();
 
-            DBG("PID = %s: Input = %.2f, Setpoint = %.2f, Output = %.2f", status?"loop":"frozen", _input_ref, _settings.fpid.setpoint, _output);
+            DBG("%u: PID = %s: Input = %.2f, Setpoint = %.2f, Output = %.2f", 
+                now, status?"loop":"frozen", _input_ref, _settings.fpid.setpoint, _output);
         }else{
             // DBG("PID: Input = %.2f, In-Active, Output = %.2f", _input_ref, _output);
         };
@@ -139,24 +140,22 @@ void PIDLoop::loop()
         case MODE_NONE:
             break;
         case MODE_NP:
-            if (_output > (now - _windowstarttime))
+            if (_output >= (now - _windowstarttime))
                 P = HIGH;
             else
                 N = HIGH;
             break;
         case MODE_ZP:
-            if (_output > (now - _windowstarttime))
+            if (_output >= (now - _windowstarttime))
                 P = HIGH;
             break;
     };
     if(_pin_n)
     {
-        DBG("pin(%d) = %s", _pin_n, N == HIGH ? "H" : "L");
         digitalWrite(_pin_n, N);
     };
     if(_pin_p)
     {
-        DBG("pin(%d) = %s", _pin_p, P == HIGH ? "H" : "L");
         digitalWrite(_pin_p, P);
     };
 };
