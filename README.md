@@ -1,16 +1,17 @@
-# Humitemp
-Humidty & Temperature Dual channel PID regulator. Currently used for controlling both temperature and humidity but should be(come) versatile enough to control any two things from different sensors. The general design goals are:
+# DualPID
+Dual channel PID regulator. Currently used for controlling both temperature and humidity but should be(come) versatile enough to control any two things from different sensors. The general design goals are:
  * [ ] Least work hardware: Use existing, easily buyable parts like M5Stack.
  * [x] Two channel PID
  * [x] Two H-Bridge outputs able to control most things from heaters, peltiers, valves etc
- * [ ] Multiple sensors and run-time configurable
+ * [ ] Multiple sensors
+ * [ ] run-time configurable
  * [x] Error graphs
 
 Unfortunately M5Stack does not (yet) provide a high voltage H-Bridge module (right?). For this a design will be made that can stack with M5Stack and provide: LDO regulator for power and two directly controllable H-bridges. For temperature only a (solid-state) relay could be used as well.
 
 ## Dependencies
  * My fork of MiniPID: [FPID](https://github.com/knifter/FPID)
- * Temp/Hum sensor: [lib-SHT30](https://github.com/knifter/lib-SHT3x)
+ * Temp/Hum sensor: [lib-SHT35](https://github.com/knifter/lib-SHT3x)
    * Uses my I2C Device library wrapper: [lib-TwoWireDevice](https://github.com/knifter/lib-TwoWireDevice)
  * my GUI framework: [lib-soogh](https://github.com/knifter/lib-soogh)
    * Uses [LVGL](https://github.com/lvgl)
@@ -39,7 +40,7 @@ Unfortunately M5Stack does not (yet) provide a high voltage H-Bridge module (rig
  * [Fan for motor module](https://shop.m5stack.com/collections/m5-module/products/fan-module-for-stepmotor)
 
 ### Sensors
-Currently the project supports the SHT30 (temp + hum) sensor. But other sensors can, and should, be added as well.
+Currently the project supports the SHT31/35 (temp + hum) sensor. But other sensors can, and should, be added as well.
 
 ## Credits
 Originally this design was based upon https://github.com/sciunto-org/humidity_regulator, an arduino sketch for an Ardiuno Uno. But since I've replaced even the PID loop library, I don't think there is much left of that design. But the idea came from them so credit where credit is due ;)
