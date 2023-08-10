@@ -25,7 +25,7 @@ class PIDLoop
             STATUS_LOCKED,
             STATUS_UNLOCKED,
             STATUS_ERROR
-        } pidloop_state_t;
+        } pidloop_status_t;
 
         typedef struct
         {
@@ -48,7 +48,7 @@ class PIDLoop
         // double get_input() { return *_input; };
         double get_output() { return _output; };
         double get_output_percent() { return _output*100/_settings.windowtime; };
-        pidloop_state_t get_status() { return _status; };
+        pidloop_status_t get_status() { return _status; };
         // int get_output_state() { return _output_state; };
         void set_active(bool);
         // bool active() { return _settings->active; };
@@ -63,7 +63,7 @@ class PIDLoop
         // double Input, Output, Setpoint;
         const double &_input_ref;
         double _output;
-        pidloop_state_t _status;
+        pidloop_status_t _status;
         time_t _windowstarttime;
         gpio_num_t _pin_n, _pin_p;
         time_t _pid_last;
