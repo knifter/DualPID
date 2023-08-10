@@ -30,11 +30,12 @@ class PidPanel
 		lv_style_t 	style_font26;
 		String unit;
 		lv_style_t style_indic;
+        PIDLoop::status_t current_status;
 
 		void setSetPoint(float sp);
 		void setValue(float v);
 		void setBar(float p);   
-		void setState(state_t s);
+		void setState(PIDLoop::status_t s);
 };
 
 PidPanel::PidPanel(lv_obj_t* parent, const char* unit_in)
@@ -45,6 +46,8 @@ PidPanel::PidPanel(lv_obj_t* parent, const char* unit_in)
 	lv_obj_set_size(box, DISPLAY_WIDTH/2, 80);
 	lv_obj_set_style_border_width(box, 3, 0);
 	lv_obj_set_style_pad_all(box, 5, 0);
+    lv_obj_set_style_border_color(box, COLOR_WHITE, 0);
+    lv_obj_set_style_bg_color(box, COLOR_WHITE, 0);
 
 	lv_style_init(&style_font26);
 	lv_style_set_text_font(&style_font26, &lv_font_montserrat_26);
@@ -55,7 +58,7 @@ PidPanel::PidPanel(lv_obj_t* parent, const char* unit_in)
 		lv_obj_set_style_border_width(lbl_sp, 1, 0);
 		lv_obj_set_size(lbl_sp, LV_PCT(100), 20);
 		lv_obj_align(lbl_sp, LV_ALIGN_TOP_MID, 0, 0);
-		lv_obj_set_style_text_color(lbl_sp, COLOR_GREY, LV_PART_ANY);
+		// lv_obj_set_style_text_color(lbl_sp, COLOR_GREY, LV_PART_ANY);
 		lv_obj_set_style_text_align(lbl_sp, LV_TEXT_ALIGN_CENTER, 0);
 		lv_label_set_text(lbl_sp, "<setpoint>");
 		lv_obj_set_style_bg_opa(lbl_sp, LV_OPA_COVER, 0);
@@ -70,7 +73,7 @@ PidPanel::PidPanel(lv_obj_t* parent, const char* unit_in)
 		lv_obj_set_style_text_color(lbl_value, COLOR_BLACK, LV_PART_ANY);
 		lv_obj_set_style_text_align(lbl_value, LV_TEXT_ALIGN_CENTER, 0);
 		lv_label_set_text(lbl_value, "<value>");
-		// lv_obj_set_style_bg_opa(lbl_value, LV_OPA_COVER, 0);
+		lv_obj_set_style_bg_opa(lbl_value, LV_OPA_COVER, 0);
 	};
 
 	// Output bar
@@ -80,56 +83,112 @@ PidPanel::PidPanel(lv_obj_t* parent, const char* unit_in)
 		lv_obj_set_size(bar_output, LV_PCT(100), 10);
 		lv_obj_align(bar_output, LV_ALIGN_BOTTOM_MID, 0, 0);
 		lv_bar_set_range(bar_output, 0, 100);
-		
+	    lv_obj_set_style_bg_color(bar_output, COLOR_WHITE, 0);
+		lv_obj_set_style_bg_opa(bar_output, LV_OPA_COVER, 0);
+
     	lv_style_init(&style_indic);
     	lv_style_set_bg_opa(&style_indic, LV_OPA_COVER);
     	lv_style_set_bg_grad_dir(&style_indic, LV_GRAD_DIR_HOR);
+        lv_style_set_bg_color(&style_indic, COLOR_BLUE);
+        lv_style_set_bg_grad_color(&style_indic, COLOR_RED);
 
 		lv_obj_add_style(bar_output, &style_indic, LV_PART_INDICATOR);
-		lv_obj_set_style_bg_opa(bar_output, LV_OPA_COVER, 0);
 	};
+
+    // Set all state properties, but to trigger we need to set status to something we're not
+    current_status = PIDLoop::STATUS_ERROR;
+    setState(PIDLoop::STATUS_DISABLED);
+    // current_status => disabled
 }; // PidPanel()
 
-void PidPanel::setState(PidPanel::state_t state)
+void PidPanel::setState(PIDLoop::status_t status)
 {
-	switch(state)
-	{
-		case PS_DISABLED:
-			lv_obj_set_style_border_color(box, COLOR_WHITE, 0);
-			lv_obj_set_style_bg_color(box, COLOR_WHITE, 0);
+    // Only update widget styles if status changed
+    if(current_status == status)
+        return;
+    current_status = status;
 
-			lv_obj_set_style_bg_color(lbl_sp, COLOR_GREY, 0);
-			// lv_obj_set_style_bg_color(lbl_value, COLOR_WHITE, 0);
+    // Setpoint label
+    switch(status)
+	{
+		case PIDLoop::STATUS_DISABLED:
+			lv_obj_set_style_bg_color(lbl_sp, COLOR_LIGHT_BLUE, 0);
+            lv_obj_set_style_text_color(lbl_sp, COLOR_GREY_DARK(1), 0);
+			break;
+		case PIDLoop::STATUS_INACTIVE:
+			lv_obj_set_style_bg_color(lbl_sp, COLOR_BLUE_GREY, 0);
+            lv_obj_set_style_text_color(lbl_sp, COLOR_BLACK, 0);
+            break;
+		case PIDLoop::STATUS_LOCKED:
+			lv_obj_set_style_bg_color(lbl_sp, COLOR_GREEN_LIGHT(2), 0);
+            lv_obj_set_style_text_color(lbl_sp, COLOR_BLACK, 0);
+			break;
+		case PIDLoop::STATUS_UNLOCKED:
+			lv_obj_set_style_bg_color(lbl_sp, COLOR_GREEN_LIGHT(2), 0);
+            lv_obj_set_style_text_color(lbl_sp, COLOR_BLACK, 0);
+            break;
+		case PIDLoop::STATUS_ERROR:
+			lv_obj_set_style_bg_color(lbl_sp, COLOR_RED_LIGHT(2), 0);
+            lv_obj_set_style_text_color(lbl_sp, COLOR_BLACK, 0);
+            break;
+    };
+
+    // Value label
+    switch(status)
+	{
+		case PIDLoop::STATUS_DISABLED:
+		case PIDLoop::STATUS_INACTIVE:
+		case PIDLoop::STATUS_LOCKED:
+			lv_obj_set_style_bg_color(lbl_value, COLOR_WHITE, 0);
+			break;
+		case PIDLoop::STATUS_UNLOCKED:
+			lv_obj_set_style_bg_color(lbl_value, COLOR_ORANGE, 0);
+            break;
+		case PIDLoop::STATUS_ERROR:
+			lv_obj_set_style_bg_color(lbl_value, COLOR_RED, 0);
+            break;
+    };
+
+    // Output bar
+    switch(status)
+    {
+        case PIDLoop::STATUS_DISABLED:
+            lv_obj_add_flag(bar_output, LV_OBJ_FLAG_HIDDEN);
+            break;
+        case PIDLoop::STATUS_INACTIVE:
+            lv_obj_clear_flag(bar_output, LV_OBJ_FLAG_HIDDEN);
 
 			lv_obj_set_style_bg_color(bar_output, COLOR_GREY, 0);
-			lv_style_set_bg_color(&style_indic, COLOR_GREY);
+   			lv_style_set_bg_color(&style_indic, COLOR_GREY);
 			lv_style_set_bg_grad_color(&style_indic, COLOR_GREY);
-			break;
-		case PS_OK:
-			lv_obj_set_style_border_color(box, COLOR_WHITE, 0);
-			lv_obj_set_style_bg_color(box, COLOR_WHITE, 0);
-
-			lv_obj_set_style_bg_color(lbl_sp, COLOR_GREEN_LIGHT(2), 0);
-			// lv_obj_set_style_bg_color(lbl_value, COLOR_WHITE, 0);
+            break;
+        case PIDLoop::STATUS_LOCKED:
+		case PIDLoop::STATUS_UNLOCKED:
+		case PIDLoop::STATUS_ERROR:
+            lv_obj_clear_flag(bar_output, LV_OBJ_FLAG_HIDDEN);
 
 			lv_obj_set_style_bg_color(bar_output, COLOR_WHITE, 0);
-			lv_style_set_bg_color(&style_indic, COLOR_BLUE);
-			lv_style_set_bg_grad_color(&style_indic, COLOR_RED);
-			break;
-	};
+            lv_style_set_bg_color(&style_indic, COLOR_BLUE);
+            lv_style_set_bg_grad_color(&style_indic, COLOR_RED);
+            break;
+    };
 };
-void PidPanel::setSetPoint(float sp) { lv_label_set_text_fmt(lbl_sp, "sp = %0.01f %s", sp, unit.c_str()); };
-void PidPanel::setValue(float v) { 	lv_label_set_text_fmt(lbl_value, "%0.01f %s", v, unit.c_str()); };
-void PidPanel::setBar(float p) {     	lv_bar_set_value(bar_output, p, LV_ANIM_ON); };
-void PidPanel::selected(bool select)
-{
-	if(select)
+void PidPanel::setSetPoint(float sp) 
+{ 
+    switch(current_status)
     {
-        lv_obj_set_style_border_color(box, COLOR_BLACK, 0);
-	}else{
-		lv_obj_set_style_border_color(box, COLOR_GREY, 0);
-	};
+        case PIDLoop::STATUS_DISABLED:
+            lv_label_set_text(lbl_sp, "Sensor");
+            return;
+        default:
+            lv_label_set_text_fmt(lbl_sp, "sp = %0.01f %s", sp, unit.c_str());
+            return;
+    };
 };
+
+void PidPanel::setValue(float v) { 	    lv_label_set_text_fmt(lbl_value, "%0.01f %s", v, unit.c_str()); };
+void PidPanel::setBar(float p) {     	lv_bar_set_value(bar_output, p, LV_ANIM_ON); };
+void PidPanel::selected(bool select) {  lv_obj_set_style_border_color(box, select ? COLOR_BLACK : COLOR_GREY, 0);};
 
 /*********************************************************************************************************************************/
 class GraphPanel
@@ -294,22 +353,12 @@ void MainScreen::loop()
 	pw1->setSetPoint(settings.pid1.fpid.setpoint);
 	pw1->setValue(input_value1);
 	pw1->setBar(pid1.get_output_percent());
-	if(settings.pid1.active)
-	{
-		pw1->setState(PidPanel::PS_OK);
-	}else{
-		pw1->setState(PidPanel::PS_DISABLED);
-	};
+    pw1->setState(pid1.get_status());
 
 	pw2->setSetPoint(settings.pid2.fpid.setpoint);
 	pw2->setValue(input_value2);
 	pw2->setBar(pid2.get_output_percent());
-	if(settings.pid2.active)
-	{
-		pw2->setState(PidPanel::PS_OK);
-	}else{
-		pw2->setState(PidPanel::PS_DISABLED);
-	};
+    pw2->setState(pid2.get_status());
 
 	if(now < _next_chart)
 		return;
