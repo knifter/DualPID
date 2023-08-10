@@ -40,7 +40,7 @@ SelectorField::item_t pid_loop_times [] = {
 
 SelectorField::item_t window_loop_times [] = {
 	{1000, 	"1s",   "1 sec"},
-	{1000, 	"2s",   "2 sec"},
+	{2000, 	"2s",   "2 sec"},
 	{5000, 	"5s",   "5 sec"},
 	{10000, "10s",  "10 sec"},
 	{60000, "1m",   "1 min"},
@@ -63,6 +63,13 @@ SelectorField::item_t graph_delta_times [] = {
 	{5000, "5s", "5 sec"},
 	{60000, "1m", "1 min"},
 	{600000, "10m", "10 min"},
+	{0, 0, 0}
+	};
+
+SelectorField::item_t lock_times [] = {
+	{1000, "1s", "1 sec"},
+	{10000, "10s", "10 sec"},
+	{60000, "1m", "1 min"},
 	{0, 0, 0}
 	};
 
@@ -99,6 +106,9 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
         	// sub->addCheckbox("Take-Back-Half", &set.fpid.takebackhalf);
             sub->addSelector("Looptime", &set.looptime, pid_loop_times);
             sub->addSelector("Windowtime", &set.windowtime, window_loop_times)->onChange( [](MenuItem*, void*){ pid1.begin(); });    
+            sub->addSelector("Lock Time", &set.lock_time, lock_times);
+            sub->addSpinbox("Lock Window", &set.lock_window, 0, PID1_SETPOINT_MAX-PID1_SETPOINT_MIN);
+
             sub->onClose(check_reboot_cb);
         };
     };
@@ -132,6 +142,9 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
         	// sub->addCheckbox("Take-Back-Half", &set.fpid.takebackhalf);
             sub->addSelector("Looptime", &set.looptime, pid_loop_times);
             sub->addSelector("Windowtime", &set.windowtime, window_loop_times)->onChange( [](MenuItem*, void*){ pid2.begin(); });
+            sub->addSelector("Lock Time", &set.lock_time, lock_times);
+            sub->addSpinbox("Lock Window", &set.lock_window, 0, PID2_SETPOINT_MAX-PID2_SETPOINT_MIN);
+
             sub->onClose(check_reboot_cb);
         };
     };
