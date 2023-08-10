@@ -75,7 +75,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
         if(set.mode != PIDLoop::MODE_NONE)
         {
             menu.addSeparator(PID1_NAME);
-            menu.addSpinbox("Setpoint", &set.fpid.setpoint, PID1_MIN, PID1_MAX, PID1_PRECISION);
+            menu.addSpinbox("Setpoint", &set.fpid.setpoint, PID1_SETPOINT_MIN, PID1_SETPOINT_MAX, PID1_PRECISION);
             menu.addSwitch("Active", &set.active);
             auto sub = menu.addSubMenu("PID Settings");
             sub->addSpinbox("kP", &set.fpid.kP, PID1_PAR_MIN, PID1_PAR_MAX, PID1_PAR_PRECISION);
@@ -108,7 +108,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
         if(set.mode != PIDLoop::MODE_NONE)
         {
             menu.addSeparator(PID2_NAME);
-            menu.addSpinbox("Setpoint", &set.fpid.setpoint, PID2_MIN, PID2_MAX, PID2_PRECISION);
+            menu.addSpinbox("Setpoint", &set.fpid.setpoint, PID2_SETPOINT_MIN, PID2_SETPOINT_MAX, PID2_PRECISION);
             menu.addSwitch("Active", &set.active);
             auto sub = menu.addSubMenu("PID Settings");
             sub->addSpinbox("kP", &set.fpid.kP, PID2_PAR_MIN, PID2_PAR_MAX, PID2_PAR_PRECISION);

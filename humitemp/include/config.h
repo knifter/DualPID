@@ -36,47 +36,51 @@
 #define DEFAULT_SENSOR_LOOP_MS  1000
 #define DEFAULT_GRAPH_DELTA_MS	60E3		    // Time between graph points
 
-#define PID1_NAME               "Temperature"
-#define PID1_UNIT_TEXT			"C"
-#define PID1_MIN			    0
-#define PID1_MAX			    60
-#define PID1_PRECISION	        1
-#define PID1_PAR_MIN			-50
-#define PID1_PAR_MAX			100
-#define PID1_PAR_PRECISION		1
-#define PID1_DEFAULT_F  		0.0
-#define PID1_DEFAULT_P  		5.0
-#define PID1_DEFAULT_I  		2.0
-#define PID1_DEFAULT_D  		2.0
-#define PID1_DEFAULT_MODE       PIDLoop::MODE_ZP
-#define PID1_DEFAULT_SETPOINT	20.0
-#define PID1_DEFAULT_OFILTER    0.0             // PID Output filter, 0 = no filter
-#define PID1_DEFAULT_DFILTER    0.0             // PID D-Term filter
-#define PID1_DEFAULT_TBH        0
-#define PID1_DEFAULT_LOOPTIME_MS 1000            // time between each pid-loop iteration
-#define PID1_DEFAULT_WINDOWTIME  5000      		// soft-pwm time-window size in ms
-#define PID1_DEFAULT_MAX_OUTPUT  1.0             // Factor max output, between 0..1
+#define PID1_NAME                   "Temperature"
+#define PID1_UNIT_TEXT			    "C"
+#define PID1_SETPOINT_MIN		    -20
+#define PID1_SETPOINT_MAX		    60
+#define PID1_PRECISION	            1
+#define PID1_PAR_MIN			    -50
+#define PID1_PAR_MAX			    100
+#define PID1_PAR_PRECISION		    1
+#define PID1_DEFAULT_F  		    0.0
+#define PID1_DEFAULT_P  		    5.0
+#define PID1_DEFAULT_I  		    0.0
+#define PID1_DEFAULT_D  		    0.0
+#define PID1_DEFAULT_MODE           PIDLoop::MODE_ZP
+#define PID1_DEFAULT_SETPOINT	    20.0
+#define PID1_DEFAULT_OFILTER        0.0             // PID Output filter, 0 = no filter
+#define PID1_DEFAULT_DFILTER        0.0             // PID D-Term filter
+#define PID1_DEFAULT_TBH            0
+#define PID1_DEFAULT_LOOPTIME_MS    1000           // time between each pid-loop iteration
+#define PID1_DEFAULT_WINDOWTIME     5000      		// soft-pwm time-window size in ms
+#define PID1_DEFAULT_MAX_OUTPUT     1.0            // Factor max output, between 0..1
+#define PID1_DEFAULT_LOCK_WINDOW    5                         
+#define PID1_DEFAULT_LOCK_TIME_MS   60000
 
-#define PID2_NAME               "Humidity"
-#define PID2_UNIT_TEXT			"%RH"
-#define PID2_MIN			    0
-#define PID2_MAX			    100
-#define PID2_PRECISION		    0
-#define PID2_PAR_MIN			0
-#define PID2_PAR_MAX			100
-#define PID2_PAR_PRECISION		1
-#define PID2_DEFAULT_F  		0.0
-#define PID2_DEFAULT_P  		5.0
-#define PID2_DEFAULT_I  		2.0
-#define PID2_DEFAULT_D  		2.0
-#define PID2_DEFAULT_MODE       PIDLoop::MODE_ZP
-#define PID2_DEFAULT_SETPOINT	50.0
-#define PID2_DEFAULT_OFILTER    0.0             // PID Output filter, 0 = no filter
-#define PID2_DEFAULT_DFILTER    0.0             // PID D-Term filter
-#define PID2_DEFAULT_TBH        0
-#define PID2_DEFAULT_LOOPTIME_MS 1000            // time between each pid-loop iteration
-#define PID2_DEFAULT_WINDOWTIME  5000      		// soft-pwm time-window size in ms
-#define PID2_DEFAULT_MAX_OUTPUT  1.0             // Factor max output, between 0..1
+#define PID2_NAME                   "Humidity"
+#define PID2_UNIT_TEXT			    "%RH"
+#define PID2_SETPOINT_MIN	        0
+#define PID2_SETPOINT_MAX	        100
+#define PID2_PRECISION		        0
+#define PID2_PAR_MIN			    0
+#define PID2_PAR_MAX			    100
+#define PID2_PAR_PRECISION		    1
+#define PID2_DEFAULT_F  		    0.0
+#define PID2_DEFAULT_P  		    5.0
+#define PID2_DEFAULT_I  		    2.0
+#define PID2_DEFAULT_D  		    2.0
+#define PID2_DEFAULT_MODE           PIDLoop::MODE_ZP
+#define PID2_DEFAULT_SETPOINT	    50.0
+#define PID2_DEFAULT_OFILTER        0.0             // PID Output filter, 0 = no filter
+#define PID2_DEFAULT_DFILTER        0.0             // PID D-Term filter
+#define PID2_DEFAULT_TBH            0
+#define PID2_DEFAULT_LOOPTIME_MS    1000            // time between each pid-loop iteration
+#define PID2_DEFAULT_WINDOWTIME     5000      		// soft-pwm time-window size in ms
+#define PID2_DEFAULT_MAX_OUTPUT     1.0             // Factor max output, between 0..1
+#define PID2_DEFAULT_LOCK_WINDOW    5 
+#define PID2_DEFAULT_LOCK_TIME_MS   60000
 
 // #define DISPLAY_WIDTH			320
 // #define DISPLAY_HEIGHT			240
