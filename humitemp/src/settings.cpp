@@ -90,6 +90,7 @@ bool SettingsManager::read_blob(void* blob, const size_t blob_size, const uint32
         case 3: 
             set_defaults_since(0);
             _dirty = true;
+            gui.showMessage("INFO", "Default settings loaded.");
             return true;
 
         // latest
@@ -100,7 +101,7 @@ bool SettingsManager::read_blob(void* blob, const size_t blob_size, const uint32
                 return false;
             };
             memcpy(_data, blob, blob_size);
-            _data_version = 3;
+            _data_version = 4;
             _dirty = false;
             return true;
     };
