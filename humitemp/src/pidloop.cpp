@@ -9,7 +9,7 @@
 #include "settings.h"
 #include "tools-log.h"
 
-PIDLoop::PIDLoop(pidloop_settings_t& s, const double& input) :
+PIDLoop::PIDLoop(settings_t& s, const double& input) :
     _pid(&(s.fpid), (&input), (&_output)),
     _settings(s), _input_ref(input)
 {
