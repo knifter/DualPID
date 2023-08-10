@@ -28,6 +28,7 @@ bool PIDLoop::begin()
 
 	_windowstarttime = millis();
     _pid_last = millis();
+    _status = STATUS_OFF;
 
     switch(_settings.mode)
     {
@@ -79,18 +80,57 @@ void PIDLoop::set_active(bool active)
     {
         _pid.alignOutput();
         reset_output();
+        _status = STATUS_UNLOCKED;
     } else {
         if(_pin_n)
             digitalWrite(_pin_n, LOW);
         if(_pin_p)
             digitalWrite(_pin_p, LOW);
+        _status = STATUS_OFF;
     };
     _settings.active = active;
     _active_last = active;
 };
 
+void PIDLoop::calculate()
+{
+    // Run the inner pidloop
+    bool res = _pid.calculate();
+
+    time_t now = millis();
+    DBG("%u: PID = %s: Input = %.2f, Setpoint = %.2f, Output = %.2f", 
+        now, res?"loop":"frozen", _input_ref, _settings.fpid.setpoint, _output);
+
+    // If saturated, we're in error
+    if(!res)
+    {
+        _status = STATUS_ERROR;
+        return;
+    };
+
+    float error = _settings.lock_window * _settings.fpid.setpoint / 100;
+    if(abs(_input_ref - _settings.fpid.setpoint) > error)
+    {
+        // UNLOCKED
+        _status = STATUS_UNLOCKED;
+        _unlocked_last = now;
+        return;
+    };
+
+    // In lock window, long enough?
+    if(now - _unlocked_last < _settings.lock_time)
+    {
+        _status = STATUS_UNLOCKED;
+        return;
+    };
+
+    // LOCKED
+    _status = STATUS_LOCKED;
+};
+
 void PIDLoop::loop()
 {
+    // Follow _settings when it changes.
     if(_active_last != _settings.active)
     {
         set_active(_settings.active);
@@ -103,10 +143,7 @@ void PIDLoop::loop()
     {
         if(_settings.active)
         {
-            bool status = _pid.calculate();
-
-            DBG("%u: PID = %s: Input = %.2f, Setpoint = %.2f, Output = %.2f", 
-                now, status?"loop":"frozen", _input_ref, _settings.fpid.setpoint, _output);
+            calculate();            
         }else{
             // DBG("PID: Input = %.2f, In-Active, Output = %.2f", _input_ref, _output);
         };

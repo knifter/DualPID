@@ -46,6 +46,8 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
             settings->pid1.fpid.output_filter =     PID1_DEFAULT_OFILTER;
             settings->pid1.fpid.dterm_filter =      PID1_DEFAULT_DFILTER;
             settings->pid1.fpid.takebackhalf =      PID1_DEFAULT_TBH;
+            settings->pid1.lock_window =            PID1_DEFAULT_LOCK_WINDOW;
+            settings->pid1.lock_time =              PID1_DEFAULT_LOCK_TIME_MS;
 
             settings->pid2.active =                 false;
             settings->pid2.mode =                   PID2_DEFAULT_MODE;
@@ -62,6 +64,8 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
             settings->pid2.fpid.output_filter =     PID2_DEFAULT_OFILTER;
             settings->pid2.fpid.dterm_filter =      PID2_DEFAULT_DFILTER;
             settings->pid2.fpid.takebackhalf =      PID2_DEFAULT_TBH;
+            settings->pid2.lock_window =            PID2_DEFAULT_LOCK_WINDOW;
+            settings->pid2.lock_time =              PID2_DEFAULT_LOCK_TIME_MS;
 
         // End with the current version:
         case 4:

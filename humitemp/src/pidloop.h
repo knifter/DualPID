@@ -17,7 +17,15 @@ class PIDLoop
             // MODE_NZP,       // Negative/Zero/Positive: peltier off when in setpoint window
             MODE_NP,        // Negative/Positive: peltier
             // MODE_NZ,        // Negative/Zero: cool only
-        } output_mode_t;
+        } pidloop_output_mode_t;
+
+        typedef enum
+        {
+            STATUS_OFF,
+            STATUS_LOCKED,
+            STATUS_UNLOCKED,
+            STATUS_ERROR
+        } pidloop_state_t;
 
         typedef struct
         {
@@ -29,6 +37,8 @@ class PIDLoop
             uint32_t windowtime;
             double max_output;
             FPID::fpid_settings_t fpid;
+            uint32_t lock_window;
+            uint32_t lock_time;
         } pidloop_settings_t;
 
         PIDLoop(pidloop_settings_t& s, const double& input);
@@ -38,22 +48,27 @@ class PIDLoop
         // double get_input() { return *_input; };
         double get_output() { return _output; };
         double get_output_percent() { return _output*100/_settings.windowtime; };
+        pidloop_state_t get_status() { return _status; };
         // int get_output_state() { return _output_state; };
         void set_active(bool);
         // bool active() { return _settings->active; };
         void reset_output();
 
     private: 
+        void calculate();
+
         FPID _pid;
         pidloop_settings_t &_settings;
 
         // double Input, Output, Setpoint;
         const double &_input_ref;
         double _output;
+        pidloop_state_t _status;
         time_t _windowstarttime;
         gpio_num_t _pin_n, _pin_p;
         time_t _pid_last;
         bool _active_last;
+        time_t _unlocked_last;
 };
 
 #endif // __PIDLOOP_H
