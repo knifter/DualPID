@@ -21,7 +21,8 @@ class PIDLoop
 
         typedef enum
         {
-            STATUS_OFF,
+            STATUS_DISABLED,
+            STATUS_INACTIVE,
             STATUS_LOCKED,
             STATUS_UNLOCKED,
             STATUS_ERROR
@@ -37,7 +38,7 @@ class PIDLoop
             uint32_t windowtime;
             double max_output;
             FPID::fpid_settings_t fpid;
-            uint32_t lock_window;
+            double lock_window;
             uint32_t lock_time;
         } settings_t;
 
@@ -50,11 +51,11 @@ class PIDLoop
         double get_output_percent() { return _output*100/_settings.windowtime; };
         status_t get_status() { return _status; };
         // int get_output_state() { return _output_state; };
+
+    private: 
         void set_active(bool);
         // bool active() { return _settings->active; };
         void reset_output();
-
-    private: 
         void calculate();
 
         FPID _pid;
