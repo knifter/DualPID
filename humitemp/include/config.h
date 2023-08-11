@@ -69,8 +69,8 @@
 #define PID2_PAR_PRECISION		    1
 #define PID2_DEFAULT_F  		    0.0
 #define PID2_DEFAULT_P  		    5.0
-#define PID2_DEFAULT_I  		    2.0
-#define PID2_DEFAULT_D  		    2.0
+#define PID2_DEFAULT_I  		    0.0
+#define PID2_DEFAULT_D  		    0.0
 #define PID2_DEFAULT_MODE           PIDLoop::MODE_ZP
 #define PID2_DEFAULT_SETPOINT	    50.0
 #define PID2_DEFAULT_OFILTER        0.0             // PID Output filter, 0 = no filter
