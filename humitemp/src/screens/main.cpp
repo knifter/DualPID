@@ -188,7 +188,7 @@ void PidPanel::setSetPoint(float sp)
 
 void PidPanel::setValue(float v) { 	    lv_label_set_text_fmt(lbl_value, "%0.01f %s", v, unit.c_str()); };
 void PidPanel::setBar(float p) {     	lv_bar_set_value(bar_output, p, LV_ANIM_ON); };
-void PidPanel::selected(bool select) {  lv_obj_set_style_border_color(box, select ? COLOR_BLACK : COLOR_GREY, 0);};
+void PidPanel::selected(bool select) {  lv_obj_set_style_border_color(box, select ? COLOR_BLACK : COLOR_WHITE, 0);};
 
 /*********************************************************************************************************************************/
 class GraphPanel
@@ -374,18 +374,17 @@ bool MainScreen::handle(soogh_event_t key)
 {
 	switch(key)
 	{
-		case KEY_A_SHORT:
-			pw1->selected(true);
-			pw2->selected(false);
-			break;
+		// case KEY_A_SHORT:
+		// 	pw1->selected(true);
+		// 	pw2->selected(false);
+		// 	break;
 		case KEY_B_SHORT:
 		    gui.pushScreen(std::make_shared<MenuScreen>(gui));
 			return true;
-		case KEY_C_SHORT:
-			pw1->selected(false);
-			pw2->selected(true);
-			break;
-		case KEY_B_LONG:
+		// case KEY_C_SHORT:
+		// 	pw1->selected(false);
+		// 	pw2->selected(true);
+		// 	break;
 		default: break;
 	};
 	return true;
