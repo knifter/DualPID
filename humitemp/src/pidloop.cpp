@@ -101,8 +101,8 @@ void PIDLoop::calculate()
     bool res = _pid.calculate();
 
     time_t now = millis();
-    DBG("%u: PID = %s: Input = %.2f, Setpoint = %.2f, Output = %.2f", 
-        now, res?"ok":"err", _input_ref, _settings.fpid.setpoint, _output);
+    // DBG("%u: PID = %s: Input = %.2f, Setpoint = %.2f, Output = %.2f", 
+    //     now, res?"ok":"err", _input_ref, _settings.fpid.setpoint, _output);
 
     // If saturated, we're in error
     if(!res)
