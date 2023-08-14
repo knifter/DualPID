@@ -209,13 +209,13 @@ bool MenuScreen::handle(soogh_event_t e)
 		case KEY_B_SHORT:
 			menu.sendKey(LV_KEY_ENTER);
 			break;
+		case KEY_B_LONG:
+			menu.sendKey(LV_KEY_ESC);
+			break;
 		case KEY_C_SHORT:
 		case KEY_C_LONG:
 		case KEY_C_LONG_REPEAT:
 			menu.sendKey(LV_KEY_RIGHT);
-			break;
-		case KEY_B_LONG:
-			menu.sendKey(LV_KEY_ESC);
 			break;
 		case KEY_AC_LONG:
 			gui.popScreen();

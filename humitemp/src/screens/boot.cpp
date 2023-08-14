@@ -34,8 +34,7 @@ void BootScreen::loop()
     uint32_t now = millis();
     if((now - _start) > BOOTSCREEN_TIMEOUT_MS)
     {
-		ScreenPtr scr = std::make_shared<MainScreen>(_gui);
-        _gui.pushScreen(scr);
+        gui.pushScreenType(ScreenType::MAIN);
     };
 	return;
 };
@@ -47,7 +46,8 @@ bool BootScreen::handle(soogh_event_t e)
 		case KEY_A_SHORT:
 		case KEY_B_SHORT:
 		case KEY_C_SHORT:
-	        gui.pushScreenType(ScreenType::MAIN);
+            // Push mainscreen next loop
+            _start = 0;
 			return true;
 		default:
 			return false;
