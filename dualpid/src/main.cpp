@@ -59,6 +59,9 @@ void setup()
 void loop()
 {
     soogh_event_t e = static_cast<soogh_event_t>(key2event(scan_keys()));
+    // if(e & KEYTOOL_EVENT_MASK)
+    //     DBG("event: %s", soogh_event_name(e));
+
 	gui.handle(e);
 
 	setman.loop();
