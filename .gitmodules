@@ -1,15 +1,15 @@
-[submodule "humitemp/lib/soogh"]
-	path = dualpid/lib/soogh
-	url = https://github.com/knifter/lib-soogh
-[submodule "humitemp/lib/SHT3x"]
-	path = dualpid/lib/SHT3x
-	url = https://github.com/knifter/lib-SHT3x
-[submodule "humitemp/lib/tools"]
-	path = dualpid/lib/tools
-	url = https://github.com/knifter/lib-tools
-[submodule "humitemp/lib/FPID"]
-	path = dualpid/lib/FPID
-	url = https://github.com/knifter/lib-FPID
-[submodule "humitemp/lib/TwoWireDevice"]
-	path = dualpid/lib/TwoWireDevice
+[submodule "dualpid/lib/lib-TwoWireDevice"]
+	path = dualpid/lib/lib-TwoWireDevice
 	url = https://github.com/knifter/lib-TwoWireDevice
+[submodule "dualpid/lib/lib-soogh"]
+	path = dualpid/lib/lib-soogh
+	url = https://github.com/knifter/lib-soogh
+[submodule "dualpid/lib/lib-tools"]
+	path = dualpid/lib/lib-tools
+	url = https://github.com/knifter/lib-tools
+[submodule "dualpid/lib/lib-FPID"]
+	path = dualpid/lib/lib-FPID
+	url = https://github.com/knifter/lib-FPID
+[submodule "dualpid/lib/lib-SHT3x"]
+	path = dualpid/lib/lib-SHT3x
+	url = https://github.com/knifter/lib-SHT3x
