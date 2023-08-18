@@ -10,9 +10,9 @@
 typedef struct
 {
     uint32_t sensor_loop_ms;         // Sensor poll loop-time
-    uint32_t graph_len;              // history length in graph on screen
-	PIDLoop::pidloop_settings_t pid1;
-	PIDLoop::pidloop_settings_t pid2;
+    uint32_t graph_delta;            // Time per point, ms
+	PIDLoop::settings_t pid1;
+	PIDLoop::settings_t pid2;
 } settings_t;
 
 class SettingsManager : public NVSettings

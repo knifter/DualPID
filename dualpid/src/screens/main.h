@@ -5,7 +5,6 @@
 #include <stdint.h>
 
 #include <soogh.h>
-#include <treemenu.h>
 
 #include "gui.h"
 
@@ -19,7 +18,7 @@ class MainScreen : public Screen
 
 		virtual ScreenType type() { return ScreenType::MAIN; };
 
-        virtual bool loop();
+        virtual void loop();
 		virtual bool handle(soogh_event_t);
 	
 	private:
