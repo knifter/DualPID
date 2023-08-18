@@ -150,7 +150,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
         // sub->addAction("Begin", [](MenuItem*, void*){ setman.begin(true); });
     };
 
-	menu.onClose(menu_close_cb);
+	menu.onClose(menu_close_cb, this);
 	menu.open();
 };
 
@@ -168,7 +168,7 @@ void menu_close_cb(MenuItem* item, void* data)
 	DBG("Menu closing!");
 	setman.saveDelayed();
 
-	gui.popScreen();
+    static_cast<MenuScreen*>(data)->close();
 };
 
 void MenuScreen::load()
@@ -192,22 +192,26 @@ bool MenuScreen::handle(soogh_event_t e)
 		case KEY_A_LONG:
 		case KEY_A_LONG_REPEAT:
 			menu.sendKey(LV_KEY_LEFT);
-			break;
+			return true;
 		case KEY_B_SHORT:
 			menu.sendKey(LV_KEY_ENTER);
-			break;
+			return true;
 		case KEY_B_LONG:
 			menu.sendKey(LV_KEY_ESC);
-			break;
+			return true;
 		case KEY_C_SHORT:
 		case KEY_C_LONG:
 		case KEY_C_LONG_REPEAT:
 			menu.sendKey(LV_KEY_RIGHT);
-			break;
+			return true;
 		case KEY_AC_LONG:
-			gui.popScreen();
+            DBG("before AC_LONG");
+			// gui.popScreen();
+            close();
+            DBG("after AC_LONG");
 			return true;
 		default: break;
 	};
-	return true;
+
+	return true; // Don't propagate event further below mainscreen
 };
