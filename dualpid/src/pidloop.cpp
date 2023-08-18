@@ -189,12 +189,18 @@ void PIDLoop::loop()
     {
         case MODE_NONE:
             break;
-        case MODE_NP:
+        case MODE_NZ:   // Negative-Zero
+            if (output_time <= (now - _windowstarttime))
+                N = HIGH;
+            break;
+        case MODE_NP:   // Negative or Positive
             if (output_time >= (now - _windowstarttime))
                 P = HIGH;
             else
                 N = HIGH;
             break;
+        // case MODE_NZP:
+        //     break;
         case MODE_ZP:
             if (output_time >= (now - _windowstarttime))
                 P = HIGH;

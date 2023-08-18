@@ -16,7 +16,7 @@ class PIDLoop
             MODE_ZP,        // Zero/Positive: heater
             // MODE_NZP,       // Negative/Zero/Positive: peltier off when in setpoint window
             MODE_NP,        // Negative/Positive: peltier
-            // MODE_NZ,        // Negative/Zero: cool only
+            MODE_NZ,        // Negative/Zero: cool only
         } output_mode_t;
 
         typedef enum

@@ -49,10 +49,10 @@ SelectorField::item_t window_loop_times [] = {
 
 SelectorField::item_t pid_modes [] = {
     {PIDLoop::MODE_NONE, "-", "Sensor"},
-    {PIDLoop::MODE_ZP,   "ZP", "ZeroPos"},
-    // {PIDLoop::MODE_NZP,     "NZP", "NegZeroPos"},
-    {PIDLoop::MODE_NP,   "NP", "NegPos"},
-    // {PIDLoop::MODE_NZ,   }; "NZ", "NegZero"},
+    {PIDLoop::MODE_ZP,   "0+", "ZeroPos"},
+    // {PIDLoop::MODE_NZP,  "-0+", "NegZeroPos"},
+    {PIDLoop::MODE_NP,   "-+", "NegPos"},
+    {PIDLoop::MODE_NZ,   "-0", "NegZero"},
     {0, 0, 0}
 };
 
