@@ -96,6 +96,9 @@
 #define PIN_BTN_B				GPIO_NUM_38
 #define PIN_BTN_C				GPIO_NUM_37
 
+#define PIN_CO2_RX              GPIO_NUM_16
+#define PIN_CO2_TX              GPIO_NUM_17
+
 #ifdef M5STACK_CORE
 #endif
 
