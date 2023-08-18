@@ -352,12 +352,12 @@ void MainScreen::loop()
 
 	pw1->setSetPoint(settings.pid1.fpid.setpoint);
 	pw1->setValue(input_value1);
-	pw1->setBar(pid1.get_output_percent());
+	pw1->setBar(pid1.get_output());
     pw1->setState(pid1.get_status());
 
 	pw2->setSetPoint(settings.pid2.fpid.setpoint);
 	pw2->setValue(input_value2);
-	pw2->setBar(pid2.get_output_percent());
+	pw2->setBar(pid2.get_output());
     pw2->setState(pid2.get_status());
 
 	if(now < _next_chart)

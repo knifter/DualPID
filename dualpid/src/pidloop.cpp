@@ -37,10 +37,10 @@ bool PIDLoop::begin()
         	_pid.setOutputLimits(0,0);
             break;
         case MODE_NP:
-        	_pid.setOutputLimits(0, _settings.windowtime);
+        	_pid.setOutputLimits(0, 100);
             break;
         case MODE_ZP:
-        	_pid.setOutputLimits(0, _settings.windowtime);
+        	_pid.setOutputLimits(0, 100);
             break;
     };
 
@@ -101,8 +101,8 @@ void PIDLoop::calculate()
     bool res = _pid.calculate();
 
     time_t now = millis();
-    // DBG("%u: PID = %s: Input = %.2f, Setpoint = %.2f, Output = %.2f", 
-    //     now, res?"ok":"err", _input_ref, _settings.fpid.setpoint, _output);
+    DBG("%u: PID = %s: Input = %.2f, Setpoint = %.2f, Output = %.2f", 
+        now, res?"ok":"err", _input_ref, _settings.fpid.setpoint, _output);
 
     // If saturated, we're in error
     if(!res)
@@ -184,18 +184,19 @@ void PIDLoop::loop()
     // Set output
     uint8_t N = LOW;
     uint8_t P = LOW;
+    uint32_t output_time = _output * _settings.windowtime / 100;
     switch(_settings.mode)
     {
         case MODE_NONE:
             break;
         case MODE_NP:
-            if (_output >= (now - _windowstarttime))
+            if (output_time >= (now - _windowstarttime))
                 P = HIGH;
             else
                 N = HIGH;
             break;
         case MODE_ZP:
-            if (_output >= (now - _windowstarttime))
+            if (output_time >= (now - _windowstarttime))
                 P = HIGH;
             break;
     };

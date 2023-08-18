@@ -36,16 +36,18 @@
 #define DEFAULT_SENSOR_LOOP_MS  1000
 #define DEFAULT_GRAPH_DELTA_MS	60E3		    // Time between graph points
 
+#define NUMBER_OF_CHANNELS      2
+#define PID_PAR_MIN			    0
+#define PID_PAR_MAX			    9
+#define PID_PAR_PRECISION		2
+
 #define PID1_NAME                   "Temperature"
 #define PID1_UNIT_TEXT			    "C"
 #define PID1_SETPOINT_MIN		    -20
 #define PID1_SETPOINT_MAX		    60
-#define PID1_PRECISION	            1
-#define PID1_PAR_MIN			    -50
-#define PID1_PAR_MAX			    100
-#define PID1_PAR_PRECISION		    1
+#define PID1_SETPOINT_PRECISION     1
 #define PID1_DEFAULT_F  		    0.0
-#define PID1_DEFAULT_P  		    5.0
+#define PID1_DEFAULT_P  		    1.0
 #define PID1_DEFAULT_I  		    0.0
 #define PID1_DEFAULT_D  		    0.0
 #define PID1_DEFAULT_MODE           PIDLoop::MODE_ZP
@@ -63,12 +65,9 @@
 #define PID2_UNIT_TEXT			    "%RH"
 #define PID2_SETPOINT_MIN	        0
 #define PID2_SETPOINT_MAX	        100
-#define PID2_PRECISION		        0
-#define PID2_PAR_MIN			    0
-#define PID2_PAR_MAX			    100
-#define PID2_PAR_PRECISION		    1
+#define PID2_SETPOINT_PRECISION	    0
 #define PID2_DEFAULT_F  		    0.0
-#define PID2_DEFAULT_P  		    5.0
+#define PID2_DEFAULT_P  		    1.0
 #define PID2_DEFAULT_I  		    0.0
 #define PID2_DEFAULT_D  		    0.0
 #define PID2_DEFAULT_MODE           PIDLoop::MODE_ZP

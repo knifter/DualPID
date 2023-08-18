@@ -48,7 +48,6 @@ class PIDLoop
         void loop();
         // double get_input() { return *_input; };
         double get_output() { return _output; };
-        double get_output_percent() { return _output*100/_settings.windowtime; };
         status_t get_status() { return _status; };
         // int get_output_state() { return _output_state; };
 
