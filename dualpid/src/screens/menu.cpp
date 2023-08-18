@@ -101,7 +101,6 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
             default: ERROR("Un-implemented channel number: %d", ch); 
                     return;
         };
-        DBG("menu channel %d: %p %d", ch, set, set->mode);
             
         if(set->mode != PIDLoop::MODE_NONE)
         {
