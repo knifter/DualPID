@@ -9,11 +9,6 @@
 #include "tools-log.h"
 #include "globals.h"
 
-#include <treemenu.h>
-
-
-// C-style callbacks
-
 /*********************************************************************************************************************************/
 class PidPanel
 {

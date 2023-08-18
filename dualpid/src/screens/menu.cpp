@@ -8,7 +8,7 @@
 #include "tools-log.h"
 #include "globals.h"
 #include "soogh-debug.h"
-#include <treemenu.h>
+#include <widgets/treemenu.h>
 
 // C-style callbacks
 void check_reboot_cb(MenuItem* item, void* data);
