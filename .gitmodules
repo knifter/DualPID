@@ -17,3 +17,6 @@
 	path = dualpid/lib/lib-SprintIR
 	url = https://github.com/knifter/lib-SprintIR
 
+[submodule "dualpid/lib/lib-MAX31855"]
+	path = dualpid/lib/lib-MAX31855
+	url = https://github.com/knifter/lib-MAX31855.git

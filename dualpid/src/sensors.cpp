@@ -53,7 +53,7 @@ double sensors1_read()
     double sensor2_read()
     {
         #ifndef PID1_SENSOR_SHT3X_TEMP
-        return sht_measure();
+        sht_measure();
         #endif
 
         if(sensor_sht_m->error)
