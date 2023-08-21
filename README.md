@@ -1,11 +1,18 @@
 # DualPID
 Dual channel PID regulator. Currently used for controlling both temperature and humidity but should be(come) versatile enough to control any two things from different sensors. The general design goals are:
  * [ ] Least work hardware: Use existing, easily buyable parts like M5Stack.
- * [x] Two channel PID
+ * [x] Two channel PID with
+   * [x] Lock detection
+   * [ ] Linear forward term 
+   * [ ] Derivative-on-measurement
+   * [ ] Intergral windup prevention
+   * [ ] On-Device editable PID settings
  * [x] Two H-Bridge outputs able to control most things from heaters, peltiers, valves etc
- * [ ] Multiple sensors
+ * [ ] Multiple sensors: Temperature, Humidity, Co2, etc
+ * [ ] Adjustable time intervals per channel (100ms - minutes)
  * [ ] run-time configurable
  * [x] Error graphs
+ * [ ] Remote logging (csv, mqtt or other)
 
 ![Current version](Pictures/PXL_20230807_150730906.jpg)
 
@@ -31,28 +38,31 @@ Start with [M5Stack Cushion, mandatory lab equipment](https://shop.m5stack.com/c
  * [Power Supply](https://nl.farnell.com/xp-power/vel12us120-eu-ja/adaptor-ac-dc-12v-1a/dp/2524421)
 
 ### Sensor
- * [SHT31-D breakout board](https://www.adafruit.com/product/2857)
+ * [x] [SHT31-D breakout board](https://www.adafruit.com/product/2857)
+ * [ ] [M5 Kmeter Isolation Unit with Thermocouple Temperature Sensor (MAX31855)](https://shop.m5stack.com/collections/m5-sensor/products/kmeter-isolation-unit-with-thermocouple-temperature-sensor-max31855)
+ * [ ] [SprintIR CO2 sensors](https://www.co2meter.com/products/sprintir-wr-20-pct-co2-sensor)
+ * [ ] [M5 ENV III Unit with Temperature Humidity Air Pressure Sensor (SHT30+QMP6988)](https://shop.m5stack.com/collections/m5-sensor/products/env-iii-unit-with-temperature-humidity-air-pressure-sensor-sht30-qmp6988)
+ * [ ] [M5 CO2 Unit with Temperature and humidity Sensor (SCD40)](https://shop.m5stack.com/collections/m5-sensor/products/co2-unit-with-temperature-and-humidity-sensor-scd40)
+ * [ ] [M5 CO2L Unit with Temperature and Humidity Sensor (SCD41)](https://shop.m5stack.com/collections/m5-sensor/products/co2l-unit-with-temperature-and-humidity-sensor-scd41)
 
-### Output
-Unfortunately M5Stack does not (yet) provide a high voltage, stackable H-Bridge module (right?). So something must be chosen or build to switch the heater/peltier/valve. In simple designs I just solder a TIP132 on the little proto board of an AC base (See /Pictures). But for more sophisticated designs (Peltier), an H-bridge is soldered into an M5Stack Proto Module. It should also be possible to use an external Solid State Relay module (available from M5Stack).
- * TIP132 solution (see /Pictures)
- * https://shop.m5stack.com/products/solid-state-relay-unit-bt136s
- * https://shop.m5stack.com/products/single-phase-ac-ssr-unit-cdg1-1da-10a
-
+### Output Drivers
+ * [x] TIP132 solution (see /Pictures), Simple On/Off regulator
+ * [ ] [M5 H-bridge Unit v1.1](https://shop.m5stack.com/collections/m5-sensor/products/h-bridge-unit-v1-1-stm32f030)
+ * [x] [M5 2-Channel SPST Relay Unit](https://shop.m5stack.com/collections/m5-sensor/products/2-channel-spst-relay-unit)
+ * [x] [M5 4-Relay Unit](https://shop.m5stack.com/collections/m5-sensor/products/4-relay-unit)
+ * [ ] [M5 Solid State Relay Unit](https://shop.m5stack.com/products/solid-state-relay-unit-bt136s)
+ * [ ] [M5 Single-phase AC SSR Unit](https://shop.m5stack.com/products/single-phase-ac-ssr-unit-cdg1-1da-10a)
 
 ### Ideas which could be added/supported/implemented:
- * [Core2 with touch interface](https://shop.m5stack.com/products/m5stack-core2-esp32-iot-development-kit)
- * [4Ch Lego Motor module](https://shop.m5stack.com/collections/m5-module/products/lego-module)
- * [3Ch Stepmotor module](https://shop.m5stack.com/products/stepmotor-module-with-mega328p-drv8825)
- * [Base+4x Lego Motor Module](https://shop.m5stack.com/products/basex)
- * [Fan for motor module](https://shop.m5stack.com/collections/m5-module/products/fan-module-for-stepmotor)
- * [H-Bridge Unit](https://shop.m5stack.com/products/h-bridge-unitstm32f030)
-
-### Sensors
-Currently the project supports the SHT31/35 (temp + hum) sensor. But other sensors can, and should, be added as well.
- * [grove SHT31 breakout](https://wiki.seeedstudio.com/Grove-TempAndHumi_Sensor-SHT31/)
- * [untested: Temp/Humidity/Pressure Module](https://shop.m5stack.com/products/env-iii-unit-with-temperature-humidity-air-pressure-sensor-sht30-qmp6988)
-
+ * [ ] [Core2 with touch interface](https://shop.m5stack.com/products/m5stack-core2-esp32-iot-development-kit)
+ * [ ] [4Ch Lego Motor module](https://shop.m5stack.com/collections/m5-module/products/lego-module)
+ * [ ] [3Ch Stepmotor module](https://shop.m5stack.com/products/stepmotor-module-with-mega328p-drv8825)
+ * [ ] [Base+4x Lego Motor Module](https://shop.m5stack.com/products/basex)
+ * [ ] [Fan for motor module](https://shop.m5stack.com/collections/m5-module/products/fan-module-for-stepmotor)
+ * [ ] [H-Bridge Unit](https://shop.m5stack.com/products/h-bridge-unitstm32f030)
+ * [ ] [M5 Tube/Air Pressure Unit](https://shop.m5stack.com/collections/m5-sensor/products/tube-air-pressure-unit)
+ * [ ] [M5 Voltmeter Unit (ADS1115)](https://shop.m5stack.com/collections/m5-sensor/products/voltmeter-unit-ads1115)
+ 
 ## Credits
 Originally this design was based upon https://github.com/sciunto-org/humidity_regulator, an arduino sketch for an Ardiuno Uno. But since I've replaced even the PID loop library, I don't think there is much left of that design. But the idea came from them so credit where credit is due ;)
 
