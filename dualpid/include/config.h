@@ -41,11 +41,11 @@
 #define PID_PAR_MAX			    9
 #define PID_PAR_PRECISION		2
 
-#define PID1_NAME                   "Temperature"
-#define PID1_UNIT_TEXT			    "C"
-#define PID1_SETPOINT_MIN		    -20
-#define PID1_SETPOINT_MAX		    60
-#define PID1_SETPOINT_PRECISION     1
+#define PID1_SENSOR_SHT3X_TEMP
+#define PID2_SENSOR_SHT3X_RH
+// #define PID1_SENSOR_MAX31855
+// #define PID2_SENSOR_SPRINTIR    
+
 #define PID1_DEFAULT_F  		    0.0
 #define PID1_DEFAULT_P  		    1.0
 #define PID1_DEFAULT_I  		    0.0
@@ -61,11 +61,6 @@
 #define PID1_DEFAULT_LOCK_WINDOW    5                         
 #define PID1_DEFAULT_LOCK_TIME_MS   60000
 
-#define PID2_NAME                   "Humidity"
-#define PID2_UNIT_TEXT			    "%RH"
-#define PID2_SETPOINT_MIN	        0
-#define PID2_SETPOINT_MAX	        100
-#define PID2_SETPOINT_PRECISION	    0
 #define PID2_DEFAULT_F  		    0.0
 #define PID2_DEFAULT_P  		    1.0
 #define PID2_DEFAULT_I  		    0.0
@@ -96,11 +91,8 @@
 #define PIN_BTN_B				GPIO_NUM_38
 #define PIN_BTN_C				GPIO_NUM_37
 
-#define PIN_CO2_RX              GPIO_NUM_16
-#define PIN_CO2_TX              GPIO_NUM_17
-
-#ifdef M5STACK_CORE
-#endif
+#define PIN_SPRINT_RX           GPIO_NUM_16
+#define PIN_SPRINT_TX           GPIO_NUM_17
 
 #ifdef ARDUINO_M5Stack_Core_ESP32
 #define PIDLOOP_PORTS_LIST	\

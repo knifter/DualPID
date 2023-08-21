@@ -1,17 +1,13 @@
 #include <Arduino.h>
-#include <SHT3X.h>
-#include <SprintIR.h>
 
 #include "config.h"
 #include "globals.h"
 #include "settings.h"
 #include "pidloop.h"
 #include "screens.h"
+#include "sensors.h"
 
 #include "tools-log.h"
-
-SHT3X sht_sensor(Wire);
-SprintIR sprint(Serial2);
 
 void halt(const char*);
 uint32_t scan_keys();
@@ -28,9 +24,6 @@ void setup()
 	pinMode(PIN_BTN_A, INPUT);
 	pinMode(PIN_BTN_B, INPUT);
 	pinMode(PIN_BTN_C, INPUT);
-
-	Serial2.begin(9600, SERIAL_8N1, PIN_CO2_RX, PIN_CO2_TX);
-	
 	
 	// Hold startup, and registere debugging purposes
     expert_mode = 0;
@@ -42,18 +35,16 @@ void setup()
 	gui.begin();
 
 	Wire.begin(PIN_SDA, PIN_SCL);
-	if(!sht_sensor.begin(SHT3X_ADDRESS_DEFAULT))
-	{
-        if(!sht_sensor.begin(SHT3X_ADDRESS_ALT))
-        {
-			gui.showMessage("WARNING:", "SHT3X(0x44/0x45): not found");
-        };
-	};
 
-	if(!sprint.begin())
-	{
-		gui.showMessage("WARNING:", "CO2 Sensor not found.");
-	};
+    if(!sensor1_begin())
+    {
+			gui.showMessage("WARNING:", "Channel 1 sensor error.");
+    };
+
+    if(!sensor2_begin())
+    {
+			gui.showMessage("WARNING:", "Channel 2 sensor error.");
+    };
 
 	input_value1 = NAN;
 	input_value2 = NAN;
@@ -89,24 +80,8 @@ void sensor_loop()
 		return;
 	next = now + settings.sensor_loop_ms;
 
-	// Temperature (from SHT31)
-	SHT3X::measurement_t* m = sht_sensor.newMeasurement();
-	if(m->error)
-	{
-		input_value1 = NAN;
-		return;
-	};
-
-	input_value1 = m->temperature;
-
-	// CO2 from SprintIR-WX-20
-	int ppm = sprint.getPPM();
-	if(ppm < 0)
-	{
-		input_value2 = NAN;
-		return;
-	};
-	input_value2 = ppm;
+    input_value1 = sensor1_read();
+    input_value2 = sensor2_read();    
 };
 
 void halt(const char* error)
