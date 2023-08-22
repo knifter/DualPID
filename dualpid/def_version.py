@@ -18,5 +18,8 @@ branch = (
 curr_date = datetime.datetime.now()
 date_ymd = "%02d%02d%02d" % (curr_date.year % 100, curr_date.month, curr_date.day)
 date_ym = "%02d%02d" % (curr_date.year % 100, curr_date.month)
+devbuild = ""
+if(branch in ['master', 'main']):
+    devbuild = "-DDEVELOPMENT_BUILD"
 
-print("-DBUILD_DATE_YMD=%s -DBUILD_DATE_YM=%s -DGIT_BRANCH=%s -DGIT_REVISION=%s" % (date_ymd, date_ym, branch, revision[-8:]))
+print("-DBUILD_DATE_YMD=%s -DBUILD_DATE_YM=%s -DGIT_BRANCH=%s -DGIT_REVISION=%s %s" % (date_ymd, date_ym, branch, revision[-8:], devbuild))

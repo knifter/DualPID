@@ -9,8 +9,8 @@
 // #define BUILD_DATESTR_YMD       STRINGIFY(BUILD_DATE_YMD)
 // #define BUILD_DATESTR_YM        STRINGIFY(BUILD_DATE_YM)
 #define VERSION                 BUILD_DATE_YMD
-#if GET_BRANCH == master
-    #define VERSION_STR        "dev" STRINGIFY(BUILD_DATE_YMD)
+#ifdef DEVELOPMENT_BUILD
+    #define VERSION_STR        "dev" STRINGIFY(GIT_REVISION)
 #else
     #define VERSION_STR             STRINGIFY(GIT_BRANCH) " (" STRINGIFY(BUILD_DATE_YM) ")"
 #endif

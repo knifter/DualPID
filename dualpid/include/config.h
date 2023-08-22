@@ -3,7 +3,9 @@
 
 #include "version.h"
 
-#define DEBUG                   1
+#ifdef DEVELOPMENT_BUILD
+    #define DEBUG                   1
+#endif
 #ifdef DEBUG
 	// Enable DBG(...) globally:
 	#define TOOLS_LOG_DEBUG
