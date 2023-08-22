@@ -5,6 +5,7 @@
 #include "gui.h"
 
 #include "config.h"
+#include "sensors.h"
 #include "tools-log.h"
 #include "globals.h"
 #include "soogh-debug.h"

@@ -36,6 +36,8 @@ void BootScreen::load()
 void BootScreen::loop()
 {
     uint32_t now = millis();
+    if(expert_mode)
+        return;
     if((now - _start) > BOOTSCREEN_TIMEOUT_MS)
     {
         gui.pushScreenType(ScreenType::MAIN);
@@ -50,8 +52,7 @@ bool BootScreen::handle(soogh_event_t e)
 		case KEY_A_SHORT:
 		case KEY_B_SHORT:
 		case KEY_C_SHORT:
-            // Push mainscreen next loop
-            _start = 0;
+            gui.pushScreenType(ScreenType::MAIN);
 			return true;
 		default:
 			return false;

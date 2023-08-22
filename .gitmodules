@@ -13,3 +13,9 @@
 [submodule "dualpid/lib/lib-SHT3x"]
 	path = dualpid/lib/lib-SHT3x
 	url = https://github.com/knifter/lib-SHT3x
+[submodule "dualpid/lib/lib-SprintIR"]
+	path = dualpid/lib/lib-SprintIR
+	url = https://github.com/knifter/lib-SprintIR
+[submodule "dualpid/lib/lib-M5KMeter"]
+	path = dualpid/lib/lib-M5KMeter
+	url = https://github.com/knifter/lib-M5KMeter.git
