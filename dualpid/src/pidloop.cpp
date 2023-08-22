@@ -108,6 +108,7 @@ void PIDLoop::calculate()
     if(!res)
     {
         _status = STATUS_ERROR;
+        _unlocked_last = now;
         return;
     };
 
