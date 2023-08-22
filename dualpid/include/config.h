@@ -1,8 +1,7 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-#define _STRINGIFY(x)      #x
-#define STRINGIFY(x)      _STRINGIFY(x)
+#include "version.h"
 
 #define DEBUG                   1
 #ifdef DEBUG
@@ -16,10 +15,6 @@
 #endif
 
 #define GUI_KEYPAD
-
-#define VERSION                BUILD_DATETIME
-#define VERSIONSTR_LONG        STRINGIFY(GIT_BRANCH-VERSION)
-#define VERSIONSTR_SHORT       STRINGIFY(VERSION)
 
 // #define DEBUG_INTERVAL_MS		100
 #define BOOTSCREEN_TIMEOUT_MS	1000
