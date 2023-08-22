@@ -35,9 +35,19 @@
     };
 #endif
 
-#if defined(PID1_SENSOR_MAX31855)
-double sensors1_read()
+#if defined(PID1_SENSOR_M5KMETER)
+#include <M5_KMeter.h>
+M5_KMeter kmeter;
+bool sensor1_begin()
 {
+    kmeter.begin(&Wire);
+    return kmeter.setSleepTime(1);
+};
+double sensor1_read()
+{
+    if(!kmeter.update())
+        return NAN;
+    return kmeter.getTemperature();
 };
 #endif
 
@@ -69,13 +79,13 @@ SprintIR sensor_sprint(Serial2);
 bool sensor2_begin()
 {
 	Serial2.begin(9600, SERIAL_8N1, PIN_SPRINT_RX, PIN_SPRINT_TX);
-    return sprint.begin();
+    return sensor_sprint.begin();
 };
 
-double sensors_pid2_value()
+double sensor2_read()
 {
 	// CO2 from SprintIR-WX-20
-	int ppm = sprint.getPPM();
+	int ppm = sensor_sprint.getPPM();
 	if(ppm < 0)
 	{
         return NAN;

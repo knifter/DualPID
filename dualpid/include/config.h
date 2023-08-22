@@ -41,10 +41,10 @@
 #define PID_PAR_MAX			    9
 #define PID_PAR_PRECISION		2
 
-#define PID1_SENSOR_SHT3X_TEMP
-#define PID2_SENSOR_SHT3X_RH
-// #define PID1_SENSOR_MAX31855
-// #define PID2_SENSOR_SPRINTIR    
+// #define PID1_SENSOR_SHT3X_TEMP
+#define PID1_SENSOR_M5KMETER
+// #define PID2_SENSOR_SHT3X_RH
+#define PID2_SENSOR_SPRINTIR    
 
 #define PID1_DEFAULT_F  		    0.0
 #define PID1_DEFAULT_P  		    1.0

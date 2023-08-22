@@ -4,7 +4,7 @@
 #include "config.h"
 
 // Temperature
-#if defined(PID1_SENSOR_MAX31855) || defined(PID1_SENSOR_SHT3X_TEMP)
+#if defined(PID1_SENSOR_M5KMETER) || defined(PID1_SENSOR_SHT3X_TEMP)
     #define SENSOR1_PRESENT
     #define PID1_NAME                   "Temperature"
     #define PID1_UNIT_TEXT			    "C"
@@ -23,11 +23,12 @@
 #endif
 
 #ifdef PID2_SENSOR_SPRINTIR
-#define PID2_NAME                   "CO2 Content"
-#define PID2_UNIT_TEXT			    "ppm"
-#define PID2_SETPOINT_MIN	        0
-#define PID2_SETPOINT_MAX	        100
-#define PID2_SETPOINT_PRECISION	    0
+    #define SENSOR2_PRESENT
+    #define PID2_NAME                   "CO2 Content"
+    #define PID2_UNIT_TEXT			    "ppm"
+    #define PID2_SETPOINT_MIN	        0
+    #define PID2_SETPOINT_MAX	        100
+    #define PID2_SETPOINT_PRECISION	    0
 #endif
 
 bool sensor1_begin();
