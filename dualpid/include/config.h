@@ -88,8 +88,8 @@
 #define PIN_BTN_B				GPIO_NUM_38
 #define PIN_BTN_C				GPIO_NUM_37
 
-#define PIN_SPRINT_RX           GPIO_NUM_16
-#define PIN_SPRINT_TX           GPIO_NUM_17
+#define PIN_RX                  GPIO_NUM_16
+#define PIN_TX                  GPIO_NUM_17
 
 #ifdef ARDUINO_M5Stack_Core_ESP32
 #define PIDLOOP_PORTS_LIST	\

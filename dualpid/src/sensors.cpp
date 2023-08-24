@@ -78,7 +78,7 @@ SprintIR sensor_sprint(Serial2);
 
 bool sensor2_begin()
 {
-	Serial2.begin(9600, SERIAL_8N1, PIN_SPRINT_RX, PIN_SPRINT_TX);
+	Serial2.begin(9600, SERIAL_8N1, PIN_RX, PIN_TX);
     return sensor_sprint.begin();
 };
 
