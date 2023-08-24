@@ -91,18 +91,18 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
                     name = PID1_NAME;
                     sp_min = PID1_SETPOINT_MIN;
                     sp_max = PID1_SETPOINT_MAX;
-                    sp_prec = PID1_SETPOINT_PRECISION;
+                    sp_prec = PID1_PRECISION;
                     break;
             case 2: set = &settings.pid2;
                     name = PID2_NAME;
                     sp_min = PID2_SETPOINT_MIN;
                     sp_max = PID2_SETPOINT_MAX;
-                    sp_prec = PID2_SETPOINT_PRECISION;
+                    sp_prec = PID2_PRECISION;
                     break;
             default: ERROR("Un-implemented channel number: %d", ch); 
                     return;
         };
-            
+
         if(set->mode != PIDLoop::MODE_NONE)
         {
             menu.addSeparator(name);

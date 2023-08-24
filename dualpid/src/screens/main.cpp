@@ -6,6 +6,7 @@
 #include "gui.h"
 
 #include "config.h"
+#include "sensors.h"
 #include "tools-log.h"
 #include "globals.h"
 
@@ -18,24 +19,31 @@ class PidPanel
 			PS_OK,
 		} state_t;
 
-		PidPanel(lv_obj_t* parent, const char* unit);
-		void selected(bool);
+		PidPanel(lv_obj_t* parent, const uint8_t num);
 
 		lv_obj_t	*box, *lbl_sp, *lbl_value, *bar_output;
 		lv_style_t 	style_font26;
-		String unit;
+        int num;
+        const char *unit;
+        uint8_t prec;
 		lv_style_t style_indic;
         PIDLoop::status_t current_status;
 
-		void setSetPoint(float sp);
-		void setValue(float v);
-		void setBar(float p);   
-		void setState(PIDLoop::status_t s);
+		const void setSelected(bool);
+		const void setSetPoint(float sp);
+		const void setValue(float v);
+		const void setBar(float p);   
+		const void setState(PIDLoop::status_t s);
 };
 
-PidPanel::PidPanel(lv_obj_t* parent, const char* unit_in)
+PidPanel::PidPanel(lv_obj_t* parent, const uint8_t num_in) : num(num_in)
 {
-	unit = unit_in;
+    switch(num)
+    {
+        case 1: unit = PID1_UNIT_TEXT; prec = PID1_PRECISION; break;
+        case 2: unit = PID2_UNIT_TEXT; prec = PID2_PRECISION; break;
+    };
+
 	box = lv_obj_create(parent);
 
 	lv_obj_set_size(box, DISPLAY_WIDTH/2, 80);
@@ -96,7 +104,7 @@ PidPanel::PidPanel(lv_obj_t* parent, const char* unit_in)
     // current_status => disabled
 }; // PidPanel()
 
-void PidPanel::setState(PIDLoop::status_t status)
+const void PidPanel::setState(PIDLoop::status_t status)
 {
     // Only update widget styles if status changed
     if(current_status == status)
@@ -168,7 +176,7 @@ void PidPanel::setState(PIDLoop::status_t status)
             break;
     };
 };
-void PidPanel::setSetPoint(float sp) 
+const void PidPanel::setSetPoint(float sp) 
 { 
     switch(current_status)
     {
@@ -176,14 +184,14 @@ void PidPanel::setSetPoint(float sp)
             lv_label_set_text(lbl_sp, "Sensor");
             return;
         default:
-            lv_label_set_text_fmt(lbl_sp, "sp = %0.01f %s", sp, unit.c_str());
+            lv_label_set_text_fmt(lbl_sp, "sp = %0.*f %s", prec, sp, unit);
             return;
     };
 };
 
-void PidPanel::setValue(float v) { 	    lv_label_set_text_fmt(lbl_value, "%0.01f %s", v, unit.c_str()); };
-void PidPanel::setBar(float p) {     	lv_bar_set_value(bar_output, p, LV_ANIM_ON); };
-void PidPanel::selected(bool select) {  lv_obj_set_style_border_color(box, select ? COLOR_BLACK : COLOR_WHITE, 0);};
+const void PidPanel::setValue(float v) { 	    lv_label_set_text_fmt(lbl_value, "%0.*f %s", prec, v, unit); };
+const void PidPanel::setBar(float p) {     	    lv_bar_set_value(bar_output, p, LV_ANIM_ON); };
+const void PidPanel::setSelected(bool select) {    lv_obj_set_style_border_color(box, select ? COLOR_BLACK : COLOR_WHITE, 0);};
 
 /*********************************************************************************************************************************/
 class GraphPanel
@@ -328,8 +336,8 @@ void GraphPanel::autoScale(const lv_chart_axis_t axis, const float inc_sp)
 MainScreen::MainScreen(SooghGUI& g) : Screen(g)
 {
 	// pw1 = new PidPanel(_screen, "\xe2\x84\x83");
-	pw1 = new PidPanel(_screen, "\xc2\xb0""C");
-	pw2 = new PidPanel(_screen, "%RH");
+	pw1 = new PidPanel(_screen, 1);
+	pw2 = new PidPanel(_screen, 2);
 	lv_obj_align_to(pw2->box, pw1->box, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
 
 	gw = new GraphPanel(_screen);
