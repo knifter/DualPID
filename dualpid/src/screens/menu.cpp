@@ -103,7 +103,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
                     return;
         };
 
-        if(set->mode != PIDLoop::MODE_NONE)
+        if(set->mode != PIDLoop::MODE_NONE || expert_mode)
         {
             menu.addSeparator(name);
             menu.addSpinbox("Setpoint", &set->fpid.setpoint, sp_min, sp_max, sp_prec);
@@ -112,11 +112,18 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
             sub->addSpinbox("kP", &set->fpid.kP, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
             sub->addSpinbox("kI", &set->fpid.kI, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
             sub->addSpinbox("kD", &set->fpid.kD, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+            sub->addSpinbox("kF", &set->fpid.kF, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+            sub->addSpinbox("F-Offset", &set->fpid.kF_offset, sp_min, sp_max, sp_prec);
+            if(expert_mode)
+            {
+                sub = menu.addSubMenu("Advanced");
+                sub->addSpinbox("D-Filter", &set->input_filter, 0, 1, 2);
+                sub->addSelector("Lock Time", &set->lock_time, lock_times);
+                sub->addSpinbox("Lock Window", &set->lock_window, 0, sp_max - sp_min);
+            };
         };
         if(expert_mode)
         {
-            if(set->mode == PIDLoop::MODE_NONE)
-                menu.addSeparator(name);
             auto sub = menu.addSubMenu("Setup");
             sub->addSelector("Mode", &set->mode, pid_modes)->onChange( [](MenuItem*, void*){ need_reboot = true; });
             switch(set->mode)
@@ -127,11 +134,10 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
                 case PIDLoop::MODE_ZP:
                     sub->addSelector("Pin P (+)", &set->pin_p, hardware_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
             };
-        	// sub->addCheckbox("Take-Back-Half", &set->fpid.takebackhalf);
-            sub->addSelector("Looptime", &set->looptime, pid_loop_times);
+            sub->addSpinbox("Input Filter", &set->input_filter, 0, 1, 2);
             sub->addSelector("Windowtime", &set->windowtime, window_loop_times)->onChange( [](MenuItem*, void*){ pid1.begin(); });    
-            sub->addSelector("Lock Time", &set->lock_time, lock_times);
-            sub->addSpinbox("Lock Window", &set->lock_window, 0, sp_max - sp_min);
+            sub->addSelector("Looptime", &set->looptime, pid_loop_times);
+            // sub->addCheckbox("Take-Back-Half", &set->fpid.takebackhalf);
 
             sub->onClose(check_reboot_cb);
         };

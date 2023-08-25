@@ -40,6 +40,7 @@ class PIDLoop
             FPID::fpid_settings_t fpid;
             double lock_window;
             uint32_t lock_time;
+            double input_filter;
         } settings_t;
 
         PIDLoop(settings_t& s, const double& input);

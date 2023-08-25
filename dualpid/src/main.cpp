@@ -80,8 +80,14 @@ void sensor_loop()
 		return;
 	next = now + settings.sensor_loop_ms;
 
+	// Read sensors and apply averaging/filter
     input_value1 = sensor1_read();
+	static double prv_input_value1 = input_value1;
+	input_value1 = input_value1*(1 - settings.pid1.input_filter) + prv_input_value1*settings.pid1.input_filter;
+
     input_value2 = sensor2_read();    
+	static double prv_input_value2 = input_value2;
+	input_value2 = input_value2*(1 - settings.pid2.input_filter) + prv_input_value2*settings.pid2.input_filter;
 };
 
 void halt(const char* error)

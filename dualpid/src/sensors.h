@@ -19,7 +19,7 @@
     #define PID2_UNIT_TEXT			    "%RH"
     #define PID2_SETPOINT_MIN	        0
     #define PID2_SETPOINT_MAX	        100
-    #define PID2_SETPOINT_PRECISION	    0
+    #define PID2_PRECISION	            0
 #endif
 
 #ifdef PID2_SENSOR_SPRINTIR
