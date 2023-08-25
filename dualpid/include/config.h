@@ -31,7 +31,7 @@
 
 // Settings defaults
 #define DEFAULT_SENSOR_LOOP_MS  1000
-#define DEFAULT_GRAPH_DELTA_MS	60E3		    // Time between graph points
+#define DEFAULT_GRAPH_DELTA_MS	200		  	    // Time between graph points
 
 #define NUMBER_OF_CHANNELS      2
 #define PID_PAR_MIN			    0
