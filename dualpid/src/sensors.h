@@ -4,7 +4,16 @@
 #include "config.h"
 
 // Temperature
-#if defined(PID1_SENSOR_M5KMETER) || defined(PID1_SENSOR_SHT3X_TEMP)
+#if defined(PID1_SENSOR_M5KMETER)
+    #define SENSOR1_PRESENT
+    #define PID1_NAME                   "Temperature"
+    #define PID1_UNIT_TEXT			    "\xc2\xb0""C"
+    #define PID1_SETPOINT_MIN		    -20
+    #define PID1_SETPOINT_MAX		    60
+    #define PID1_PRECISION              2
+#endif
+
+ #if defined(PID1_SENSOR_SHT3X_TEMP)
     #define SENSOR1_PRESENT
     #define PID1_NAME                   "Temperature"
     #define PID1_UNIT_TEXT			    "\xc2\xb0""C"
