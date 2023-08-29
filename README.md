@@ -3,12 +3,18 @@ Dual channel PID regulator. Currently used for controlling both temperature and 
  * [ ] Least work hardware: Use existing, easily buyable parts like M5Stack.
  * [x] Two channel PID with
    * [x] Lock detection
-   * [ ] Linear forward term 
-   * [ ] Derivative-on-measurement
-   * [ ] Intergral windup prevention
-   * [ ] On-Device editable PID settings
+   * [x] Linear forward term 
+   * [x] Derivative-on-measurement
+   * [x] Intergral windup prevention
+   * [x] On-Device editable PID settings
+   * [x] Input and/or D-term filter
+   * [ ] Take-back-half
  * [x] Two H-Bridge outputs able to control most things from heaters, peltiers, valves etc
- * [ ] Multiple sensors: Temperature, Humidity, Co2, etc
+ * [x] Multiple sensors: Temperature, Humidity, Co2. Currently Supports:
+   * [x] SHT30/31/35 Temperature+Humidity sensor
+   * [x] K5Meter with intergrated MAX31855 Thermocouple sensor
+   * [x] SprintIR Co2 sensor
+   * [ ] more to come..
  * [ ] Adjustable time intervals per channel (100ms - minutes)
  * [ ] run-time configurable
  * [x] Error graphs
@@ -39,8 +45,10 @@ Start with [M5Stack Cushion, mandatory lab equipment](https://shop.m5stack.com/c
 
 ### Sensor
  * [x] [SHT31-D breakout board](https://www.adafruit.com/product/2857)
- * [ ] [M5 Kmeter Isolation Unit with Thermocouple Temperature Sensor (MAX31855)](https://shop.m5stack.com/collections/m5-sensor/products/kmeter-isolation-unit-with-thermocouple-temperature-sensor-max31855)
- * [ ] [SprintIR CO2 sensors](https://www.co2meter.com/products/sprintir-wr-20-pct-co2-sensor)
+ * [x] [M5 Kmeter Isolation Unit with Thermocouple Temperature Sensor (MAX31855)](https://shop.m5stack.com/collections/m5-sensor/products/kmeter-isolation-unit-with-thermocouple-temperature-sensor-max31855)
+ * [x] [SprintIR CO2 sensors](https://www.co2meter.com/products/sprintir-wr-20-pct-co2-sensor)\
+ * [ ] [MAX31856 Precision Thermocouple to Digital Converter](https://www.analog.com/media/en/technical-documentation/data-sheets/MAX31856.pdf)
+ * [ ] [M5 Temperature Humidity Air Pressure Sensor (SHT40+BMP280)](https://shop.m5stack.com/products/env-iv-unit-with-temperature-humidity-air-pressure-sensor-sht40-bmp280?mc_cid=4195edd3e8&mc_eid=9d94b48854)
  * [ ] [M5 ENV III Unit with Temperature Humidity Air Pressure Sensor (SHT30+QMP6988)](https://shop.m5stack.com/collections/m5-sensor/products/env-iii-unit-with-temperature-humidity-air-pressure-sensor-sht30-qmp6988)
  * [ ] [M5 CO2 Unit with Temperature and humidity Sensor (SCD40)](https://shop.m5stack.com/collections/m5-sensor/products/co2-unit-with-temperature-and-humidity-sensor-scd40)
  * [ ] [M5 CO2L Unit with Temperature and Humidity Sensor (SCD41)](https://shop.m5stack.com/collections/m5-sensor/products/co2l-unit-with-temperature-and-humidity-sensor-scd41)
