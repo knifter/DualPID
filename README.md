@@ -22,15 +22,6 @@ Dual channel PID regulator. Currently used for controlling both temperature and 
 
 ![Current version](Pictures/PXL_20230807_150730906.jpg)
 
-## Dependencies
- * My fork of MiniPID: [FPID](https://github.com/knifter/FPID)
- * Temp/Hum sensor: [lib-SHT35](https://github.com/knifter/lib-SHT3x)
-   * Uses my I2C Device library wrapper: [lib-TwoWireDevice](https://github.com/knifter/lib-TwoWireDevice)
- * my GUI framework: [lib-soogh](https://github.com/knifter/lib-soogh)
-   * Uses [LVGL](https://github.com/lvgl)
-   * Uses [LovyanGFX](https://github.com/lovyan03/LovyanGFX)
- * my tools library [lib-tools](https://github.com/knifter/lib-Tools)
-
 ## Hardware
 Start with [M5Stack Cushion, mandatory lab equipment](https://shop.m5stack.com/collections/m5-accessory/products/m5stack-cushion)
 
@@ -72,7 +63,16 @@ Start with [M5Stack Cushion, mandatory lab equipment](https://shop.m5stack.com/c
  * [ ] [H-Bridge Unit](https://shop.m5stack.com/products/h-bridge-unitstm32f030)
  * [ ] [M5 Tube/Air Pressure Unit](https://shop.m5stack.com/collections/m5-sensor/products/tube-air-pressure-unit)
  * [ ] [M5 Voltmeter Unit (ADS1115)](https://shop.m5stack.com/collections/m5-sensor/products/voltmeter-unit-ads1115)
- 
+
+ ## Dependencies
+ * My fork of MiniPID: [FPID](https://github.com/knifter/FPID)
+ * Temp/Hum sensor: [lib-SHT35](https://github.com/knifter/lib-SHT3x)
+   * Uses my I2C Device library wrapper: [lib-TwoWireDevice](https://github.com/knifter/lib-TwoWireDevice)
+ * my GUI framework: [lib-soogh](https://github.com/knifter/lib-soogh)
+   * Uses [LVGL](https://github.com/lvgl)
+   * Uses [LovyanGFX](https://github.com/lovyan03/LovyanGFX)
+ * my tools library [lib-tools](https://github.com/knifter/lib-Tools)
+
 ## Credits
 Originally this design was based upon https://github.com/sciunto-org/humidity_regulator, an arduino sketch for an Ardiuno Uno. But since I've replaced even the PID loop library, I don't think there is much left of that design. But the idea came from them so credit where credit is due ;)
 
