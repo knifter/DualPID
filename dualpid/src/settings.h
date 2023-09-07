@@ -3,8 +3,6 @@
 
 #include <tools-nvs.h>
 
-// #include "config.h"
-// #include "globals.h"
 #include "pidloop.h"
 
 typedef struct
