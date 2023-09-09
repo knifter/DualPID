@@ -33,6 +33,11 @@
 #define DEFAULT_SENSOR_LOOP_MS  1000
 #define DEFAULT_GRAPH_DELTA_MS	200		  	    // Time between graph points
 
+// lib-FPID config
+#define FPID_D_FILTER
+#define FPID_FORWARD_LINEAR
+#define FPID_OUTPUT_FILTER
+
 #define NUMBER_OF_CHANNELS      2
 #define PID_PAR_MIN			    0
 #define PID_PAR_MAX			    9

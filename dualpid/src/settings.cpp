@@ -46,7 +46,7 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
             settings->pid1.fpid.kD =                PID1_DEFAULT_D;
             settings->pid1.fpid.setpoint =          PID1_DEFAULT_SETPOINT;
             settings->pid1.fpid.output_filter =     PID1_DEFAULT_OFILTER;
-            settings->pid1.fpid.dterm_filter =      PID1_DEFAULT_DFILTER;
+            settings->pid1.fpid.D_filter =          PID1_DEFAULT_DFILTER;
             settings->pid1.fpid.takebackhalf =      PID1_DEFAULT_TBH;
             settings->pid1.lock_window =            PID1_DEFAULT_LOCK_WINDOW;
             settings->pid1.lock_time =              PID1_DEFAULT_LOCK_TIME_MS;
@@ -66,7 +66,7 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
             settings->pid2.fpid.kD =                PID2_DEFAULT_D;
             settings->pid2.fpid.setpoint =          PID2_DEFAULT_SETPOINT;
             settings->pid2.fpid.output_filter =     PID2_DEFAULT_OFILTER;
-            settings->pid2.fpid.dterm_filter =      PID2_DEFAULT_DFILTER;
+            settings->pid2.fpid.D_filter =          PID2_DEFAULT_DFILTER;
             settings->pid2.fpid.takebackhalf =      PID2_DEFAULT_TBH;
             settings->pid2.lock_window =            PID2_DEFAULT_LOCK_WINDOW;
             settings->pid2.lock_time =              PID2_DEFAULT_LOCK_TIME_MS;
