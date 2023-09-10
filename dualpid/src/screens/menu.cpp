@@ -1,6 +1,7 @@
 #include "screens.h"
 
 #include <soogh.h>
+#include <widgets/treemenu.h>
 
 #include "gui.h"
 
@@ -9,7 +10,7 @@
 #include "tools-log.h"
 #include "globals.h"
 #include "soogh-debug.h"
-#include <widgets/treemenu.h>
+
 
 // C-style callbacks
 void check_reboot_cb(MenuItem* item, void* data);
