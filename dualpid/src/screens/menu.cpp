@@ -79,6 +79,8 @@ bool need_reboot = false;
 
 MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 {
+    menu.addCloseMenuButton();
+    
     // Add menu for each active channel
     int ch = 0;
     while(++ch <= NUMBER_OF_CHANNELS)
