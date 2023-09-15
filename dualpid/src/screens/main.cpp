@@ -38,10 +38,11 @@ class PidPanel
 
 PidPanel::PidPanel(lv_obj_t* parent, const uint8_t num_in) : num(num_in)
 {
+    lv_color_t color1;
     switch(num)
     {
-        case 1: unit = PID1_UNIT_TEXT; prec = PID1_PRECISION; break;
-        case 2: unit = PID2_UNIT_TEXT; prec = PID2_PRECISION; break;
+        case 1: unit = PID1_UNIT_TEXT; prec = PID1_PRECISION; color1 = PID1_COLOR; break;
+        case 2: unit = PID2_UNIT_TEXT; prec = PID2_PRECISION; color1 = PID2_COLOR; break;
     };
 
 	box = lv_obj_create(parent);
@@ -65,6 +66,7 @@ PidPanel::PidPanel(lv_obj_t* parent, const uint8_t num_in) : num(num_in)
 		lv_obj_set_style_text_align(lbl_sp, LV_TEXT_ALIGN_CENTER, 0);
 		lv_label_set_text(lbl_sp, "<setpoint>");
 		lv_obj_set_style_bg_opa(lbl_sp, LV_OPA_COVER, 0);
+		lv_obj_set_style_bg_color(lbl_sp, color1, 0);
 	};
 	// Value label
 	{
@@ -115,23 +117,23 @@ const void PidPanel::setState(PIDLoop::status_t status)
     switch(status)
 	{
 		case PIDLoop::STATUS_DISABLED:
-			lv_obj_set_style_bg_color(lbl_sp, COLOR_LIGHT_BLUE, 0);
+			// lv_obj_set_style_bg_color(lbl_sp, COLOR_LIGHT_BLUE, 0);
             lv_obj_set_style_text_color(lbl_sp, COLOR_GREY_DARK(1), 0);
 			break;
 		case PIDLoop::STATUS_INACTIVE:
-			lv_obj_set_style_bg_color(lbl_sp, COLOR_BLUE_GREY, 0);
+			// lv_obj_set_style_bg_color(lbl_sp, COLOR_BLUE_GREY, 0);
             lv_obj_set_style_text_color(lbl_sp, COLOR_BLACK, 0);
             break;
 		case PIDLoop::STATUS_LOCKED:
-			lv_obj_set_style_bg_color(lbl_sp, COLOR_GREEN_LIGHT(2), 0);
+			// lv_obj_set_style_bg_color(lbl_sp, COLOR_GREEN_LIGHT(2), 0);
             lv_obj_set_style_text_color(lbl_sp, COLOR_BLACK, 0);
 			break;
 		case PIDLoop::STATUS_UNLOCKED:
-			lv_obj_set_style_bg_color(lbl_sp, COLOR_GREEN_LIGHT(2), 0);
+			// lv_obj_set_style_bg_color(lbl_sp, COLOR_GREEN_LIGHT(2), 0);
             lv_obj_set_style_text_color(lbl_sp, COLOR_BLACK, 0);
             break;
 		case PIDLoop::STATUS_ERROR:
-			lv_obj_set_style_bg_color(lbl_sp, COLOR_RED_LIGHT(2), 0);
+			// lv_obj_set_style_bg_color(lbl_sp, COLOR_RED_LIGHT(2), 0);
             lv_obj_set_style_text_color(lbl_sp, COLOR_BLACK, 0);
             break;
     };
@@ -140,9 +142,13 @@ const void PidPanel::setState(PIDLoop::status_t status)
     switch(status)
 	{
 		case PIDLoop::STATUS_DISABLED:
+			lv_obj_set_style_bg_color(lbl_value, COLOR_WHITE, 0); 
+            break;
 		case PIDLoop::STATUS_INACTIVE:
+			lv_obj_set_style_bg_color(lbl_value, COLOR_GREY_LIGHT(2), 0);
+            break;
 		case PIDLoop::STATUS_LOCKED:
-			lv_obj_set_style_bg_color(lbl_value, COLOR_WHITE, 0);
+			lv_obj_set_style_bg_color(lbl_value, COLOR_GREEN_LIGHT(2), 0);
 			break;
 		case PIDLoop::STATUS_UNLOCKED:
 			lv_obj_set_style_bg_color(lbl_value, COLOR_ORANGE, 0);
@@ -238,8 +244,8 @@ GraphPanel::GraphPanel(lv_obj_t* parent)
 
     /*Add two data series*/
 	lv_chart_set_point_count(chart, GRAPH_POINTS);
-    ser1 = lv_chart_add_series(chart, COLOR_RED, LV_CHART_AXIS_PRIMARY_Y);
-    ser2 = lv_chart_add_series(chart, COLOR_BLUE, LV_CHART_AXIS_SECONDARY_Y);
+    ser1 = lv_chart_add_series(chart, PID1_COLOR, LV_CHART_AXIS_PRIMARY_Y);
+    ser2 = lv_chart_add_series(chart, PID2_COLOR, LV_CHART_AXIS_SECONDARY_Y);
 	
 	lv_obj_add_event_cb(chart, draw_lbl_cb, LV_EVENT_DRAW_PART_BEGIN, this);
 };
