@@ -19,3 +19,6 @@
 [submodule "dualpid/lib/lib-M5KMeter"]
 	path = dualpid/lib/lib-M5KMeter
 	url = https://github.com/knifter/lib-M5KMeter.git
+[submodule "dualpid/lib/lib-MCP9600"]
+	path = dualpid/lib/lib-MCP9600
+	url = https://github.com/knifter/lib-MCP9600.git
