@@ -1,5 +1,9 @@
 # DualPID
-Dual channel PID regulator. Currently used for controlling both temperature and humidity but should be(come) versatile enough to control any two things from different sensors. The general design goals are:
+Dual channel PID regulator. Each channel is (compile time) configurable to read out a sensor and control an output (on/off or H-Bridge). It could for example be used for:
+ * Temperature and/or Humidity control (Incubator or Grow box)
+ * Reflow Oven (either use one channel or two 'zones')
+
+Currently used for controlling both temperature and humidity but should be versatile enough to control any two things from different sensors. The general design goals are:
  * [ ] Least work hardware: Use existing, easily buyable parts like M5Stack.
  * [x] Two channel PID with
    * [x] Lock detection
