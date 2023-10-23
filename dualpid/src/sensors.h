@@ -28,7 +28,7 @@
 #if defined(PID2_SENSOR_SHT3X_RH)
     #define SENSOR2_PRESENT
     #define PID2_NAME                   "Humidity"
-    #define PID1_COLOR                 COLOR_BLUE
+    #define PID2_COLOR                 COLOR_BLUE
     #define PID2_UNIT_TEXT			    "%RH"
     #define PID2_SETPOINT_MIN	        0
     #define PID2_SETPOINT_MAX	        100
