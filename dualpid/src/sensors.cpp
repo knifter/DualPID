@@ -51,6 +51,19 @@ double sensor1_read()
 };
 #endif
 
+#if defined(PID1_SENSOR_MCP9600)
+#include <MCP9600.h>
+MCP9600 mcp;
+bool sensor1_begin()
+{
+    return mcp.begin();
+};
+double sensor1_read()
+{
+    return mcp.readThermocouple();
+};
+#endif
+
 /***** CHANNEL 2 ********************************************/
 #if defined(PID2_SENSOR_SHT3X_RH)
     bool sensor2_begin()
