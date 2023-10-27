@@ -383,17 +383,18 @@ bool MainScreen::handle(soogh_event_t key)
 {
 	switch(key)
 	{
-		// case KEY_A_SHORT:
-		// 	pw1->selected(true);
-		// 	pw2->selected(false);
-		// 	break;
+		case KEY_A_LONG:
+			settings.pid1.active = !settings.pid1.active;
+			return true;
+		case KEY_C_LONG:
+			settings.pid2.active = !settings.pid2.active;
+			return true;
+		case KEY_ABC_LONG:
+			expert_mode = true;
+			// fallthrough
 		case KEY_B_SHORT:
 		    gui.pushScreen(std::make_shared<MenuScreen>(gui));
 			return true;
-		// case KEY_C_SHORT:
-		// 	pw1->selected(false);
-		// 	pw2->selected(true);
-		// 	break;
 		default: break;
 	};
 	return true;

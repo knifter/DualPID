@@ -25,12 +25,8 @@ void setup()
 	pinMode(PIN_BTN_B, INPUT);
 	pinMode(PIN_BTN_C, INPUT);
 	
-	// Hold startup, and registere debugging purposes
-    expert_mode = 0;
-	while(scan_keys() == KEY_AC)
-    {
-        expert_mode = 1;
-    };
+	// Hold startup if C pressed
+	while(scan_keys() == KEY_C);
 
 	gui.begin();
 
@@ -46,6 +42,7 @@ void setup()
 			gui.showMessage("WARNING:", "Channel 2 sensor error.");
     };
 
+    expert_mode = 0;
 	input_value1 = NAN;
 	input_value2 = NAN;
 
