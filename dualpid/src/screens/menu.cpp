@@ -13,7 +13,6 @@
 
 
 // C-style callbacks
-void check_reboot_cb(MenuItem* item, void* data);
 void menu_close_cb(MenuItem* item, void* data);
 
 SelectorField::item_t hardware_ports[] = {
@@ -129,20 +128,12 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
         {
             auto sub = menu.addSubMenu("Setup");
             sub->addSelector("Mode", &set->mode, pid_modes)->onChange( [](MenuItem*, void*){ need_reboot = true; });
-            switch(set->mode)
-            {
-                case PIDLoop::MODE_NONE: break;
-                case PIDLoop::MODE_NP:
-                    sub->addSelector("Pin N (-)", &set->pin_n, hardware_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
-                case PIDLoop::MODE_ZP:
-                    sub->addSelector("Pin P (+)", &set->pin_p, hardware_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
-            };
+            sub->addSelector("Pin N (-)", &set->pin_n, hardware_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
+            sub->addSelector("Pin P (+)", &set->pin_p, hardware_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
             sub->addSpinbox("Input Filter", &set->input_filter, 0, 1, 2);
             sub->addSelector("Windowtime", &set->windowtime, window_loop_times)->onChange( [](MenuItem*, void*){ pid1.begin(); });    
             sub->addSelector("Looptime", &set->looptime, pid_loop_times);
             // sub->addCheckbox("Take-Back-Half", &set->fpid.takebackhalf);
-
-            sub->onClose(check_reboot_cb);
         };
     };
 
@@ -164,19 +155,16 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 	menu.open();
 };
 
-void check_reboot_cb(MenuItem* item, void* data)
+void menu_close_cb(MenuItem* item, void* data)
 {
+	DBG("Menu closing!");
+	setman.saveDelayed();
+
 	if(need_reboot)
 	{
 		setman.save();
 		gui.showMessage("INFO", "Settings changed. Need to reboot!", [](lv_event_t* e){ ESP.restart(); });
 	};
-};
-
-void menu_close_cb(MenuItem* item, void* data)
-{
-	DBG("Menu closing!");
-	setman.saveDelayed();
 
     static_cast<MenuScreen*>(data)->close();
 };

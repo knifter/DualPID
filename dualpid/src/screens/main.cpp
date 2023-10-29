@@ -392,7 +392,7 @@ bool MainScreen::handle(soogh_event_t key)
 		case KEY_ABC_LONG:
 			expert_mode = true;
 			// fallthrough
-		case KEY_B_SHORT:
+		case KEY_B_PRESSED:
 		    gui.pushScreen(std::make_shared<MenuScreen>(gui));
 			return true;
 		default: break;
