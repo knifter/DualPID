@@ -44,8 +44,9 @@
 #define PID_PAR_PRECISION		2
 
 // #define PID1_SENSOR_SHT3X_TEMP
+#define PID1_SENSOR_MAX31865
 // #define PID1_SENSOR_M5KMETER
-#define PID1_SENSOR_MCP9600
+// #define PID1_SENSOR_MCP9600
 // #define PID2_SENSOR_SHT3X_RH
 #define PID2_SENSOR_SPRINTIR    
 
@@ -88,6 +89,9 @@
 // #define LV_BUF_SIZE				(DISPLAY_WIDTH*DISPLAY_WIDTH/10)
 
 //// PINS 
+#define PIN_RX                  GPIO_NUM_16
+#define PIN_TX                  GPIO_NUM_17
+
 #define PIN_SDA					GPIO_NUM_21
 #define PIN_SCL					GPIO_NUM_22
 
@@ -98,8 +102,8 @@
 #define PIN_BTN_B				GPIO_NUM_38
 #define PIN_BTN_C				GPIO_NUM_37
 
-#define PIN_RX                  GPIO_NUM_16
-#define PIN_TX                  GPIO_NUM_17
+#define PIN_SD_CS				GPIO_NUM_4
+#define PIN_MAX31865_CS			GPIO_NUM_26
 
 #ifdef ARDUINO_M5Stack_Core_ESP32
 #define PIDLOOP_PORTS_LIST	\

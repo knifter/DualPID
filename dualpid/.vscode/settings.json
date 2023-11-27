@@ -13,6 +13,16 @@
         "unordered_set": "cpp",
         "vector": "cpp",
         "string_view": "cpp",
-        "initializer_list": "cpp"
+        "initializer_list": "cpp",
+        "atomic": "cpp",
+        "chrono": "cpp",
+        "iterator": "cpp",
+        "memory_resource": "cpp",
+        "optional": "cpp",
+        "streambuf": "cpp",
+        "system_error": "cpp",
+        "thread": "cpp",
+        "functional": "cpp",
+        "tuple": "cpp"
     }
 }

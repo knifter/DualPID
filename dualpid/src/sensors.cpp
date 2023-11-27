@@ -64,6 +64,19 @@ double sensor1_read()
 };
 #endif
 
+#if defined(PID1_SENSOR_MAX31865)
+#include <MAX31865.h>
+MAX31865 max31865(SPI, PIN_MAX31865_CS);
+bool sensor1_begin()
+{
+    return max31865.begin(100, 430, true, true);
+};
+double sensor1_read()
+{
+    return max31865.getTemperature();
+};
+#endif
+
 /***** CHANNEL 2 ********************************************/
 #if defined(PID2_SENSOR_SHT3X_RH)
     bool sensor2_begin()

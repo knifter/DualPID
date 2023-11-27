@@ -6,16 +6,20 @@
 
 // Temperature
 #if defined(PID1_SENSOR_M5KMETER)
-    #define SENSOR1_PRESENT
-    #define PID1_NAME                   "Temperature"
-    #define PID1_COLOR                 COLOR_RED
-    #define PID1_UNIT_TEXT			    "\xc2\xb0""C"
-    #define PID1_SETPOINT_MIN		    -20
-    #define PID1_SETPOINT_MAX		    60
-    #define PID1_PRECISION              2
+    #define PID1_TEMPERATURE
 #endif
 
 #if defined(PID1_SENSOR_MCP9600)
+    #define PID1_TEMPERATURE
+#endif
+#if defined(PID1_SENSOR_SHT3X_TEMP)
+    #define PID1_TEMPERATURE
+#endif
+#if defined(PID1_SENSOR_MAX31865)
+    #define PID1_TEMPERATURE
+#endif
+
+#if defined(PID1_TEMPERATURE)
     #define SENSOR1_PRESENT
     #define PID1_NAME                   "Temperature"
     #define PID1_COLOR                 COLOR_RED
@@ -23,16 +27,6 @@
     #define PID1_SETPOINT_MIN		    -20
     #define PID1_SETPOINT_MAX		    60
     #define PID1_PRECISION              2
-#endif
-
-#if defined(PID1_SENSOR_SHT3X_TEMP)
-    #define SENSOR1_PRESENT
-    #define PID1_NAME                   "Temperature"
-    #define PID1_COLOR                 COLOR_RED
-    #define PID1_UNIT_TEXT			    "\xc2\xb0""C"
-    #define PID1_SETPOINT_MIN		    -20
-    #define PID1_SETPOINT_MAX		    60
-    #define PID1_PRECISION              1
 #endif
 
 #if defined(PID2_SENSOR_SHT3X_RH)
@@ -48,7 +42,7 @@
 #ifdef PID2_SENSOR_SPRINTIR
     #define SENSOR2_PRESENT
     #define PID2_NAME                   "CO2 Content"
-    #define PID2_COLOR                 COLOR_LIGHT_BLUE
+    #define PID2_COLOR                 COLOR_YELLOW_DARK(2)
     #define PID2_UNIT_TEXT			    "ppm"
     #define PID2_SETPOINT_MIN	        400
     #define PID2_SETPOINT_MAX	        20000

@@ -32,14 +32,14 @@ void setup()
 
 	Wire.begin(PIN_SDA, PIN_SCL);
 
-    if(!sensor1_begin())
+    if(!sensor1_begin())  
     {
-			gui.showMessage("WARNING:", "Channel 1 sensor error.");
+		gui.showMessage("WARNING:", "Channel 1 sensor error.");
     };
 
     if(!sensor2_begin())
     {
-			gui.showMessage("WARNING:", "Channel 2 sensor error.");
+		gui.showMessage("WARNING:", "Channel 2 sensor error.");
     };
 
     expert_mode = 0;

@@ -22,3 +22,9 @@
 [submodule "dualpid/lib/lib-MCP9600"]
 	path = dualpid/lib/lib-MCP9600
 	url = https://github.com/knifter/lib-MCP9600.git
+[submodule "dualpid/lib/lib-SPIDevice"]
+	path = dualpid/lib/lib-SPIDevice
+	url = https://github.com/knifter/lib-SPIDevice
+[submodule "dualpid/lib/lib-MAX31865"]
+	path = dualpid/lib/lib-MAX31865
+	url = https://github.com/knifter/lib-MAX31865
