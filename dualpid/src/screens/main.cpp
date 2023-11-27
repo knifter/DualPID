@@ -38,12 +38,14 @@ class PidPanel
 
 PidPanel::PidPanel(lv_obj_t* parent, const uint8_t num_in) : num(num_in)
 {
-    lv_color_t color1;
+    lv_color_t color1, color2;
     switch(num)
     {
         case 1: unit = PID1_UNIT_TEXT; prec = PID1_PRECISION; color1 = PID1_COLOR; break;
         case 2: unit = PID2_UNIT_TEXT; prec = PID2_PRECISION; color1 = PID2_COLOR; break;
     };
+
+	color2 = lv_color_lighten(color1, 4);
 
 	box = lv_obj_create(parent);
 
@@ -138,23 +140,28 @@ const void PidPanel::setState(PIDLoop::status_t status)
             break;
     };
 
-    // Value label
+    // Value label, Background
     switch(status)
 	{
 		case PIDLoop::STATUS_DISABLED:
 			lv_obj_set_style_bg_color(lbl_value, COLOR_WHITE, 0); 
+		    lv_obj_set_style_bg_color(box, COLOR_WHITE, 0);
             break;
 		case PIDLoop::STATUS_INACTIVE:
 			lv_obj_set_style_bg_color(lbl_value, COLOR_GREY_LIGHT(2), 0);
+		    lv_obj_set_style_bg_color(box, COLOR_WHITE, 0);
             break;
 		case PIDLoop::STATUS_LOCKED:
 			lv_obj_set_style_bg_color(lbl_value, COLOR_GREEN_LIGHT(2), 0);
+		    lv_obj_set_style_bg_color(box, COLOR_GREEN_LIGHT(2), 0);
 			break;
 		case PIDLoop::STATUS_UNLOCKED:
 			lv_obj_set_style_bg_color(lbl_value, COLOR_ORANGE, 0);
+		    lv_obj_set_style_bg_color(box, COLOR_ORANGE_LIGHT(2), 0);
             break;
 		case PIDLoop::STATUS_ERROR:
 			lv_obj_set_style_bg_color(lbl_value, COLOR_RED, 0);
+		    lv_obj_set_style_bg_color(box, COLOR_RED, 0);
             break;
     };
 
@@ -181,6 +188,7 @@ const void PidPanel::setState(PIDLoop::status_t status)
             lv_style_set_bg_grad_color(&style_indic, COLOR_RED);
             break;
     };
+
 };
 const void PidPanel::setSetPoint(float sp) 
 { 
@@ -239,8 +247,8 @@ GraphPanel::GraphPanel(lv_obj_t* parent)
 	// setScaleY(LV_CHART_AXIS_PRIMARY_Y, -10*GRAPH_MULTIPLIER, 30*GRAPH_MULTIPLIER);
 	// setScaleY(LV_CHART_AXIS_SECONDARY_Y, 0*GRAPH_MULTIPLIER, 100*GRAPH_MULTIPLIER);
 	// void lv_chart_set_axis_tick(obj, axis, 						major_len, minor_len, major_cnt, minor_cnt, label_en, draw_size)
-    lv_chart_set_axis_tick(		chart,  LV_CHART_AXIS_PRIMARY_Y, 	1,         0,         3,         1,         true,     40);
-    lv_chart_set_axis_tick(		chart,  LV_CHART_AXIS_SECONDARY_Y, 	1,         0,         3,         1,         true,     40);
+    lv_chart_set_axis_tick(	chart,  LV_CHART_AXIS_PRIMARY_Y, 	1,         0,         3,         1,         true,     40);
+    lv_chart_set_axis_tick(	chart,  LV_CHART_AXIS_SECONDARY_Y, 	1,         0,         3,         1,         true,     40);
 
     /*Add two data series*/
 	lv_chart_set_point_count(chart, GRAPH_POINTS);
@@ -280,11 +288,11 @@ void GraphPanel::draw_lbl_cb(lv_event_t* e)
             lv_snprintf(dsc->text, dsc->text_length, "-%d:%02d", this_sec / 3600, (this_sec % 3600) / 60);
     		return;
         case LV_CHART_AXIS_PRIMARY_Y:
-		    dsc->label_dsc->color = COLOR_RED;
+		    dsc->label_dsc->color = PID1_COLOR;
             lv_snprintf(dsc->text, dsc->text_length, "%d", dsc->value / GRAPH_MULTIPLIER);
             return;
 	    case LV_CHART_AXIS_SECONDARY_Y:
-		    dsc->label_dsc->color = COLOR_BLUE;
+		    dsc->label_dsc->color = PID2_COLOR;
             lv_snprintf(dsc->text, dsc->text_length, "%d", dsc->value / GRAPH_MULTIPLIER);
             return;
         default:
