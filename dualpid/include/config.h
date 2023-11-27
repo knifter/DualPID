@@ -40,8 +40,8 @@
 
 #define NUMBER_OF_CHANNELS      2
 #define PID_PAR_MIN			    0
-#define PID_PAR_MAX			    9
-#define PID_PAR_PRECISION		2
+#define PID_PAR_MAX			    99
+#define PID_PAR_PRECISION		3
 
 // #define PID1_SENSOR_SHT3X_TEMP
 #define PID1_SENSOR_MAX31865
