@@ -1,117 +1,89 @@
 #include "sensors.h"
 #include "config.h"
 
-/***** CHANNEL 1 ********************************************/
-#if defined(PID1_SENSOR_SHT3X_TEMP) || defined(PID2_SENSOR_SHT3X_RH)
-    #include <SHT3x.h>
-    SHT3X sensor_sht(Wire);\
-    SHT3X::measurement_t* sensor_sht_m;
-    bool sht_begin()
-    {
-        if(!sensor_sht.begin(SHT3X_ADDRESS_DEFAULT))
-            if(!sensor_sht.begin(SHT3X_ADDRESS_ALT))
-                return false;
-        return true;
-    };
-    void sht_measure()
-    {
-        sensor_sht_m = sensor_sht.newMeasurement();
-    };
-#endif
-
-#if defined(PID1_SENSOR_SHT3X_TEMP)
-    bool sensor1_begin()
-    {
-        return sht_begin();    
-    };
-
-    double sensor1_read()
-    {
-        sht_measure();
-
-        if(sensor_sht_m->error)
-            return NAN;
-        return sensor_sht_m->temperature;    
-    };
-#endif
-
-#if defined(PID1_SENSOR_M5KMETER)
-#include <M5_KMeter.h>
-M5_KMeter kmeter;
-bool sensor1_begin()
+#ifdef SENSOR_SHT31_ENABLED
+#include <SHT3x.h>
+SHT3X sensor_sht31(Wire);\
+bool sensor_sht31_begin()
 {
-    kmeter.begin(&Wire);
-    return kmeter.setSleepTime(1);
+    if(!sensor_sht31.begin(SHT3X_ADDRESS_DEFAULT))
+        if(!sensor_sht31.begin(SHT3X_ADDRESS_ALT))
+            return false;
+    return true;
 };
-double sensor1_read()
+double sensor_sht31temp_read()
 {
-    if(!kmeter.update())
+    SHT3X::measurement_t* m = sensor_sht31.newMeasurement();
+
+    if(m->error)
         return NAN;
-    return kmeter.getTemperature();
+    return m->temperature;    
+};
+double sensor_sht31rh_read()
+{
+    SHT3X::measurement_t* m = sensor_sht31.newMeasurement();
+
+    if(m->error)
+        return NAN;
+    return m->humidity;
 };
 #endif
 
-#if defined(PID1_SENSOR_MCP9600)
+#ifdef SENSOR_M5KMETER_ENABLED
+#include <M5_KMeter.h>
+M5_KMeter sensor_kmeter;
+bool sensor_m5kmeter_begin()
+{
+    sensor_kmeter.begin(&Wire);
+    return sensor_kmeter.setSleepTime(1);
+};
+double sensor_m5kmeter_read()
+{
+    if(!sensor_kmeter.update())
+        return NAN;
+    return sensor_kmeter.getTemperature();
+};
+#endif
+
+#ifdef SENSOR_MCP9600_ENABLED
 #include <MCP9600.h>
-MCP9600 mcp;
-bool sensor1_begin()
+MCP9600 mcp9600;
+bool sensor_mcp9600_begin()
 {
-    return mcp.begin();
+    return mcp9600.begin();
 };
-double sensor1_read()
+double sensor_mcp9600_read()
 {
-    return mcp.readThermocouple();
+    return mcp9600.readThermocouple();
 };
 #endif
 
-#if defined(PID1_SENSOR_MAX31865)
+#ifdef SENSOR_MAX31865_ENABLED
 #include <MAX31865.h>
 MAX31865 max31865(SPI, PIN_MAX31865_CS);
-bool sensor1_begin()
+bool sensor_max31865_begin()
 {
     return max31865.begin(100, 430, true, true);
 };
-double sensor1_read()
+double sensor_max31865_read()
 {
     return max31865.getTemperature();
 };
 #endif
 
-/***** CHANNEL 2 ********************************************/
-#if defined(PID2_SENSOR_SHT3X_RH)
-    bool sensor2_begin()
-    {
-        #ifndef PID1_SENSOR_SHT3X_TEMP
-        return sht_begin();
-        #endif
-        return true;
-    };
-    double sensor2_read()
-    {
-        #ifndef PID1_SENSOR_SHT3X_TEMP
-        sht_measure();
-        #endif
-
-        if(sensor_sht_m->error)
-            return NAN;
-        return sensor_sht_m->humidity;    
-    };
-#endif
-
-#ifdef PID2_SENSOR_SPRINTIR
+#ifdef SENSOR_SPRINTIR_ENABLED
 #include <SprintIR.h>
-SprintIR sensor_sprint(Serial2);
+SprintIR sensor_sprintir(Serial2);
 
-bool sensor2_begin()
+bool sensor_sprintir_begin()
 {
 	Serial2.begin(9600, SERIAL_8N1, PIN_RX, PIN_TX);
-    return sensor_sprint.begin();
+    return sensor_sprintir.begin();
 };
-
-double sensor2_read()
+double sensor_sprintir_read()
 {
 	// CO2 from SprintIR-WX-20
-	int ppm = sensor_sprint.getPPM();
+	int ppm = sensor_sprintir.getPPM();
 	if(ppm < 0)
 	{
         return NAN;

@@ -13,6 +13,11 @@ void halt(const char*);
 uint32_t scan_keys();
 void sensor_loop();
 
+sensor_begin_fptr sensor1_begin = nullptr;
+sensor_read_fptr sensor1_read = nullptr;
+sensor_begin_fptr sensor2_begin = nullptr;
+sensor_read_fptr sensor2_read = nullptr;
+
 void setup()
 {
 	Serial.begin(115200);
@@ -32,6 +37,12 @@ void setup()
 
 	Wire.begin(PIN_SDA, PIN_SCL);
 
+	// Sort out configured sensor
+	sensor1_begin = sensor_sht31_begin;
+	sensor1_read = sensor_sht31rh_read;
+	sensor2_begin = sensor_sht31_begin;
+	sensor2_read = sensor_sht31temp_read;
+	
     if(!sensor1_begin())  
     {
 		gui.showMessage("WARNING:", "Channel 1 sensor error.");
