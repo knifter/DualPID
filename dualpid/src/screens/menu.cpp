@@ -21,12 +21,14 @@ SelectorField::item_t hardware_ports[] = {
 	,{0, 0, 0}
 	};
 
-SelectorField::item_t sensor_loop_times [] = {
-	{100, "100ms", "100 ms"},
-	{1000, "1s", "1 sec"},
-	{5000, "5s", "5 sec"},
-	{0, 0, 0}
-	};
+// SelectorField::item_t sensor_loop_times [] = {
+// 	{100, "100ms", "100 ms"},
+// 	{200, "200ms", "200 ms"},
+// 	{500, "500ms", "500 ms"},
+// 	{1000, "1s", "1 sec"},
+// 	{5000, "5s", "5 sec"},
+// 	{0, 0, 0}
+// 	};
 
 SelectorField::item_t pid_loop_times [] = {
 	{100, 	"100ms", "100 ms"},
@@ -160,7 +162,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
     if(expert_mode)
     {
         auto sub = menu.addSubMenu("General");
-        sub->addSelector("Measure time", &settings.sensor_loop_ms, sensor_loop_times);
+        sub->addSelector("Measure time", &settings.sensor_loop_ms, /* sensor_loop_times */ pid_loop_times);
         sub = menu.addSubMenu("NVM");
         sub->addAction("Save NVM", [](MenuItem*, void*){ setman.save(); });
         sub->addAction("Erase NVM", [](MenuItem*, void*){ setman.erase(); });    
