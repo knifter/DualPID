@@ -24,6 +24,15 @@ typedef enum
     SENSOR_SPRINTIR = 300,
 } sensor_type_t;
 
+#define SENSOR_TYPES_LIST \
+    {SENSOR_NONE, "none", "No sensor"},                 \
+    {SENSOR_SHT31_TEMP, "sht-t", "SHT31 Temperature"},  \
+    {SENSOR_M5KMETER, "kmeter", "M5-KMeter"},           \
+    {SENSOR_MCP9600, "mcp9600", "MCP9600"},             \
+    {SENSOR_MAX31865, "max31865", "MAX31865"},          \
+    {SENSOR_SHT31_RH, "sht-rh", "SHT31 Humidity"},      \
+    {SENSOR_SPRINTIR, "sprintir", "SprintIR"}          
+
 sensor_begin_fptr find_sensor_begin(uint32_t sensor_type);
 sensor_read_fptr find_sensor_read(uint32_t sensor_type);
 

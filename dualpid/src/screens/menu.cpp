@@ -11,7 +11,6 @@
 #include "globals.h"
 #include "soogh-debug.h"
 
-
 // C-style callbacks
 void menu_close_cb(MenuItem* item, void* data);
 
@@ -77,12 +76,7 @@ SelectorField::item_t lock_times [] = {
 	};
 
 SelectorField::item_t sensor_types [] = {
-    {SENSOR_SHT31_TEMP, "sht-t", "SHT31 Temperature"},
-    {SENSOR_M5KMETER, "kmeter", "M5-KMeter"},
-    {SENSOR_MCP9600, "mcp9600", "MCP9600"},
-    {SENSOR_MAX31865, "max31865", "MAX31865"},
-    {SENSOR_SHT31_RH, "sht-rh", "SHT31 Humidity"},
-    {SENSOR_SPRINTIR, "sprintir", "SprintIR"},
+    SENSOR_TYPES_LIST,
     {0, 0, 0},
     };
 
