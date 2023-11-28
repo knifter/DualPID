@@ -74,12 +74,27 @@ SelectorField::item_t lock_times [] = {
 	{0, 0, 0}
 	};
 
+SelectorField::item_t sensor_types [] = {
+    {SENSOR_SHT31_TEMP, "sht-t", "SHT31 Temperature"},
+    {SENSOR_M5KMETER, "kmeter", "M5-KMeter"},
+    {SENSOR_MCP9600, "mcp9600", "MCP9600"},
+    {SENSOR_MAX31865, "max31865", "MAX31865"},
+    {SENSOR_SHT31_RH, "sht-rh", "SHT31 Humidity"},
+    {SENSOR_SPRINTIR, "sprintir", "SprintIR"},
+    {0, 0, 0},
+    };
+
 bool need_reboot = false;
+void set_need_reboot(MenuItem*, void*)
+{
+    need_reboot = true;
+};
 
 MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 {
     menu.addCloseMenuButton();
     
+
     // Add menu for each active channel
     int ch = 0;
     while(++ch <= NUMBER_OF_CHANNELS)
@@ -127,11 +142,12 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
         if(expert_mode)
         {
             auto sub = menu.addSubMenu("Setup");
-            sub->addSelector("Mode", &set->mode, pid_modes)->onChange( [](MenuItem*, void*){ need_reboot = true; });
-            sub->addSelector("Pin N (-)", &set->pin_n, hardware_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
-            sub->addSelector("Pin P (+)", &set->pin_p, hardware_ports)->onChange( [](MenuItem*, void*){ need_reboot = true; });
+            sub->addSelector("Sensor", &set->sensor_type, sensor_types)->onChange(set_need_reboot);
+            sub->addSelector("Mode", &set->mode, pid_modes)->onChange(set_need_reboot);
+            sub->addSelector("Pin N (-)", &set->pin_n, hardware_ports)->onChange(set_need_reboot);
+            sub->addSelector("Pin P (+)", &set->pin_p, hardware_ports)->onChange(set_need_reboot);
             sub->addSpinbox("Input Filter", &set->input_filter, 0, 1, 2);
-            sub->addSelector("Windowtime", &set->windowtime, window_loop_times)->onChange( [](MenuItem*, void*){ pid1.begin(); });    
+            sub->addSelector("Windowtime", &set->windowtime, window_loop_times)->onChange(set_need_reboot);    
             sub->addSelector("Looptime", &set->looptime, pid_loop_times);
             // sub->addCheckbox("Take-Back-Half", &set->fpid.takebackhalf);
         };

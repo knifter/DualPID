@@ -1,6 +1,35 @@
 #include "sensors.h"
 #include "config.h"
 
+
+sensor_begin_fptr find_sensor_begin(uint32_t sensor_type)
+{
+	switch(sensor_type)
+	{
+		case SENSOR_SHT31_TEMP:		return sensor_sht31_begin;
+		case SENSOR_M5KMETER:		return sensor_m5kmeter_begin;
+		case SENSOR_MCP9600:		return sensor_mcp9600_begin;
+		case SENSOR_MAX31865:		return sensor_max31865_begin;
+		case SENSOR_SHT31_RH:		return sensor_sht31_begin;
+		case SENSOR_SPRINTIR:		return sensor_sprintir_begin;
+        default: return nullptr;
+	};
+};
+
+sensor_read_fptr find_sensor_read(uint32_t sensor_type)
+{
+	switch(sensor_type)
+	{
+		case SENSOR_SHT31_TEMP:		return sensor_sht31temp_read;
+		case SENSOR_M5KMETER:		return sensor_m5kmeter_read;
+		case SENSOR_MCP9600:		return sensor_mcp9600_read;
+		case SENSOR_MAX31865:		return sensor_max31865_read;
+		case SENSOR_SHT31_RH:		return sensor_sht31rh_read;
+		case SENSOR_SPRINTIR:		return sensor_sprintir_read;
+        default: return nullptr;
+	};
+};
+
 #ifdef SENSOR_SHT31_ENABLED
 #include <SHT3x.h>
 SHT3X sensor_sht31(Wire);\

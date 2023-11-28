@@ -22,7 +22,10 @@ typedef enum
 
     // 300 = CO2
     SENSOR_SPRINTIR = 300,
-} sensor_id_t;
+} sensor_type_t;
+
+sensor_begin_fptr find_sensor_begin(uint32_t sensor_type);
+sensor_read_fptr find_sensor_read(uint32_t sensor_type);
 
 #ifdef SENSOR_SHT31_ENABLED
     bool sensor_sht31_begin();

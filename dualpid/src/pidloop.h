@@ -41,6 +41,7 @@ class PIDLoop
             double lock_window;
             uint32_t lock_time;
             double input_filter;
+            uint32_t sensor_type;
         } settings_t;
 
         PIDLoop(settings_t& s, const double& input);

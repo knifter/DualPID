@@ -4,8 +4,10 @@
 #include <nvs.h>
 
 #include "config.h"
-#include "globals.h"
 #include "tools-log.h"
+#include "globals.h"
+
+#include "sensors.h"
 
 SettingsManager::SettingsManager(settings_t& settings) : NVSettings(&settings, sizeof(settings_t))
 {
@@ -26,6 +28,7 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
         case 2: //
         case 3: //
         case 4: //
+        case 5: //
             DBG("Init settings v5: defaults");
             memset(_data, 0, _data_size);
 
@@ -51,6 +54,7 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
             settings->pid1.lock_window =            PID1_DEFAULT_LOCK_WINDOW;
             settings->pid1.lock_time =              PID1_DEFAULT_LOCK_TIME_MS;
             settings->pid1.input_filter =           PID1_DEFAULT_INPUT_FILTER;
+            settings->pid1.sensor_type =            SENSOR_NONE;
 
             settings->pid2.active =                 false;
             settings->pid2.mode =                   PID2_DEFAULT_MODE;
@@ -71,10 +75,11 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
             settings->pid2.lock_window =            PID2_DEFAULT_LOCK_WINDOW;
             settings->pid2.lock_time =              PID2_DEFAULT_LOCK_TIME_MS;
             settings->pid2.input_filter =           PID2_DEFAULT_INPUT_FILTER;
+            settings->pid2.sensor_type =            SENSOR_NONE;
 
         // End with the current version:
-        case 5:
-            _data_version = 5;
+        case 6:
+            _data_version = 6;
             return true;
     };
 
@@ -94,20 +99,21 @@ bool SettingsManager::read_blob(void* blob, const size_t blob_size, const uint32
         case 2: 
         case 3: 
         case 4: 
+        case 5: 
             set_defaults_since(0);
             _dirty = true;
             gui.showMessage("INFO", "Default settings loaded.");
             return true;
 
         // latest
-        case 5:
+        case 6:
             if(blob_size != sizeof(settings_t))
             {
                 ERROR("Settings blob size mismatch (version is ok).");
                 return false;
             };
             memcpy(_data, blob, blob_size);
-            _data_version = 5;
+            _data_version = 6;
             _dirty = false;
             return true;
     };

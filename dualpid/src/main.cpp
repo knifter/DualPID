@@ -37,27 +37,30 @@ void setup()
 
 	Wire.begin(PIN_SDA, PIN_SCL);
 
-	// Sort out configured sensor
-	sensor1_begin = sensor_sht31_begin;
-	sensor1_read = sensor_sht31rh_read;
-	sensor2_begin = sensor_sht31_begin;
-	sensor2_read = sensor_sht31temp_read;
-	
-    if(!sensor1_begin())  
-    {
-		gui.showMessage("WARNING:", "Channel 1 sensor error.");
-    };
-
-    if(!sensor2_begin())
-    {
-		gui.showMessage("WARNING:", "Channel 2 sensor error.");
-    };
-
     expert_mode = 0;
 	input_value1 = NAN;
 	input_value2 = NAN;
 
 	setman.begin();
+
+	// Sort out configured sensor
+	sensor1_begin = find_sensor_begin(settings.pid1.sensor_type);
+	sensor1_read = find_sensor_read(settings.pid1.sensor_type);
+	sensor2_begin = find_sensor_begin(settings.pid2.sensor_type);
+	sensor2_read = find_sensor_read(settings.pid2.sensor_type);
+	
+	if(sensor1_begin != nullptr)
+    	if(!sensor1_begin())  
+    	{
+			gui.showMessage("WARNING:", "Channel 1 sensor error.");
+	    };
+
+    if(sensor2_begin != nullptr)
+		if(!sensor2_begin())
+    	{
+			gui.showMessage("WARNING:", "Channel 2 sensor error.");
+	    };
+
 	pid1.begin();
 	pid2.begin();
 
@@ -89,15 +92,25 @@ void sensor_loop()
 	next = now + settings.sensor_loop_ms;
 
 	// Read sensors and apply averaging/filter
-    double read1 = sensor1_read();
-    if(isnan(input_value1))
-        input_value1 = read1;
-	input_value1 = read1*(1 - settings.pid1.input_filter) + input_value1*settings.pid1.input_filter;
+	if(sensor1_read != nullptr)
+	{
+		double read1 = sensor1_read();
+		if(isnan(input_value1))
+			input_value1 = read1;
+		input_value1 = read1*(1 - settings.pid1.input_filter) + input_value1*settings.pid1.input_filter;
+	}else{
+		input_value1 = NAN;
+	};
 
-    double read2 = sensor2_read();
-    if(isnan(input_value2)) 
-        input_value2 = read2;
-	input_value2 = read2*(1 - settings.pid2.input_filter) + input_value2*settings.pid2.input_filter;
+	if(sensor2_read != nullptr)
+	{
+		double read2 = sensor2_read();
+		if(isnan(input_value2)) 
+			input_value2 = read2;
+		input_value2 = read2*(1 - settings.pid2.input_filter) + input_value2*settings.pid2.input_filter;
+	}else{
+		input_value2 = NAN;
+	};
 };
 
 void halt(const char* error)
