@@ -10,8 +10,6 @@
 extern settings_t settings;
 
 extern bool expert_mode;
-extern double input_value1;
-extern double input_value2;
 
 extern GUI gui;
 extern SettingsManager setman;

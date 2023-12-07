@@ -4,7 +4,7 @@
 #include <FPID.h>
 
 #include "config.h"
-// #include "settings.h"
+#include "sensors.h"
 #include "driver/gpio.h"
 
 class PIDLoop
@@ -44,31 +44,47 @@ class PIDLoop
             uint32_t sensor_type;
         } settings_t;
 
-        PIDLoop(settings_t& s, const double& input);
+        PIDLoop(settings_t& s);
 
         bool begin();
         void loop();
-        // double get_input() { return *_input; };
-        double get_output() { return _output; };
-        status_t get_status() { return _status; };
+
+        // inspection
+        double input_value() { return _input_value; };
+        double output_value() { return _output_value; };
+        status_t status() { return _status; };
+        settings_t settings() { return _settings; };
         // int get_output_state() { return _output_state; };
 
     private: 
+        // priv functions
         void set_active(bool);
         // bool active() { return _settings->active; };
         void reset_output();
+
+        void do_sensor();
+        void do_pid();
+        void do_output();
         void calculate();
 
+        // SENSOR
+        time_t _next_sensor = 0;
+        sensor_begin_fptr _sensor_begin = nullptr;
+        sensor_read_fptr _sensor_read = nullptr;
+
+        // PID
         FPID _pid;
+        double _input_value;
+        double _output_value;
+        time_t _next_pid;
         settings_t &_settings;
 
-        // double Input, Output, Setpoint;
-        const double &_input_ref;
-        double _output;
+        // OUTPUT
+        // const double &_input_ref;
         status_t _status;
         time_t _windowstarttime;
         gpio_num_t _pin_n, _pin_p;
-        time_t _pid_last;
+
         bool _active_last;
         time_t _unlocked_last;
 };

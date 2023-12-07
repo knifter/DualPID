@@ -367,20 +367,23 @@ void MainScreen::loop()
 
 	_next_update = now + MAIN_LOOP_MS;
 
+	double in1 = pid1.get_input();
+	double in2 = pid2.get_input();
+
 	pw1->setSetPoint(settings.pid1.fpid.setpoint);
-	pw1->setValue(input_value1);
+	pw1->setValue(in1);
 	pw1->setBar(pid1.get_output());
     pw1->setState(pid1.get_status());
 
 	pw2->setSetPoint(settings.pid2.fpid.setpoint);
-	pw2->setValue(input_value2);
+	pw2->setValue(in2);
 	pw2->setBar(pid2.get_output());
     pw2->setState(pid2.get_status());
 
 	if(now < _next_chart)
 		return;
 
-	gw->appendVals(input_value1, input_value2);
+	gw->appendVals(in1, in2);
 
 	_next_chart = now + settings.graph_delta;
     
