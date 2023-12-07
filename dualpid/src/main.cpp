@@ -53,12 +53,14 @@ void setup()
     	if(!sensor1_begin())  
     	{
 			gui.showMessage("WARNING:", "Channel 1 sensor error.");
+			sensor1_read = nullptr;
 	    };
 
     if(sensor2_begin != nullptr)
 		if(!sensor2_begin())
     	{
 			gui.showMessage("WARNING:", "Channel 2 sensor error.");
+			sensor2_read = nullptr;
 	    };
 
 	pid1.begin();
