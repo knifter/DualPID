@@ -53,7 +53,7 @@ class PIDLoop
         double input_value() { return _input_value; };
         double output_value() { return _output_value; };
         status_t status() { return _status; };
-        settings_t settings() { return _settings; };
+        settings_t pid_settings() { return _settings; };
         // int get_output_state() { return _output_state; };
 
     private: 

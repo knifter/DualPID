@@ -36,8 +36,10 @@ void setup()
 	
 	setman.begin();
 
-	pid1.begin();
-	pid2.begin();
+	for(PIDLoop pid : pids)
+	{
+		pid.begin();
+	};
 
     ScreenPtr scr = std::make_shared<BootScreen>(gui);
     gui.pushScreen(scr);
@@ -52,8 +54,10 @@ void loop()
 	gui.handle(e);
 
 	setman.loop();
-	pid1.loop();
-	pid2.loop();
+	for(PIDLoop pid : pids)
+	{
+		pid.loop();
+	};
 	gui.loop();
 };
 

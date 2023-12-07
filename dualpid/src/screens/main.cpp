@@ -38,14 +38,13 @@ class PidPanel
 
 PidPanel::PidPanel(lv_obj_t* parent, const uint8_t num_in) : num(num_in)
 {
-    lv_color_t color1, color2;
+    lv_color_t color1;
     switch(num)
     {
         case 1: unit = PID1_UNIT_TEXT; prec = PID1_PRECISION; color1 = PID1_COLOR; break;
         case 2: unit = PID2_UNIT_TEXT; prec = PID2_PRECISION; color1 = PID2_COLOR; break;
     };
-
-	color2 = lv_color_lighten(color1, 4);
+	lv_color_t color2 = lv_color_lighten(color1, 4);
 
 	box = lv_obj_create(parent);
 
@@ -367,23 +366,23 @@ void MainScreen::loop()
 
 	_next_update = now + MAIN_LOOP_MS;
 
-	double in1 = pid1.get_input();
-	double in2 = pid2.get_input();
-
 	pw1->setSetPoint(settings.pid1.fpid.setpoint);
-	pw1->setValue(in1);
-	pw1->setBar(pid1.get_output());
-    pw1->setState(pid1.get_status());
+	pw1->setValue(pids[0].input_value());
+	pw1->setBar(pids[0].output_value());
+    pw1->setState(pids[0].status());
 
 	pw2->setSetPoint(settings.pid2.fpid.setpoint);
-	pw2->setValue(in2);
-	pw2->setBar(pid2.get_output());
-    pw2->setState(pid2.get_status());
+	pw2->setValue(pids[1].input_value());
+	pw2->setBar(pids[1].output_value());
+    pw2->setState(pids[1].status());
 
 	if(now < _next_chart)
 		return;
 
-	gw->appendVals(in1, in2);
+	gw->appendVals(
+		pids[0].input_value(), 
+		pids[1].input_value()
+		);
 
 	_next_chart = now + settings.graph_delta;
     

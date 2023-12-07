@@ -11,5 +11,7 @@ SettingsManager setman(settings);
 
 bool expert_mode;
 
-PIDLoop pid1((settings.pid1), input_value1);
-PIDLoop pid2((settings.pid2), input_value2);
+PIDLoop pids[] = {
+	PIDLoop(settings.pid1),
+	PIDLoop(settings.pid2)
+	};
