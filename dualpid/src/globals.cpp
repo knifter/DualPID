@@ -11,7 +11,8 @@ SettingsManager setman(settings);
 
 bool expert_mode;
 
-PIDLoop pids[] = {
-	PIDLoop(settings.pid1),
-	PIDLoop(settings.pid2)
-	};
+PIDLoop pid1(settings.pid1);
+PIDLoop pid2(settings.pid2);
+
+PIDLoop* pids[NUMBER_OF_CHANNELS] = {&pid1, &pid2};
+

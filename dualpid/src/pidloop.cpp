@@ -118,25 +118,27 @@ void PIDLoop::loop()
 
 void PIDLoop::do_sensor()
 {
+	_sensor_read = find_sensor_read(_settings.sensor_type);
+
     // Read sensor?
 	time_t now = millis();
 	if(_next_sensor > now)
         return;
-
-    _next_sensor = now + settings.sensor_loop_ms;
+    _next_sensor = now + settings.sensor_loop_ms; // FIXME: rather absolute dT
 
     // Read sensors and apply averaging/filter
-    if(_sensor_read != nullptr)
+    if(_sensor_read == nullptr)
     {
-        double read = _sensor_read();
-        if(isnan(_input_value))
-            _input_value = read;
-
-        // apply input filter
-        _input_value = read*(1 - _settings.input_filter) + _input_value*_settings.input_filter;
-    }else{
         _input_value = NAN;
+        return;
     };
+
+    double read = _sensor_read();
+    if(isnan(_input_value))
+        _input_value = read;
+
+    // apply input filter
+    _input_value = read*(1 - _settings.input_filter) + _input_value*_settings.input_filter;
 };
 
 void PIDLoop::do_pid()

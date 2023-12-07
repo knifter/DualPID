@@ -367,21 +367,21 @@ void MainScreen::loop()
 	_next_update = now + MAIN_LOOP_MS;
 
 	pw1->setSetPoint(settings.pid1.fpid.setpoint);
-	pw1->setValue(pids[0].input_value());
-	pw1->setBar(pids[0].output_value());
-    pw1->setState(pids[0].status());
+	pw1->setValue(pids[0]->input_value());
+	pw1->setBar(pids[0]->output_value());
+    pw1->setState(pids[0]->status());
 
 	pw2->setSetPoint(settings.pid2.fpid.setpoint);
-	pw2->setValue(pids[1].input_value());
-	pw2->setBar(pids[1].output_value());
-    pw2->setState(pids[1].status());
+	pw2->setValue(pids[1]->input_value());
+	pw2->setBar(pids[1]->output_value());
+    pw2->setState(pids[1]->status());
 
 	if(now < _next_chart)
 		return;
 
 	gw->appendVals(
-		pids[0].input_value(), 
-		pids[1].input_value()
+		pids[0]->input_value(), 
+		pids[1]->input_value()
 		);
 
 	_next_chart = now + settings.graph_delta;

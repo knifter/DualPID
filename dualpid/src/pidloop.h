@@ -6,8 +6,9 @@
 #include "config.h"
 #include "sensors.h"
 #include "driver/gpio.h"
+#include "tools-nocopy.h"
 
-class PIDLoop
+class PIDLoop: private NonCopyable
 {
     public:
         typedef enum
@@ -65,7 +66,6 @@ class PIDLoop
         void do_sensor();
         void do_pid();
         void do_output();
-        void calculate();
 
         // SENSOR
         time_t _next_sensor = 0;

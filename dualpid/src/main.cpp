@@ -11,7 +11,6 @@
 
 void halt(const char*);
 uint32_t scan_keys();
-void sensor_loop();
 
 void setup()
 {
@@ -36,9 +35,9 @@ void setup()
 	
 	setman.begin();
 
-	for(PIDLoop pid : pids)
+	for(PIDLoop* pid : pids)
 	{
-		pid.begin();
+		pid->begin();
 	};
 
     ScreenPtr scr = std::make_shared<BootScreen>(gui);
@@ -54,9 +53,9 @@ void loop()
 	gui.handle(e);
 
 	setman.loop();
-	for(PIDLoop pid : pids)
+	for(PIDLoop* pid : pids)
 	{
-		pid.loop();
+		pid->loop();
 	};
 	gui.loop();
 };

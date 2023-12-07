@@ -13,6 +13,6 @@ extern bool expert_mode;
 
 extern GUI gui;
 extern SettingsManager setman;
-extern PIDLoop pids[NUMBER_OF_CHANNELS];
+extern PIDLoop* pids[NUMBER_OF_CHANNELS];
 
 #endif //__GLOBALS_H
