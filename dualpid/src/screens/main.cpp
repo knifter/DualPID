@@ -82,7 +82,7 @@ PidPanel::PidPanel(lv_obj_t* parent, const uint8_t num_in, PIDLoop& pid_in)
 		lv_obj_set_style_text_align(lbl_sp, LV_TEXT_ALIGN_CENTER, 0);
 		lv_label_set_text(lbl_sp, "<setpoint>");
 		lv_obj_set_style_bg_opa(lbl_sp, LV_OPA_COVER, 0);
-		lv_obj_set_style_bg_color(lbl_sp, color1, 0);
+		lv_obj_set_style_bg_color(lbl_sp, color2, 0);
 	};
 	// Value label
 	{
@@ -267,7 +267,9 @@ GraphPanel::GraphPanel(lv_obj_t* parent)
 
 	color_ch1 = find_sensor_color(pids[0]->pid_settings().sensor_type);
 	color_ch2 = find_sensor_color(pids[1]->pid_settings().sensor_type);
-
+	color_ch1 = lv_color_darken(color_ch1, 4);
+	color_ch2 = lv_color_darken(color_ch2, 4);
+	
     /*Add two data series*/
 	lv_chart_set_point_count(chart, GRAPH_POINTS);
     ser1 = lv_chart_add_series(chart, color_ch1, LV_CHART_AXIS_PRIMARY_Y);
