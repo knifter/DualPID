@@ -1,6 +1,26 @@
 #include "sensors.h"
 #include "config.h"
 
+const char*     Temperature_Name                        = "Temperature";
+const char*     Temperature_Unit_Text                   = "\xc2\xb0""C";
+const double    Temperature_Setpoint_Min                = -20;
+const double    Temperature_Setpoint_Max                = -60;
+const int       Temperature_Precision                   = 2;
+const lv_color_t Temperature_Color                      = COLOR_RED;
+
+const char*     Humidity_Name                           = "Humidity";
+const char*     Humidity_Unit_Text                      = "%RH";
+const double    Humidity_Setpoint_Min                   = 0;
+const double    Humidity_Setpoint_Max                   = 100;
+const int       Humidity_Precision                      = 0;
+const lv_color_t Humidity_Color                         = COLOR_BLUE;
+
+const char*     CO2_Name                                = "CO2 Content";
+const char*     CO2_Unit_Text                           = "ppm";
+const double    CO2_Setpoint_Min                        = 0;
+const double    CO2_Setpoint_Max                        = 5000;
+const int       CO2_Precision                           = 0;
+const lv_color_t CO2_Color                      		= COLOR_YELLOW;
 
 sensor_begin_fptr find_sensor_begin(uint32_t sensor_type)
 {
@@ -29,6 +49,23 @@ sensor_read_fptr find_sensor_read(uint32_t sensor_type)
         default: return nullptr;
 	};
 };
+
+lv_color_t find_sensor_color(uint32_t sensor_type)
+{
+	switch(sensor_type)
+	{
+		case 100 ... 199: // Temperature
+			return Temperature_Color;
+		case 200 ... 299: // Humidity
+			return Humidity_Color;
+		case 300 ... 399: // CO2
+			return CO2_Color;
+		case SENSOR_NONE: //break;
+		default:
+			return COLOR_BLACK;
+	};    
+};
+
 
 #ifdef SENSOR_SHT31_ENABLED
 #include <SHT3x.h>

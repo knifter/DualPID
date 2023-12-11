@@ -9,6 +9,7 @@
 #include "sensors.h"
 #include "tools-log.h"
 #include "globals.h"
+#include "sensors.h"
 
 /*********************************************************************************************************************************/
 class PidPanel
@@ -19,8 +20,9 @@ class PidPanel
 			PS_OK,
 		} state_t;
 
-		PidPanel(lv_obj_t* parent, const uint8_t num);
+		PidPanel(lv_obj_t* parent, const uint8_t num, PIDLoop& pid_in);
 
+		PIDLoop& pid;
 		lv_obj_t	*box, *lbl_sp, *lbl_value, *bar_output;
 		lv_style_t 	style_font26;
         int num;
@@ -36,14 +38,27 @@ class PidPanel
 		const void setState(PIDLoop::status_t s);
 };
 
-PidPanel::PidPanel(lv_obj_t* parent, const uint8_t num_in) : num(num_in)
+PidPanel::PidPanel(lv_obj_t* parent, const uint8_t num_in, PIDLoop& pid_in)
+	 : num(num_in), pid(pid_in)
 {
+	uint32_t st = pid.pid_settings().sensor_type;
     lv_color_t color1;
-    switch(num)
-    {
-        case 1: unit = PID1_UNIT_TEXT; prec = PID1_PRECISION; color1 = PID1_COLOR; break;
-        case 2: unit = PID2_UNIT_TEXT; prec = PID2_PRECISION; color1 = PID2_COLOR; break;
-    };
+	switch(st)
+	{
+		case 100 ... 199: // Temperature
+			unit = Temperature_Unit_Text; prec = Temperature_Precision; color1 = Temperature_Color;
+			break;
+		case 200 ... 299: // Humidity
+			unit = Humidity_Unit_Text; prec = Humidity_Precision; color1 = Humidity_Color; 
+			break;
+		case 300 ... 399: // CO2
+			unit = CO2_Unit_Text; prec = CO2_Precision; color1 = CO2_Color; 
+			break;
+		case SENSOR_NONE: //break;
+		default:
+			unit = "U"; prec = 0; color1 = COLOR_BLACK; 
+			break;
+	};
 	lv_color_t color2 = lv_color_lighten(color1, 4);
 
 	box = lv_obj_create(parent);
@@ -220,7 +235,8 @@ class GraphPanel
 		lv_obj_t *box;
 	    lv_obj_t *chart;
 		lv_chart_series_t *ser1, *ser2;
-        bool redraw = true;
+  	    bool redraw = true;
+		lv_color_t color_ch1, color_ch2;
 };
 
 GraphPanel::GraphPanel(lv_obj_t* parent)
@@ -249,10 +265,13 @@ GraphPanel::GraphPanel(lv_obj_t* parent)
     lv_chart_set_axis_tick(	chart,  LV_CHART_AXIS_PRIMARY_Y, 	1,         0,         3,         1,         true,     40);
     lv_chart_set_axis_tick(	chart,  LV_CHART_AXIS_SECONDARY_Y, 	1,         0,         3,         1,         true,     40);
 
+	color_ch1 = find_sensor_color(pids[0]->pid_settings().sensor_type);
+	color_ch2 = find_sensor_color(pids[1]->pid_settings().sensor_type);
+
     /*Add two data series*/
 	lv_chart_set_point_count(chart, GRAPH_POINTS);
-    ser1 = lv_chart_add_series(chart, PID1_COLOR, LV_CHART_AXIS_PRIMARY_Y);
-    ser2 = lv_chart_add_series(chart, PID2_COLOR, LV_CHART_AXIS_SECONDARY_Y);
+    ser1 = lv_chart_add_series(chart, color_ch1, LV_CHART_AXIS_PRIMARY_Y);
+    ser2 = lv_chart_add_series(chart, color_ch2, LV_CHART_AXIS_SECONDARY_Y);
 	
 	lv_obj_add_event_cb(chart, draw_lbl_cb, LV_EVENT_DRAW_PART_BEGIN, this);
 };
@@ -270,6 +289,7 @@ void GraphPanel::draw_lbl_cb(lv_event_t* e)
         return;
     };
 
+	GraphPanel* me = static_cast<GraphPanel*>(e->user_data);
 
     // tmp value, don't allocate
     static int this_sec;
@@ -287,11 +307,11 @@ void GraphPanel::draw_lbl_cb(lv_event_t* e)
             lv_snprintf(dsc->text, dsc->text_length, "-%d:%02d", this_sec / 3600, (this_sec % 3600) / 60);
     		return;
         case LV_CHART_AXIS_PRIMARY_Y:
-		    dsc->label_dsc->color = PID1_COLOR;
+		    dsc->label_dsc->color = me->color_ch1;
             lv_snprintf(dsc->text, dsc->text_length, "%d", dsc->value / GRAPH_MULTIPLIER);
             return;
 	    case LV_CHART_AXIS_SECONDARY_Y:
-		    dsc->label_dsc->color = PID2_COLOR;
+		    dsc->label_dsc->color = me->color_ch2;
             lv_snprintf(dsc->text, dsc->text_length, "%d", dsc->value / GRAPH_MULTIPLIER);
             return;
         default:
@@ -347,15 +367,14 @@ void GraphPanel::autoScale(const lv_chart_axis_t axis, const float inc_sp)
 
 /*********************************************************************************************************************************/
 MainScreen::MainScreen(SooghGUI& g) : Screen(g)
-{
+{	
 	// pw1 = new PidPanel(_screen, "\xe2\x84\x83");
-	pw1 = new PidPanel(_screen, 1);
-	pw2 = new PidPanel(_screen, 2);
+	pw1 = new PidPanel(_screen, 1, *(pids[0]));
+	pw2 = new PidPanel(_screen, 2, *(pids[1]));
 	lv_obj_align_to(pw2->box, pw1->box, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
 
 	gw = new GraphPanel(_screen);
 	lv_obj_align(gw->box, LV_ALIGN_BOTTOM_MID, 0, 0);
-
 };
 
 void MainScreen::loop()

@@ -33,8 +33,28 @@ typedef enum
     {SENSOR_SHT31_RH, "sht-rh", "SHT31 Humidity"},      \
     {SENSOR_SPRINTIR, "sprintir", "SprintIR"}          
 
+extern const char*     Temperature_Name;
+extern const char*     Temperature_Unit_Text;
+extern const double    Temperature_Setpoint_Min;
+extern const double    Temperature_Setpoint_Max;
+extern const int       Temperature_Precision;
+extern const lv_color_t Temperature_Color;
+extern const char*     Humidity_Name;
+extern const char*     Humidity_Unit_Text;
+extern const double    Humidity_Setpoint_Min;
+extern const double    Humidity_Setpoint_Max;
+extern const int       Humidity_Precision;
+extern const lv_color_t Humidity_Color;
+extern const char*     CO2_Name;
+extern const char*     CO2_Unit_Text;
+extern const double    CO2_Setpoint_Min;
+extern const double    CO2_Setpoint_Max;
+extern const int       CO2_Precision;
+extern const lv_color_t CO2_Color;
+
 sensor_begin_fptr find_sensor_begin(uint32_t sensor_type);
 sensor_read_fptr find_sensor_read(uint32_t sensor_type);
+lv_color_t find_sensor_color(uint32_t sensor_type);
 
 #ifdef SENSOR_SHT31_ENABLED
     bool sensor_sht31_begin();
@@ -61,29 +81,5 @@ sensor_read_fptr find_sensor_read(uint32_t sensor_type);
     bool sensor_sprintir_begin();
     double sensor_sprintir_read();
 #endif
-
-#define PID1_NAME                   "Temperature"
-#define PID1_COLOR                  COLOR_RED
-#define PID1_UNIT_TEXT			    "\xc2\xb0""C"
-#define PID1_SETPOINT_MIN		    -20
-#define PID1_SETPOINT_MAX		    60
-#define PID1_PRECISION              2
-
-#define PID2_NAME                   "Humidity"
-#define PID2_COLOR                 COLOR_BLUE
-#define PID2_UNIT_TEXT			    "%RH"
-#define PID2_SETPOINT_MIN	        0
-#define PID2_SETPOINT_MAX	        100
-#define PID2_PRECISION	            0
-
-// #ifdef PID2_SENSOR_SPRINTIR
-//     #define SENSOR2_PRESENT
-//     #define PID2_NAME                   "CO2 Content"
-//     #define PID2_COLOR                 COLOR_YELLOW
-//     #define PID2_UNIT_TEXT			    "ppm"
-//     #define PID2_SETPOINT_MIN	        400
-//     #define PID2_SETPOINT_MAX	        20000
-//     #define PID2_PRECISION	            0
-// #endif
 
 #endif //__SENSORS_H

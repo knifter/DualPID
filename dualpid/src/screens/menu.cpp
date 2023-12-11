@@ -92,60 +92,71 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
     
 
     // Add menu for each active channel
-    int ch = 0;
-    while(++ch <= NUMBER_OF_CHANNELS)
+    int ch = -1;
+    while(++ch < NUMBER_OF_CHANNELS)
     {
-        PIDLoop::settings_t* set = nullptr;
+        PIDLoop::settings_t& set = pids[ch]->pid_settings();
         const char* name;
         float sp_min, sp_max, sp_prec;
-        switch(ch)
+        switch(set.sensor_type)
         {
-            case 1: set = &settings.pid1;
-                    name = PID1_NAME;
-                    sp_min = PID1_SETPOINT_MIN;
-                    sp_max = PID1_SETPOINT_MAX;
-                    sp_prec = PID1_PRECISION;
-                    break;
-            case 2: set = &settings.pid2;
-                    name = PID2_NAME;
-                    sp_min = PID2_SETPOINT_MIN;
-                    sp_max = PID2_SETPOINT_MAX;
-                    sp_prec = PID2_PRECISION;
-                    break;
-            default: ERROR("Un-implemented channel number: %d", ch); 
-                    return;
+            case 100 ... 199: // Temperature
+                name =   Temperature_Name;
+                sp_min = Temperature_Setpoint_Min;
+                sp_max = Temperature_Setpoint_Max;
+                sp_prec =Temperature_Precision;
+                break;
+            case 200 ... 299: // Humidity
+                name =   Humidity_Name;
+                sp_min = Humidity_Setpoint_Min;
+                sp_max = Humidity_Setpoint_Max;
+                sp_prec =Humidity_Precision;
+                break;
+            case 300 ... 399: // CO2
+                name =   CO2_Name;
+                sp_min = CO2_Setpoint_Min;
+                sp_max = CO2_Setpoint_Max;
+                sp_prec =CO2_Precision;
+                break;
+            case SENSOR_NONE: //break;
+            default:
+                name = "none";
+                sp_min = 0;
+                sp_max = 1;
+                sp_prec = 2;
+                break;
         };
 
-        if(set->mode != PIDLoop::MODE_NONE || expert_mode)
+        if(set.mode != PIDLoop::MODE_NONE || expert_mode)
         {
             menu.addSeparator(name);
-            menu.addSpinbox("Setpoint", &set->fpid.setpoint, sp_min, sp_max, sp_prec);
-            menu.addSwitch("Active", &set->active);
+            menu.addSpinbox("Setpoint", &set.fpid.setpoint, sp_min, sp_max, sp_prec);
+            menu.addSwitch("Active", &set.active);
             auto sub = menu.addSubMenu("PID Settings");
-            sub->addSpinbox("kP", &set->fpid.kP, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-            sub->addSpinbox("kI", &set->fpid.kI, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-            sub->addSpinbox("kD", &set->fpid.kD, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-            sub->addSpinbox("kF", &set->fpid.kF, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-            sub->addSpinbox("F-Offset", &set->fpid.kF_offset, sp_min, sp_max, sp_prec);
+            sub->addSpinbox("kP", &set.fpid.kP, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+            sub->addSpinbox("kI", &set.fpid.kI, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+            sub->addSpinbox("kD", &set.fpid.kD, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+            sub->addSpinbox("kF", &set.fpid.kF, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+            sub->addSpinbox("F-Offset", &set.fpid.kF_offset, sp_min, sp_max, sp_prec);
             if(expert_mode)
             {
                 sub = menu.addSubMenu("Advanced");
-                sub->addSpinbox("D-Filter", &set->input_filter, 0, 1, 2);
-                sub->addSelector("Lock Time", &set->lock_time, lock_times);
-                sub->addSpinbox("Lock Window", &set->lock_window, 0, sp_max - sp_min);
+                sub->addSpinbox("D-Filter", &set.input_filter, 0, 1, 2);
+                sub->addSelector("Lock Time", &set.lock_time, lock_times);
+                sub->addSpinbox("Lock Window", &set.lock_window, 0, sp_max - sp_min);
             };
         };
         if(expert_mode)
         {
             auto sub = menu.addSubMenu("Setup");
-            sub->addSelector("Sensor", &set->sensor_type, sensor_types)->onChange(set_need_reboot);
-            sub->addSelector("Mode", &set->mode, pid_modes)->onChange(set_need_reboot);
-            sub->addSelector("Pin N (-)", &set->pin_n, hardware_ports)->onChange(set_need_reboot);
-            sub->addSelector("Pin P (+)", &set->pin_p, hardware_ports)->onChange(set_need_reboot);
-            sub->addSpinbox("Input Filter", &set->input_filter, 0, 1, 2);
-            sub->addSelector("Windowtime", &set->windowtime, window_loop_times)->onChange(set_need_reboot);    
-            sub->addSelector("Looptime", &set->looptime, pid_loop_times);
-            // sub->addCheckbox("Take-Back-Half", &set->fpid.takebackhalf);
+            sub->addSelector("Sensor", &set.sensor_type, sensor_types)->onChange(set_need_reboot);
+            sub->addSelector("Mode", &set.mode, pid_modes)->onChange(set_need_reboot);
+            sub->addSelector("Pin N (-)", &set.pin_n, hardware_ports)->onChange(set_need_reboot);
+            sub->addSelector("Pin P (+)", &set.pin_p, hardware_ports)->onChange(set_need_reboot);
+            sub->addSpinbox("Input Filter", &set.input_filter, 0, 1, 2);
+            sub->addSelector("Windowtime", &set.windowtime, window_loop_times)->onChange(set_need_reboot);    
+            sub->addSelector("Looptime", &set.looptime, pid_loop_times);
+            // sub->addCheckbox("Take-Back-Half", &set.fpid.takebackhalf);
         };
     };
 
