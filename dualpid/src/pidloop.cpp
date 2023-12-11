@@ -118,8 +118,6 @@ void PIDLoop::loop()
 
 void PIDLoop::do_sensor()
 {
-	_sensor_read = find_sensor_read(_settings.sensor_type);
-
     // Read sensor?
 	time_t now = millis();
 	if(_next_sensor > now)
