@@ -13,26 +13,41 @@ class PIDLoop: private NonCopyable
     public:
         typedef enum
         {
-            MODE_NONE,      // Unconfigured, Display sensor only
-            MODE_ZP,        // Zero/Positive: heater
+            OUTPUT_MODE_NONE,      // Unconfigured, Display sensor only
+            OUTPUT_MODE_ZP,        // Zero/Positive: heater
             // MODE_NZP,       // Negative/Zero/Positive: peltier off when in setpoint window
-            MODE_NP,        // Negative/Positive: peltier
-            MODE_NZ,        // Negative/Zero: cool only
+            OUTPUT_MODE_NP,        // Negative/Positive: peltier
+            OUTPUT_MODE_NZ,        // Negative/Zero: cool only
         } output_mode_t;
+
+        // typedef enum
+        // {
+        //     MODE_NONE,
+        //     MODE_SENSOR,
+        //     MODE_PID,
+        //     MODE_FIXED,
+        // } control_mode_t;
 
         typedef enum
         {
+            // Sensor
             STATUS_DISABLED,
+
+            // PID loop active
             STATUS_INACTIVE,
             STATUS_LOCKED,
             STATUS_UNLOCKED,
+
+            // Fixed output states
+            STATUS_FIXED_SET,
+
             STATUS_ERROR
         } status_t;
 
         typedef struct
         {
             bool active;
-            uint32_t mode;
+            uint32_t output_mode;
             uint32_t pin_n;
             uint32_t pin_p;
             uint32_t looptime;

@@ -50,11 +50,11 @@ SelectorField::item_t window_loop_times [] = {
 	};
 
 SelectorField::item_t pid_modes [] = {
-    {PIDLoop::MODE_NONE, "-", "Sensor"},
-    {PIDLoop::MODE_ZP,   "0+", "ZeroPos"},
+    {PIDLoop::OUTPUT_MODE_NONE, "-", "Sensor"},
+    {PIDLoop::OUTPUT_MODE_ZP,   "0+", "ZeroPos"},
     // {PIDLoop::MODE_NZP,  "-0+", "NegZeroPos"},
-    {PIDLoop::MODE_NP,   "-+", "NegPos"},
-    {PIDLoop::MODE_NZ,   "-0", "NegZero"},
+    {PIDLoop::OUTPUT_MODE_NP,   "-+", "NegPos"},
+    {PIDLoop::OUTPUT_MODE_NZ,   "-0", "NegZero"},
     {0, 0, 0}
 };
 
@@ -127,7 +127,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
                 break;
         };
 
-        if(set.mode != PIDLoop::MODE_NONE || expert_mode)
+        if(set.output_mode != PIDLoop::OUTPUT_MODE_NONE || expert_mode)
         {
             menu.addSeparator(name);
             menu.addSpinbox("Setpoint", &set.fpid.setpoint, sp_min, sp_max, sp_prec);
@@ -160,7 +160,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
             sub->addSelector("Looptime", &set.looptime, pid_loop_times);
             // sub->addCheckbox("Take-Back-Half", &set.fpid.takebackhalf);
             sub->addSeparator("Output");
-            sub->addSelector("Mode", &set.mode, pid_modes)->onChange(set_need_reboot);
+            sub->addSelector("Mode", &set.output_mode, pid_modes)->onChange(set_need_reboot);
             sub->addSelector("Pin N (-)", &set.pin_n, hardware_ports)->onChange(set_need_reboot);
             sub->addSelector("Pin P (+)", &set.pin_p, hardware_ports)->onChange(set_need_reboot);
             sub->addSelector("Windowtime", &set.windowtime, window_loop_times)->onChange(set_need_reboot);    

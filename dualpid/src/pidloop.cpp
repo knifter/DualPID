@@ -44,16 +44,16 @@ bool PIDLoop::begin()
 	    };
     };
 
-    switch(_settings.mode)
+    switch(_settings.output_mode)
     {
-        case MODE_NONE:
+        case OUTPUT_MODE_NONE:
             set_active(false);
         	_pid.setOutputLimits(0, 100);
             break;
-        case MODE_NP:
+        case OUTPUT_MODE_NP:
         	_pid.setOutputLimits(-100, 100);
             break;
-        case MODE_ZP:
+        case OUTPUT_MODE_ZP:
         	_pid.setOutputLimits(0, 100);
             break;
     };
@@ -67,14 +67,14 @@ bool PIDLoop::begin()
 
 void PIDLoop::reset_output()
 {
-    switch(_settings.mode)
+    switch(_settings.output_mode)
     {
-        case MODE_NONE:
+        case OUTPUT_MODE_NONE:
             break;
-        case MODE_NP:
+        case OUTPUT_MODE_NP:
         	_output_value = _settings.windowtime / 2;
             break;
-        case MODE_ZP:
+        case OUTPUT_MODE_ZP:
 	        _output_value = 0;
             break;
     };
@@ -84,7 +84,7 @@ void PIDLoop::set_active(bool active)
 {
     DBG("set_active(%s)", active ? "true":"false");
 
-    if(_settings.mode == MODE_NONE)
+    if(_settings.output_mode == OUTPUT_MODE_NONE)
     {
         WARNING("No pid output mode set: pid remains in-active.");
         active = false;
@@ -142,7 +142,7 @@ void PIDLoop::do_sensor()
 void PIDLoop::do_pid()
 {
     // If not configured as PID, nothing further to do
-    if(_settings.mode == MODE_NONE)
+    if(_settings.output_mode == OUTPUT_MODE_NONE)
     {
         _status = STATUS_DISABLED;
         return;
@@ -226,15 +226,15 @@ void PIDLoop::do_output()
     uint8_t N = LOW;
     uint8_t P = LOW;
     uint32_t output_time = _output_value * _settings.windowtime / 100;
-    switch(_settings.mode)
+    switch(_settings.output_mode)
     {
-        case MODE_NONE:
+        case OUTPUT_MODE_NONE:
             break;
-        case MODE_NZ:   // Negative-Zero
+        case OUTPUT_MODE_NZ:   // Negative-Zero
             if (output_time <= (now - _windowstarttime))
                 N = HIGH;
             break;
-        case MODE_NP:   // Negative or Positive
+        case OUTPUT_MODE_NP:   // Negative or Positive
             if (output_time >= (now - _windowstarttime))
                 P = HIGH;
             else
@@ -242,7 +242,7 @@ void PIDLoop::do_output()
             break;
         // case MODE_NZP:
         //     break;
-        case MODE_ZP:
+        case OUTPUT_MODE_ZP:
             if (output_time >= (now - _windowstarttime))
                 P = HIGH;
             break;

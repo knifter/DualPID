@@ -54,7 +54,7 @@
 #define PID1_DEFAULT_P  		    1.0
 #define PID1_DEFAULT_I  		    0.0
 #define PID1_DEFAULT_D  		    0.0
-#define PID1_DEFAULT_MODE           PIDLoop::MODE_NONE
+#define PID1_DEFAULT_MODE           PIDLoop::OUTPUT_MODE_NONE
 #define PID1_DEFAULT_SETPOINT	    20.0
 #define PID1_DEFAULT_OFILTER        0.0             // PID Output filter, 0 = no filter
 #define PID1_DEFAULT_DFILTER        0.0             // PID D-Term filter
@@ -71,7 +71,7 @@
 #define PID2_DEFAULT_P  		    1.0
 #define PID2_DEFAULT_I  		    0.0
 #define PID2_DEFAULT_D  		    0.0
-#define PID2_DEFAULT_MODE           PIDLoop::MODE_NONE
+#define PID2_DEFAULT_MODE           PIDLoop::OUTPUT_MODE_NONE
 #define PID2_DEFAULT_SETPOINT	    50.0
 #define PID2_DEFAULT_OFILTER        0.0             // PID Output filter, 0 = no filter
 #define PID2_DEFAULT_DFILTER        0.0             // PID D-Term filter
