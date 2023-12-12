@@ -133,6 +133,10 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
             menu.addSpinbox("Setpoint", &set.fpid.setpoint, sp_min, sp_max, sp_prec);
             menu.addSwitch("Active", &set.active);
             auto sub = menu.addSubMenu("PID Settings");
+            if(expert_mode)
+                sub->addSeparator("Standard");
+            else
+                sub->addSeparator();
             sub->addSpinbox("kP", &set.fpid.kP, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
             sub->addSpinbox("kI", &set.fpid.kI, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
             sub->addSpinbox("kD", &set.fpid.kD, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
@@ -140,7 +144,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
             sub->addSpinbox("F-Offset", &set.fpid.kF_offset, sp_min, sp_max, sp_prec);
             if(expert_mode)
             {
-                sub = menu.addSubMenu("Advanced");
+                sub->addSeparator("Advanced");
                 sub->addSpinbox("D-Filter", &set.input_filter, 0, 1, 2);
                 sub->addSelector("Lock Time", &set.lock_time, lock_times);
                 sub->addSpinbox("Lock Window", &set.lock_window, 0, sp_max - sp_min);
@@ -149,14 +153,17 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
         if(expert_mode)
         {
             auto sub = menu.addSubMenu("Setup");
+            sub->addSeparator("Input");
             sub->addSelector("Sensor", &set.sensor_type, sensor_types)->onChange(set_need_reboot);
+            sub->addSpinbox("Input Filter", &set.input_filter, 0, 1, 2);
+            sub->addSeparator("PID");
+            sub->addSelector("Looptime", &set.looptime, pid_loop_times);
+            // sub->addCheckbox("Take-Back-Half", &set.fpid.takebackhalf);
+            sub->addSeparator("Output");
             sub->addSelector("Mode", &set.mode, pid_modes)->onChange(set_need_reboot);
             sub->addSelector("Pin N (-)", &set.pin_n, hardware_ports)->onChange(set_need_reboot);
             sub->addSelector("Pin P (+)", &set.pin_p, hardware_ports)->onChange(set_need_reboot);
-            sub->addSpinbox("Input Filter", &set.input_filter, 0, 1, 2);
             sub->addSelector("Windowtime", &set.windowtime, window_loop_times)->onChange(set_need_reboot);    
-            sub->addSelector("Looptime", &set.looptime, pid_loop_times);
-            // sub->addCheckbox("Take-Back-Half", &set.fpid.takebackhalf);
         };
     };
 

@@ -23,6 +23,7 @@
         "system_error": "cpp",
         "thread": "cpp",
         "functional": "cpp",
-        "tuple": "cpp"
+        "tuple": "cpp",
+        "typeinfo": "cpp"
     }
 }
