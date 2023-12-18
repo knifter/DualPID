@@ -52,6 +52,7 @@ class PIDLoop: private NonCopyable
             uint32_t pin_p;
             uint32_t looptime;
             uint32_t windowtime;
+            double min_output;
             double max_output;
             FPID::fpid_settings_t fpid;
             double lock_window;
