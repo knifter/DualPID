@@ -22,10 +22,10 @@ class PidPanel
 
 		PidPanel(lv_obj_t* parent, const uint8_t num, PIDLoop& pid_in);
 
+        int num;
 		PIDLoop& pid;
 		lv_obj_t	*box, *lbl_sp, *lbl_value, *bar_output;
 		lv_style_t 	style_font26;
-        int num;
         const char *unit;
         uint8_t prec;
 		lv_style_t style_indic;
