@@ -10,6 +10,35 @@
 #include "tools-log.h"
 #include "sensors.h"
 
+const char* control_mode2str(PIDLoop::control_mode_t mode)
+{
+    switch(mode)
+    {
+        case PIDLoop::CONTROL_MODE_NONE:    return "(none)";
+        // case PIDLoop::CONTROL_MODE_OFF:     return "CHANNEL_OFF";
+        case PIDLoop::CONTROL_MODE_SENSOR:  return "SENSOR";
+        case PIDLoop::CONTROL_MODE_INACTIVE:return "INACTIVE";
+        case PIDLoop::CONTROL_MODE_PID:     return "PID";
+        case PIDLoop::CONTROL_MODE_FIXED:   return "FIXED";
+    };
+    return "(unknown)";
+};
+
+const char* status2str(PIDLoop::status_t status)
+{
+    switch(status)
+    {
+        case PIDLoop::STATUS_NONE:          return "(none)";
+        case PIDLoop::STATUS_SENSOR:        return "SENSOR";
+        case PIDLoop::STATUS_INACTIVE:      return "OFF";
+        case PIDLoop::STATUS_LOCKED:        return "LOCKED";
+        case PIDLoop::STATUS_UNLOCKED:      return "UNLOCKED";
+        case PIDLoop::STATUS_SATURATED:     return "SATURATED";
+        case PIDLoop::STATUS_FIXED:         return "FIXED";
+    };
+    return "(unknown)";
+};
+
 PIDLoop::PIDLoop(settings_t& s) :
     _pid(&(s.fpid), (&_input_value), (&_output_value)),
     _settings(s)
@@ -28,9 +57,10 @@ bool PIDLoop::begin()
 	digitalWrite(_pin_p, LOW);
 
 	_windowstarttime = millis();
-    _status = STATUS_DISABLED;
    	_input_value = NAN;
     _output_value = NAN;
+    _mode = CONTROL_MODE_NONE;
+    _status = STATUS_NONE;
 
 	_sensor_begin = find_sensor_begin(_settings.sensor_type);
 	_sensor_read = find_sensor_read(_settings.sensor_type);
@@ -47,70 +77,124 @@ bool PIDLoop::begin()
     switch(_settings.output_mode)
     {
         case OUTPUT_MODE_NONE:
-            set_active(false);
-        	_pid.setOutputLimits(0, 100);
+        	_pid.setOutputLimits(0, 0);
             break;
         case OUTPUT_MODE_NP:
-        	_pid.setOutputLimits(-100, 100);
+        	_pid.setOutputLimits(-1*_settings.max_output, _settings.max_output);
+        	_output_value = _settings.windowtime / 2;
+            _pid.alignOutput();
             break;
         case OUTPUT_MODE_ZP:
-        	_pid.setOutputLimits(0, 100);
+        	_pid.setOutputLimits(_settings.min_output, _settings.max_output);
+	        _output_value = 0;
+            _pid.alignOutput();
             break;
     };
 
-    reset_output();
-
-    set_active(_settings.active);
+    // configure initial mode (depends on input/output available)
+    control_mode_t initmode = CONTROL_MODE_NONE;
+    if(_sensor_read != nullptr)
+    {
+        initmode = CONTROL_MODE_SENSOR;
+        if(_settings.output_mode != OUTPUT_MODE_NONE)
+            initmode = CONTROL_MODE_INACTIVE;
+    };
+    DBG("Init with mode %s", control_mode2str(initmode));
+    set_mode(initmode);
 
 	return true;
 };
 
-void PIDLoop::reset_output()
+void PIDLoop::sync_mode()
 {
-    switch(_settings.output_mode)
+    // _settings might change due to menu options, they will be synced with the PIDLoop here
+
+    // Follow _settings when it changes.
+    switch(_mode)
     {
-        case OUTPUT_MODE_NONE:
+        case CONTROL_MODE_NONE:
+        case CONTROL_MODE_SENSOR:
+            if(_settings.active)
+            {
+                WARNING("Setting sensor-only channel to inactive. Should not be active.");
+                _settings.active = false;
+            };
             break;
-        case OUTPUT_MODE_NP:
-        	_output_value = _settings.windowtime / 2;
+        case CONTROL_MODE_INACTIVE:
+            if(_settings.active)
+            {
+                DBG("Activating PID because of setting change.");
+                set_mode(CONTROL_MODE_PID);
+            };
             break;
-        case OUTPUT_MODE_ZP:
-	        _output_value = 0;
+        case CONTROL_MODE_PID:
+            if(!_settings.active)
+            {
+                DBG("De-activating PID because of setting change.");
+                set_mode(CONTROL_MODE_INACTIVE);
+            };
+            break;
+        case CONTROL_MODE_FIXED:
+            if(_settings.active)
+            {
+                _settings.active = false;
+                set_mode(CONTROL_MODE_INACTIVE);
+            };
             break;
     };
 };
 
-void PIDLoop::set_active(bool active)
+void PIDLoop::set_mode(control_mode_t newmode)
 {
-    DBG("set_active(%s)", active ? "true":"false");
+    DBG("set_mode(%s -> %s)", control_mode2str(_mode), control_mode2str(newmode));
 
-    if(_settings.output_mode == OUTPUT_MODE_NONE)
+    if(newmode == _mode)
     {
-        WARNING("No pid output mode set: pid remains in-active.");
-        active = false;
-        _status = STATUS_DISABLED;
+        DBG("Mode is already %s, skip.", control_mode2str(newmode));
+        return;
     };
 
-    if(active)
+    switch(newmode)
     {
-        _pid.alignOutput();
-        reset_output();
+        case CONTROL_MODE_SENSOR:
+            _status = STATUS_SENSOR;
 
-        _status = STATUS_UNLOCKED;
-    } else {
-        if(_pin_n)
-            digitalWrite(_pin_n, LOW);
-        if(_pin_p)
-            digitalWrite(_pin_p, LOW);
+            _mode = CONTROL_MODE_SENSOR;
+            break;
+        case CONTROL_MODE_NONE:
+        case CONTROL_MODE_INACTIVE:
+            output_off();
 
-        _status = STATUS_INACTIVE;
+            _mode = CONTROL_MODE_INACTIVE;
+            break;
+        case CONTROL_MODE_PID:
+            if(_settings.output_mode == OUTPUT_MODE_NONE)
+            {
+                WARNING("No pid output mode set: pid remains in-active.");
+                _mode = CONTROL_MODE_INACTIVE;
+                _status = STATUS_INACTIVE;
+                break;
+            };
+
+            // align FPID internals with current _output_value
+            _pid.alignOutput();
+            _status = STATUS_UNLOCKED;
+
+            _mode = CONTROL_MODE_PID;
+            break;
+        case CONTROL_MODE_FIXED:
+            _output_value = 0;
+            _status = STATUS_FIXED;
+
+            _mode = CONTROL_MODE_FIXED;
+            break;
     };
-    _settings.active = active;
-    _active_last = active;
+    
 };
 
 void PIDLoop::loop()
 {
+    sync_mode();
     do_sensor();
     do_pid();
     do_output();
@@ -132,6 +216,8 @@ void PIDLoop::do_sensor()
     };
 
     double read = _sensor_read();
+
+    // reset filter if previous was NaN
     if(isnan(_input_value))
         _input_value = read;
 
@@ -141,21 +227,8 @@ void PIDLoop::do_sensor()
 
 void PIDLoop::do_pid()
 {
-    // If not configured as PID, nothing further to do
-    if(_settings.output_mode == OUTPUT_MODE_NONE)
-    {
-        _status = STATUS_DISABLED;
-        return;
-    };
-
-    // Follow _settings when it changes.
-    if(_active_last != _settings.active)
-    {
-        set_active(_settings.active);
-    };
-
     // If not active, don't run
-    if(!_settings.active)
+    if(_mode != CONTROL_MODE_PID)
     {
         // DBG("PID: Input = %.2f, In-Active, Output = %.2f", _input_ref, _output);
         _status = STATUS_INACTIVE;
@@ -178,7 +251,7 @@ void PIDLoop::do_pid()
     // If saturated, we're in error
     if(!res)
     {
-        _status = STATUS_ERROR;
+        _status = STATUS_SATURATED;
         _unlocked_last = now;
         return;
     };
@@ -202,16 +275,44 @@ void PIDLoop::do_pid()
     _status = STATUS_LOCKED;
 };
 
+bool PIDLoop::set_output_value(double value)
+{
+    if(_mode != CONTROL_MODE_FIXED)
+    {
+        ERROR("Wrong control mode to manually set_output.");
+        return false;
+    };
+    if(value > _settings.max_output)
+    {
+        ERROR("set_output value > max_output.");
+        return false;
+    };
+    if(value < _settings.min_output)
+    {
+        ERROR("set_output value < min_output.");
+        return false;
+    };
+
+    _output_value = value;
+    _status = STATUS_FIXED;
+    return true;
+};
+
+void PIDLoop::output_off()
+{
+    _output_value = NAN;
+    if(_pin_n)
+        digitalWrite(_pin_n, LOW);
+    if(_pin_p)
+        digitalWrite(_pin_p, LOW);
+};
+
 void PIDLoop::do_output()
 {
     // turn of output if PID loop had an error
     if(isnan(_output_value))
     {
-        // TODO: Set in-active - depending on mode what that is
-        if(_pin_n)
-            digitalWrite(_pin_n, LOW);
-        if(_pin_p)
-            digitalWrite(_pin_p, LOW);
+        output_off();
         return;
     };
 

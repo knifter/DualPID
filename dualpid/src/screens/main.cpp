@@ -117,8 +117,8 @@ PidPanel::PidPanel(lv_obj_t* parent, const uint8_t num_in, PIDLoop& pid_in)
 	};
 
     // Set all state properties, but to trigger we need to set status to something we're not
-    current_status = PIDLoop::STATUS_ERROR;
-    setState(PIDLoop::STATUS_DISABLED);
+    current_status = PIDLoop::STATUS_NONE;
+    setState(PIDLoop::STATUS_INACTIVE);
     // current_status => disabled
 }; // PidPanel()
 
@@ -132,7 +132,8 @@ const void PidPanel::setState(PIDLoop::status_t status)
     // Setpoint label
     switch(status)
 	{
-		case PIDLoop::STATUS_DISABLED:
+		case PIDLoop::STATUS_NONE:		break;
+		case PIDLoop::STATUS_SENSOR:
 			// lv_obj_set_style_bg_color(lbl_sp, COLOR_LIGHT_BLUE, 0);
             lv_obj_set_style_text_color(lbl_sp, COLOR_GREY_DARK(1), 0);
 			break;
@@ -148,16 +149,20 @@ const void PidPanel::setState(PIDLoop::status_t status)
 			// lv_obj_set_style_bg_color(lbl_sp, COLOR_GREEN_LIGHT(2), 0);
             lv_obj_set_style_text_color(lbl_sp, COLOR_BLACK, 0);
             break;
-		case PIDLoop::STATUS_ERROR:
+		case PIDLoop::STATUS_SATURATED:
 			// lv_obj_set_style_bg_color(lbl_sp, COLOR_RED_LIGHT(2), 0);
             lv_obj_set_style_text_color(lbl_sp, COLOR_BLACK, 0);
             break;
+		case PIDLoop::STATUS_FIXED:
+			lv_obj_set_style_text_color(lbl_sp, COLOR_PURPLE, 0);
+			break;
     };
 
     // Value label, Background
     switch(status)
 	{
-		case PIDLoop::STATUS_DISABLED:
+		case PIDLoop::STATUS_NONE:		break;
+		case PIDLoop::STATUS_SENSOR:
 			lv_obj_set_style_bg_color(lbl_value, COLOR_WHITE, 0); 
 		    lv_obj_set_style_bg_color(box, COLOR_WHITE, 0);
             break;
@@ -173,16 +178,21 @@ const void PidPanel::setState(PIDLoop::status_t status)
 			lv_obj_set_style_bg_color(lbl_value, COLOR_ORANGE, 0);
 		    lv_obj_set_style_bg_color(box, COLOR_ORANGE_LIGHT(2), 0);
             break;
-		case PIDLoop::STATUS_ERROR:
+		case PIDLoop::STATUS_SATURATED:
 			lv_obj_set_style_bg_color(lbl_value, COLOR_RED, 0);
 		    lv_obj_set_style_bg_color(box, COLOR_RED, 0);
             break;
+		case PIDLoop::STATUS_FIXED:
+			lv_obj_set_style_bg_color(lbl_value, COLOR_WHITE, 0); 
+		    lv_obj_set_style_bg_color(box, COLOR_WHITE, 0);
+			break;
     };
 
     // Output bar
     switch(status)
     {
-        case PIDLoop::STATUS_DISABLED:
+		case PIDLoop::STATUS_NONE:		break;
+        case PIDLoop::STATUS_SENSOR:
             lv_obj_add_flag(bar_output, LV_OBJ_FLAG_HIDDEN);
             break;
         case PIDLoop::STATUS_INACTIVE:
@@ -194,13 +204,20 @@ const void PidPanel::setState(PIDLoop::status_t status)
             break;
         case PIDLoop::STATUS_LOCKED:
 		case PIDLoop::STATUS_UNLOCKED:
-		case PIDLoop::STATUS_ERROR:
+		case PIDLoop::STATUS_SATURATED:
             lv_obj_clear_flag(bar_output, LV_OBJ_FLAG_HIDDEN);
 
 			lv_obj_set_style_bg_color(bar_output, COLOR_WHITE, 0);
             lv_style_set_bg_color(&style_indic, COLOR_BLUE);
             lv_style_set_bg_grad_color(&style_indic, COLOR_RED);
             break;
+		case PIDLoop::STATUS_FIXED:
+            lv_obj_clear_flag(bar_output, LV_OBJ_FLAG_HIDDEN);
+
+			lv_obj_set_style_bg_color(bar_output, COLOR_WHITE, 0);
+            lv_style_set_bg_color(&style_indic, COLOR_BLUE);
+            lv_style_set_bg_grad_color(&style_indic, COLOR_RED);
+			break;
     };
 
 };
@@ -208,9 +225,12 @@ const void PidPanel::setSetPoint(float sp)
 { 
     switch(current_status)
     {
-        case PIDLoop::STATUS_DISABLED:
-            lv_label_set_text(lbl_sp, "Sensor");
+        case PIDLoop::STATUS_SENSOR:
+            lv_label_set_text(lbl_sp, "-");
             return;
+		case PIDLoop::STATUS_FIXED:
+            lv_label_set_text_fmt(lbl_sp, "out = %0.0f%%", sp);
+			break;
         default:
             lv_label_set_text_fmt(lbl_sp, "sp = %0.*f %s", prec, sp, unit);
             return;
@@ -218,7 +238,12 @@ const void PidPanel::setSetPoint(float sp)
 };
 
 const void PidPanel::setValue(float v) { 	    lv_label_set_text_fmt(lbl_value, "%0.*f %s", prec, v, unit); };
-const void PidPanel::setBar(float p) {     	    lv_bar_set_value(bar_output, p, LV_ANIM_ON); };
+const void PidPanel::setBar(float p) 
+{     	    
+	if(isnan(p)) // FIXME: just a hack for now, but bar shows full ifnan
+		p = 0;
+	lv_bar_set_value(bar_output, p, LV_ANIM_ON); 
+};
 const void PidPanel::setSelected(bool select) {    lv_obj_set_style_border_color(box, select ? COLOR_BLACK : COLOR_WHITE, 0);};
 
 /*********************************************************************************************************************************/

@@ -15,33 +15,40 @@ class PIDLoop: private NonCopyable
         {
             OUTPUT_MODE_NONE,      // Unconfigured, Display sensor only
             OUTPUT_MODE_ZP,        // Zero/Positive: heater
-            // MODE_NZP,       // Negative/Zero/Positive: peltier off when in setpoint window
+            // MODE_NZP,            // Negative/Zero/Positive: peltier off when in setpoint window
             OUTPUT_MODE_NP,        // Negative/Positive: peltier
             OUTPUT_MODE_NZ,        // Negative/Zero: cool only
         } output_mode_t;
 
-        // typedef enum
-        // {
-        //     MODE_NONE,
-        //     MODE_SENSOR,
-        //     MODE_PID,
-        //     MODE_FIXED,
-        // } control_mode_t;
+        typedef enum
+        {
+            CONTROL_MODE_NONE,      // initial state
+            // CONTROL_MODE_OFF,       // Channel is completly off
+            CONTROL_MODE_SENSOR,    // sensor is polled, no output
+            CONTROL_MODE_INACTIVE,  // _output_value is set to approriate off-state
+            CONTROL_MODE_PID,       // _output_value controlled by PID output
+            CONTROL_MODE_FIXED,     // _output_value set to fixed value by user
+        } control_mode_t;
+        void set_mode(control_mode_t newmode);
 
         typedef enum
         {
-            // Sensor
-            STATUS_DISABLED,
+            // CONTROL_MODE_NONE
+            STATUS_NONE,
 
-            // PID loop active
-            STATUS_INACTIVE,
-            STATUS_LOCKED,
+            // CONTROL_MODE_SENSOR
+            STATUS_SENSOR,
+
+            // CONTROL_MODE_OFF
+            STATUS_INACTIVE,        // PID off
+            // CONTROL_MODE_PID
+            STATUS_LOCKED,      
             STATUS_UNLOCKED,
+            STATUS_SATURATED,       
 
-            // Fixed output states
-            STATUS_FIXED_SET,
+            // CONTROL_MODE_FIXED
+            STATUS_FIXED,       // Fixed value: set new value            
 
-            STATUS_ERROR
         } status_t;
 
         typedef struct
@@ -69,19 +76,22 @@ class PIDLoop: private NonCopyable
         // inspection
         double input_value() { return _input_value; };
         double output_value() { return _output_value; };
+        bool set_output_value(double value);
         status_t status() { return _status; };
         settings_t& pid_settings() { return _settings; };
         // int get_output_state() { return _output_state; };
 
     private: 
         // priv functions
-        void set_active(bool);
-        // bool active() { return _settings->active; };
-        void reset_output();
+        void output_off();  // set output in a safe off-state: no heat, no cool
 
+        // Internal loop steps
+        void sync_mode();
         void do_sensor();
         void do_pid();
         void do_output();
+
+        control_mode_t _mode = CONTROL_MODE_NONE;
 
         // SENSOR
         time_t _next_sensor = 0;
@@ -93,7 +103,7 @@ class PIDLoop: private NonCopyable
         double _input_value;
         double _output_value;
         time_t _next_pid;
-        settings_t &_settings;
+        settings_t& _settings;
 
         // OUTPUT
         // const double &_input_ref;
