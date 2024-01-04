@@ -4,7 +4,7 @@
 const char*     Temperature_Name                        = "Temperature";
 const char*     Temperature_Unit_Text                   = "\xc2\xb0""C";
 const double    Temperature_Setpoint_Min                = -20;
-const double    Temperature_Setpoint_Max                = -60;
+const double    Temperature_Setpoint_Max                = 60;
 const int       Temperature_Precision                   = 2;
 const lv_color_t Temperature_Color                      = COLOR_RED;
 
