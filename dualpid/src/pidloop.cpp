@@ -77,16 +77,26 @@ bool PIDLoop::begin()
     switch(_settings.output_mode)
     {
         case OUTPUT_MODE_NONE:
+            DBG("No output mode configured.");
         	_pid.setOutputLimits(0, 0);
-            break;
-        case OUTPUT_MODE_NP:
-        	_pid.setOutputLimits(-1*_settings.max_output, _settings.max_output);
-        	_output_value = _settings.windowtime / 2;
-            _pid.alignOutput();
+            _output_value = 0;
             break;
         case OUTPUT_MODE_ZP:
         	_pid.setOutputLimits(_settings.min_output, _settings.max_output);
-	        _output_value = 0;
+            DBG("Output mode: ZP, min:%.0f%% max:%.0f%%", _settings.min_output, _settings.max_output);
+        	_output_value = 50; // 50%
+            _pid.alignOutput();
+            break;
+        case OUTPUT_MODE_NP:
+            DBG("Output mode: NP");
+        	_pid.setOutputLimits(-1*_settings.max_output, _settings.max_output);
+        	_output_value = 0; // 0%
+            _pid.alignOutput();
+            break;
+        case OUTPUT_MODE_NZ:
+            DBG("Output mode: NZ");
+        	_pid.setOutputLimits(-1*_settings.max_output, -1*_settings.min_output);
+	        _output_value = -50;
             _pid.alignOutput();
             break;
     };
@@ -99,8 +109,9 @@ bool PIDLoop::begin()
         if(_settings.output_mode != OUTPUT_MODE_NONE)
             initmode = CONTROL_MODE_INACTIVE;
     };
-    DBG("Init with mode %s", control_mode2str(initmode));
+    DBG("Init with mode %s, output = %.0f%%", control_mode2str(initmode), _output_value);
     set_mode(initmode);
+    // sync_mode will set it active when _settings have stored so
 
 	return true;
 };
@@ -245,8 +256,8 @@ void PIDLoop::do_pid()
     // Run the inner pidloop
     bool res = _pid.calculate();
 
-    // DBG("%u: PID = %s: Input = %.2f, Setpoint = %.2f, Output = %.2f", 
-    //     now, res?"ok":"err", _input_ref, _settings.fpid.setpoint, _output);
+    DBG("%lu: PID = %s: Input = %.2f, Setpoint = %.2f, Output = %.2f", 
+        now, res?"ok":"sat", _input_value, _settings.fpid.setpoint, _output_value);
 
     // If saturated, we're in error
     if(!res)
