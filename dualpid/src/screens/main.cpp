@@ -198,25 +198,25 @@ const void PidPanel::setState(PIDLoop::status_t status)
         case PIDLoop::STATUS_INACTIVE:
             lv_obj_clear_flag(bar_output, LV_OBJ_FLAG_HIDDEN);
 
-			lv_obj_set_style_bg_color(bar_output, COLOR_GREY, 0);
-   			lv_style_set_bg_color(&style_indic, COLOR_GREY);
-			lv_style_set_bg_grad_color(&style_indic, COLOR_GREY);
+			// lv_obj_set_style_bg_color(bar_output, COLOR_WHITE, 0);
+   			lv_style_set_bg_color(&style_indic, COLOR_GREY_LIGHT(3));
+			lv_style_set_bg_grad_color(&style_indic, COLOR_GREY_LIGHT(3));
             break;
         case PIDLoop::STATUS_LOCKED:
 		case PIDLoop::STATUS_UNLOCKED:
 		case PIDLoop::STATUS_SATURATED:
             lv_obj_clear_flag(bar_output, LV_OBJ_FLAG_HIDDEN);
 
-			lv_obj_set_style_bg_color(bar_output, COLOR_WHITE, 0);
+			// lv_obj_set_style_bg_color(bar_output, COLOR_WHITE, 0);
             lv_style_set_bg_color(&style_indic, COLOR_BLUE);
             lv_style_set_bg_grad_color(&style_indic, COLOR_RED);
             break;
 		case PIDLoop::STATUS_FIXED:
             lv_obj_clear_flag(bar_output, LV_OBJ_FLAG_HIDDEN);
 
-			lv_obj_set_style_bg_color(bar_output, COLOR_WHITE, 0);
-            lv_style_set_bg_color(&style_indic, COLOR_BLUE);
-            lv_style_set_bg_grad_color(&style_indic, COLOR_RED);
+			// lv_obj_set_style_bg_color(bar_output, COLOR_WHITE, 0);
+            lv_style_set_bg_color(&style_indic, COLOR_PURPLE);
+            lv_style_set_bg_grad_color(&style_indic, COLOR_PURPLE);
 			break;
     };
 
