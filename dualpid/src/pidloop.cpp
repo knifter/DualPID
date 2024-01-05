@@ -326,7 +326,6 @@ bool PIDLoop::set_output_value(double value)
 
 void PIDLoop::output_off()
 {
-    _output_value = NAN;
     if(_pin_n)
         digitalWrite(_pin_n, LOW);
     if(_pin_p)
