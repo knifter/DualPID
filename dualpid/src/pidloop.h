@@ -66,6 +66,7 @@ class PIDLoop: private NonCopyable
             uint32_t lock_time;
             double input_filter;
             uint32_t sensor_type;
+            uint32_t fixed_output_value;
         } settings_t;
 
         PIDLoop(settings_t& s);

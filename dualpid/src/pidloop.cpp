@@ -61,6 +61,11 @@ bool PIDLoop::begin()
     _output_value = NAN;
     _mode = CONTROL_MODE_NONE;
     _status = STATUS_NONE;
+    if(!expert_mode)
+    {
+        // Reset fixed output if not in export_mode anymore
+        _settings.fixed_output_value = 0;
+    };
 
 	_sensor_begin = find_sensor_begin(_settings.sensor_type);
 	_sensor_read = find_sensor_read(_settings.sensor_type);
@@ -134,6 +139,13 @@ void PIDLoop::sync_mode()
         case CONTROL_MODE_INACTIVE:
             if(_settings.active)
             {
+                if(expert_mode && _settings.fixed_output_value > 0)
+                {
+                    DBG("Activating Fixed-Output.");
+                    set_mode(CONTROL_MODE_FIXED);
+                    set_output_value(_settings.fixed_output_value);
+                    break;
+                };
                 DBG("Activating PID because of setting change.");
                 set_mode(CONTROL_MODE_PID);
             };
@@ -146,9 +158,8 @@ void PIDLoop::sync_mode()
             };
             break;
         case CONTROL_MODE_FIXED:
-            if(_settings.active)
+            if(!_settings.active)
             {
-                _settings.active = false;
                 set_mode(CONTROL_MODE_INACTIVE);
             };
             break;
@@ -194,7 +205,6 @@ void PIDLoop::set_mode(control_mode_t newmode)
             _mode = CONTROL_MODE_PID;
             break;
         case CONTROL_MODE_FIXED:
-            _output_value = 0;
             _status = STATUS_FIXED;
 
             _mode = CONTROL_MODE_FIXED;
@@ -288,11 +298,17 @@ void PIDLoop::do_pid()
 
 bool PIDLoop::set_output_value(double value)
 {
-    if(_mode != CONTROL_MODE_FIXED)
+    // Do not touch output if PID is in control (or if we don't have an output..)
+    switch(_mode)
     {
-        ERROR("Wrong control mode to manually set_output.");
-        return false;
+        case CONTROL_MODE_INACTIVE:
+        case CONTROL_MODE_FIXED:
+            break;
+        default:
+            WARNING("Can't set output when PID Running, ignored.");
+            return false;
     };
+
     if(value > _settings.max_output)
     {
         ERROR("set_output value > max_output.");
@@ -322,6 +338,13 @@ void PIDLoop::do_output()
 {
     // turn of output if PID loop had an error
     if(isnan(_output_value))
+    {
+        output_off();
+        return;
+    };
+
+    // Output is only enabled when PID is ruuning or when Fixed Output is set (in expert_mode)
+    if(_mode != CONTROL_MODE_PID && _mode != CONTROL_MODE_FIXED)
     {
         output_off();
         return;

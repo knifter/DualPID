@@ -49,7 +49,19 @@ SelectorField::item_t window_loop_times [] = {
 	{0, 0, 0}
 	};
 
-SelectorField::item_t pid_modes [] = {
+SelectorField::item_t pid_fixed_values [] = {
+    {0, "-", "Off/PID"},
+    // {0, "0", "0%"},
+    {10, "10", "10%"},
+    {30, "30", "30%"},
+    {50, "50", "50%"},
+    {70, "70", "70%"},
+    {90, "90", "90%"},
+    {100, "max", "100%"},
+    {0, 0, 0}
+};
+
+SelectorField::item_t pid_output_modes [] = {
     {PIDLoop::OUTPUT_MODE_NONE, "-", "Sensor"},
     {PIDLoop::OUTPUT_MODE_ZP,   "0+", "ZeroPos"},
     // {PIDLoop::MODE_NZP,  "-0+", "NegZeroPos"},
@@ -95,7 +107,8 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
     int ch = -1;
     while(++ch < NUMBER_OF_CHANNELS)
     {
-        PIDLoop::settings_t& set = pids[ch]->pid_settings();
+        PIDLoop* pidloop = pids[ch];
+        PIDLoop::settings_t& set = pidloop->pid_settings();
         const char* name;
         float sp_min, sp_max, sp_prec;
         switch(set.sensor_type)
@@ -132,6 +145,10 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
             menu.addSeparator(name);
             menu.addSpinbox("Setpoint", &set.fpid.setpoint, sp_min, sp_max, sp_prec);
             menu.addSwitch("Active", &set.active);
+            if(expert_mode)
+            {
+                menu.addSelector("Fixed Output", &set.fixed_output_value, pid_fixed_values);
+            };
             auto sub = menu.addSubMenu("PID Settings");
             if(expert_mode)
                 sub->addSeparator("Standard");
@@ -160,7 +177,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
             sub->addSelector("Looptime", &set.looptime, pid_loop_times);
             // sub->addCheckbox("Take-Back-Half", &set.fpid.takebackhalf);
             sub->addSeparator("Output");
-            sub->addSelector("Mode", &set.output_mode, pid_modes)->onChange(set_need_reboot);
+            sub->addSelector("Mode", &set.output_mode, pid_output_modes)->onChange(set_need_reboot);
             sub->addSelector("Pin N (-)", &set.pin_n, hardware_ports)->onChange(set_need_reboot);
             sub->addSelector("Pin P (+)", &set.pin_p, hardware_ports)->onChange(set_need_reboot);
             sub->addSelector("Windowtime", &set.windowtime, window_loop_times)->onChange(set_need_reboot);    
