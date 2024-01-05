@@ -164,27 +164,33 @@ const void PidPanel::setState(PIDLoop::status_t status)
 		case PIDLoop::STATUS_NONE:		break;
 		case PIDLoop::STATUS_SENSOR:
 			lv_obj_set_style_bg_color(lbl_value, COLOR_WHITE, 0); 
+		    lv_obj_set_style_border_color(box, COLOR_WHITE, 0);
 		    lv_obj_set_style_bg_color(box, COLOR_WHITE, 0);
             break;
 		case PIDLoop::STATUS_INACTIVE:
 			lv_obj_set_style_bg_color(lbl_value, COLOR_GREY_LIGHT(2), 0);
+		    lv_obj_set_style_border_color(box, COLOR_WHITE, 0);
 		    lv_obj_set_style_bg_color(box, COLOR_WHITE, 0);
             break;
 		case PIDLoop::STATUS_LOCKED:
 			lv_obj_set_style_bg_color(lbl_value, COLOR_GREEN_LIGHT(2), 0);
+		    lv_obj_set_style_border_color(box, COLOR_GREEN_LIGHT(2), 0);
 		    lv_obj_set_style_bg_color(box, COLOR_GREEN_LIGHT(2), 0);
 			break;
 		case PIDLoop::STATUS_UNLOCKED:
 			lv_obj_set_style_bg_color(lbl_value, COLOR_ORANGE, 0);
+		    lv_obj_set_style_border_color(box, COLOR_ORANGE_LIGHT(2), 0);
 		    lv_obj_set_style_bg_color(box, COLOR_ORANGE_LIGHT(2), 0);
             break;
 		case PIDLoop::STATUS_SATURATED:
 			lv_obj_set_style_bg_color(lbl_value, COLOR_RED, 0);
+		    lv_obj_set_style_border_color(box, COLOR_RED, 0);
 		    lv_obj_set_style_bg_color(box, COLOR_RED, 0);
             break;
 		case PIDLoop::STATUS_FIXED:
-			lv_obj_set_style_bg_color(lbl_value, COLOR_WHITE, 0); 
-		    lv_obj_set_style_bg_color(box, COLOR_WHITE, 0);
+			lv_obj_set_style_bg_color(lbl_value, COLOR_PURPLE_LIGHT(2), 0); 
+		    lv_obj_set_style_border_color(box, COLOR_PURPLE_LIGHT(2), 0);
+		    lv_obj_set_style_bg_color(box, COLOR_PURPLE_LIGHT(2), 0);
 			break;
     };
 
@@ -199,8 +205,8 @@ const void PidPanel::setState(PIDLoop::status_t status)
             lv_obj_clear_flag(bar_output, LV_OBJ_FLAG_HIDDEN);
 
 			// lv_obj_set_style_bg_color(bar_output, COLOR_WHITE, 0);
-   			lv_style_set_bg_color(&style_indic, COLOR_GREY_LIGHT(3));
-			lv_style_set_bg_grad_color(&style_indic, COLOR_GREY_LIGHT(3));
+   			lv_style_set_bg_color(&style_indic, COLOR_GREY_LIGHT(1));
+			lv_style_set_bg_grad_color(&style_indic, COLOR_GREY_LIGHT(1));
             break;
         case PIDLoop::STATUS_LOCKED:
 		case PIDLoop::STATUS_UNLOCKED:
