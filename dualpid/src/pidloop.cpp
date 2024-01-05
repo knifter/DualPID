@@ -180,13 +180,13 @@ void PIDLoop::set_mode(control_mode_t newmode)
     {
         case CONTROL_MODE_SENSOR:
             _status = STATUS_SENSOR;
-
             _mode = CONTROL_MODE_SENSOR;
             break;
         case CONTROL_MODE_NONE:
         case CONTROL_MODE_INACTIVE:
             output_off();
 
+            _status = STATUS_INACTIVE;
             _mode = CONTROL_MODE_INACTIVE;
             break;
         case CONTROL_MODE_PID:
@@ -200,13 +200,13 @@ void PIDLoop::set_mode(control_mode_t newmode)
 
             // align FPID internals with current _output_value
             _pid.alignOutput();
-            _status = STATUS_UNLOCKED;
 
+            _status = STATUS_UNLOCKED;
             _mode = CONTROL_MODE_PID;
             break;
         case CONTROL_MODE_FIXED:
+        
             _status = STATUS_FIXED;
-
             _mode = CONTROL_MODE_FIXED;
             break;
     };
@@ -252,7 +252,6 @@ void PIDLoop::do_pid()
     if(_mode != CONTROL_MODE_PID)
     {
         // DBG("PID: Input = %.2f, In-Active, Output = %.2f", _input_ref, _output);
-        _status = STATUS_INACTIVE;
         return;
     };
 

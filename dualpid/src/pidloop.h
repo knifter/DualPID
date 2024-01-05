@@ -47,8 +47,7 @@ class PIDLoop: private NonCopyable
             STATUS_SATURATED,       
 
             // CONTROL_MODE_FIXED
-            STATUS_FIXED,       // Fixed value: set new value            
-
+            STATUS_FIXED,       // Fixed value: set new value
         } status_t;
 
         typedef struct
