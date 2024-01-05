@@ -40,8 +40,7 @@ const char* status2str(PIDLoop::status_t status)
 };
 
 PIDLoop::PIDLoop(settings_t& s) :
-    _pid(&(s.fpid), (&_input_value), (&_output_value)),
-    _settings(s)
+    _settings(s), _pid(&(s.fpid), (&_input_value), (&_output_value))
 {
 };
 

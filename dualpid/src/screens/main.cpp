@@ -31,17 +31,15 @@ class PidPanel
 		lv_style_t style_indic;
         PIDLoop::status_t current_status;
 
+		const void update();
 		const void setSelected(bool);
-		const void setSetPoint(float sp);
-		const void setValue(float v);
-		const void setBar(float p);   
 		const void setState(PIDLoop::status_t s);
 };
 
 PidPanel::PidPanel(lv_obj_t* parent, const uint8_t num_in, PIDLoop& pid_in)
 	 : num(num_in), pid(pid_in)
 {
-	uint32_t st = pid.pid_settings().sensor_type;
+	uint32_t st = pid._settings.sensor_type;
     lv_color_t color1;
 	switch(st)
 	{
@@ -227,29 +225,35 @@ const void PidPanel::setState(PIDLoop::status_t status)
     };
 
 };
-const void PidPanel::setSetPoint(float sp) 
+const void PidPanel::update()
 { 
+	// panel status/color
+	setState(pid.status());
+
+	// top barbox
     switch(current_status)
     {
         case PIDLoop::STATUS_SENSOR:
             lv_label_set_text(lbl_sp, "-");
             return;
 		case PIDLoop::STATUS_FIXED:
-            lv_label_set_text_fmt(lbl_sp, "out = %0.0f%%", sp);
+            lv_label_set_text_fmt(lbl_sp, "out = %u%%", pid._settings.fixed_output_value);
 			break;
         default:
-            lv_label_set_text_fmt(lbl_sp, "sp = %0.*f %s", prec, sp, unit);
+            lv_label_set_text_fmt(lbl_sp, "sp = %0.*f %s", prec, pid._settings.fpid.setpoint, unit);
             return;
     };
-};
 
-const void PidPanel::setValue(float v) { 	    lv_label_set_text_fmt(lbl_value, "%0.*f %s", prec, v, unit); };
-const void PidPanel::setBar(float p) 
-{     	    
+	// input value/sensor
+	lv_label_set_text_fmt(lbl_value, "%0.*f %s", prec, pid.input_value(), unit);
+
+	// output bar
+	float p = pid.output_value();
 	if(isnan(p)) // FIXME: just a hack for now, but bar shows full ifnan
 		p = 0;
 	lv_bar_set_value(bar_output, p, LV_ANIM_ON); 
 };
+
 const void PidPanel::setSelected(bool select) {    lv_obj_set_style_border_color(box, select ? COLOR_BLACK : COLOR_WHITE, 0);};
 
 /*********************************************************************************************************************************/
@@ -296,8 +300,8 @@ GraphPanel::GraphPanel(lv_obj_t* parent)
     lv_chart_set_axis_tick(	chart,  LV_CHART_AXIS_PRIMARY_Y, 	1,         0,         3,         1,         true,     40);
     lv_chart_set_axis_tick(	chart,  LV_CHART_AXIS_SECONDARY_Y, 	1,         0,         3,         1,         true,     40);
 
-	color_ch1 = find_sensor_color(pids[0]->pid_settings().sensor_type);
-	color_ch2 = find_sensor_color(pids[1]->pid_settings().sensor_type);
+	color_ch1 = find_sensor_color(pids[0]->_settings.sensor_type);
+	color_ch2 = find_sensor_color(pids[1]->_settings.sensor_type);
 	color_ch1 = lv_color_darken(color_ch1, 4);
 	color_ch2 = lv_color_darken(color_ch2, 4);
 	
@@ -418,15 +422,8 @@ void MainScreen::loop()
 
 	_next_update = now + MAIN_LOOP_MS;
 
-	pw1->setSetPoint(settings.pid1.fpid.setpoint);
-	pw1->setValue(pids[0]->input_value());
-	pw1->setBar(pids[0]->output_value());
-    pw1->setState(pids[0]->status());
-
-	pw2->setSetPoint(settings.pid2.fpid.setpoint);
-	pw2->setValue(pids[1]->input_value());
-	pw2->setBar(pids[1]->output_value());
-    pw2->setState(pids[1]->status());
+	pw1->update();
+	pw2->update();
 
 	if(now < _next_chart)
 		return;

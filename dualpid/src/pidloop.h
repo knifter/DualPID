@@ -68,7 +68,7 @@ class PIDLoop: private NonCopyable
             uint32_t fixed_output_value;
         } settings_t;
 
-        PIDLoop(settings_t& s);
+        PIDLoop(PIDLoop::settings_t& s);
 
         bool begin();
         void loop();
@@ -78,8 +78,7 @@ class PIDLoop: private NonCopyable
         double output_value() { return _output_value; };
         bool set_output_value(double value);
         status_t status() { return _status; };
-        settings_t& pid_settings() { return _settings; };
-        // int get_output_state() { return _output_state; };
+        settings_t& _settings;
 
     private: 
         // priv functions
@@ -103,7 +102,6 @@ class PIDLoop: private NonCopyable
         double _input_value;
         double _output_value;
         time_t _next_pid;
-        settings_t& _settings;
 
         // OUTPUT
         // const double &_input_ref;

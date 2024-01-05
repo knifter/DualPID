@@ -102,13 +102,12 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 {
     menu.addCloseMenuButton();
     
-
     // Add menu for each active channel
     int ch = -1;
     while(++ch < NUMBER_OF_CHANNELS)
     {
         PIDLoop* pidloop = pids[ch];
-        PIDLoop::settings_t& set = pidloop->pid_settings();
+        PIDLoop::settings_t& set = pidloop->_settings;
         const char* name;
         float sp_min, sp_max, sp_prec;
         switch(set.sensor_type)
