@@ -130,7 +130,7 @@ const void PidPanel::setState(PIDLoop::status_t status)
     // Setpoint label
     switch(status)
 	{
-		case PIDLoop::STATUS_NONE:		break;
+		case PIDLoop::STATUS_NONE:
 		case PIDLoop::STATUS_SENSOR:
 			// lv_obj_set_style_bg_color(lbl_sp, COLOR_LIGHT_BLUE, 0);
             lv_obj_set_style_text_color(lbl_sp, COLOR_GREY_DARK(1), 0);
@@ -159,7 +159,7 @@ const void PidPanel::setState(PIDLoop::status_t status)
     // Value label, Background
     switch(status)
 	{
-		case PIDLoop::STATUS_NONE:		break;
+		case PIDLoop::STATUS_NONE:
 		case PIDLoop::STATUS_SENSOR:
 			lv_obj_set_style_bg_color(lbl_value, COLOR_WHITE, 0); 
 		    lv_obj_set_style_border_color(box, COLOR_WHITE, 0);
@@ -195,7 +195,7 @@ const void PidPanel::setState(PIDLoop::status_t status)
     // Output bar
     switch(status)
     {
-		case PIDLoop::STATUS_NONE:		break;
+		case PIDLoop::STATUS_NONE:
         case PIDLoop::STATUS_SENSOR:
             lv_obj_add_flag(bar_output, LV_OBJ_FLAG_HIDDEN);
             break;

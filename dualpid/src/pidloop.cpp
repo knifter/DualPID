@@ -39,8 +39,8 @@ const char* status2str(PIDLoop::status_t status)
     return "(unknown)";
 };
 
-PIDLoop::PIDLoop(settings_t& s) :
-    _settings(s), _pid(&(s.fpid), (&_input_value), (&_output_value))
+PIDLoop::PIDLoop(uint32_t id, settings_t& s) :
+    _settings(s), _pid(&(s.fpid), (&_input_value), (&_output_value)), _id(id)
 {
 };
 
@@ -247,13 +247,6 @@ void PIDLoop::do_sensor()
 
 void PIDLoop::do_pid()
 {
-    // If not active, don't run
-    if(_mode != CONTROL_MODE_PID)
-    {
-        // DBG("PID: Input = %.2f, In-Active, Output = %.2f", _input_ref, _output);
-        return;
-    };
-
     // See if its time to do another PID iteration
     // in in-active mode just update input value for display purposes
     time_t now = millis();
@@ -261,14 +254,22 @@ void PIDLoop::do_pid()
         return;
     _next_pid = now + _settings.looptime;
 
-    // Run the inner pidloop
-    bool res = _pid.calculate();
+    // If active: Run the inner pidloop
+    bool pidres = false;
+    if(_mode == CONTROL_MODE_PID)
+        pidres = _pid.calculate();
 
-    DBG("%lu: PID = %s: Input = %.2f, Setpoint = %.2f, Output = %.2f", 
-        now, res?"ok":"sat", _input_value, _settings.fpid.setpoint, _output_value);
+    // always print status
+    Serial.printf("ST%u:%lu, %1d, %.3f, %.3f, %.3f\n", _id, now, _status, _status, _input_value, _settings.fpid.setpoint, _output_value);
+    // DBG("%lu: PID = %s: Input = %.2f, Setpoint = %.2f, Output = %.2f", 
+    //     now, res?"ok":"sat", _input_value, _settings.fpid.setpoint, _output_value);
+
+    // And, if not active, stop here
+    if(_mode != CONTROL_MODE_PID)
+        return;
 
     // If saturated, we're in error
-    if(!res)
+    if(!pidres)
     {
         _status = STATUS_SATURATED;
         _unlocked_last = now;

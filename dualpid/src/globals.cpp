@@ -10,8 +10,8 @@ settings_t settings;
 SettingsManager setman(settings);
 
 
-PIDLoop pid1(settings.pid1);
-PIDLoop pid2(settings.pid2);
+PIDLoop pid1(1, settings.pid1);
+PIDLoop pid2(2, settings.pid2);
 
 PIDLoop* pids[NUMBER_OF_CHANNELS] = {&pid1, &pid2};
 

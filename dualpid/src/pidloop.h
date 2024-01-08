@@ -68,7 +68,7 @@ class PIDLoop: private NonCopyable
             uint32_t fixed_output_value;
         } settings_t;
 
-        PIDLoop(PIDLoop::settings_t& s);
+        PIDLoop(uint32_t id, PIDLoop::settings_t& s);
 
         bool begin();
         void loop();
@@ -109,7 +109,7 @@ class PIDLoop: private NonCopyable
         time_t _windowstarttime;
         gpio_num_t _pin_n, _pin_p;
 
-        bool _active_last;
+        uint32_t _id;
         time_t _unlocked_last;
 };
 
