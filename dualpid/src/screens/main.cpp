@@ -234,14 +234,15 @@ const void PidPanel::update()
     switch(current_status)
     {
         case PIDLoop::STATUS_SENSOR:
+		case PIDLoop::STATUS_NONE:
             lv_label_set_text(lbl_sp, "-");
-            return;
+            break;
 		case PIDLoop::STATUS_FIXED:
             lv_label_set_text_fmt(lbl_sp, "out = %u%%", pid._settings.fixed_output_value);
 			break;
         default:
             lv_label_set_text_fmt(lbl_sp, "sp = %0.*f %s", prec, pid._settings.fpid.setpoint, unit);
-            return;
+            break;
     };
 
 	// input value/sensor
