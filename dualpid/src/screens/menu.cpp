@@ -139,17 +139,17 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
                 break;
         };
 
-        if(set.output_mode != PIDLoop::OUTPUT_MODE_NONE || expert_mode)
+        if(set.output_mode != PIDLoop::OUTPUT_MODE_NONE || settings.expert_mode)
         {
             menu.addSeparator(name);
             menu.addSpinbox("Setpoint", &set.fpid.setpoint, sp_min, sp_max, sp_prec);
             menu.addSwitch("Active", &set.active);
-            if(expert_mode)
+            if(settings.expert_mode)
             {
                 menu.addSelector("Fixed Output", &set.fixed_output_value, pid_fixed_values);
             };
             auto sub = menu.addSubMenu("PID Settings");
-            if(expert_mode)
+            if(settings.expert_mode)
                 sub->addSeparator("Standard");
             else
                 sub->addSeparator();
@@ -158,7 +158,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
             sub->addSpinbox("kD", &set.fpid.kD, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
             sub->addSpinbox("kF", &set.fpid.kF, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
             sub->addSpinbox("F-Offset", &set.fpid.kF_offset, sp_min, sp_max, sp_prec);
-            if(expert_mode)
+            if(settings.expert_mode)
             {
                 sub->addSeparator("Advanced");
                 sub->addSpinbox("D-Filter", &set.input_filter, 0, 1, 2);
@@ -166,7 +166,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
                 sub->addSpinbox("Lock Window", &set.lock_window, 0, sp_max - sp_min);
             };
         };
-        if(expert_mode)
+        if(settings.expert_mode)
         {
             auto sub = menu.addSubMenu("Setup");
             sub->addSeparator("Input");
@@ -189,9 +189,10 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
     menu.addSelector("Graph Delta", &settings.graph_delta, graph_delta_times);
 
     // General
-    if(expert_mode)
+    if(settings.expert_mode)
     {
         auto sub = menu.addSubMenu("General");
+        sub->addAction("Exit Expert-mode", [](MenuItem* me, void*){ settings.expert_mode = false; me->close(); });
         sub->addSelector("Measure time", &settings.sensor_loop_ms, /* sensor_loop_times */ pid_loop_times);
         sub = menu.addSubMenu("NVM");
         sub->addAction("Save NVM", [](MenuItem*, void*){ setman.save(); });

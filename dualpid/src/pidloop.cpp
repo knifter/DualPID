@@ -60,7 +60,7 @@ bool PIDLoop::begin()
     _output_value = NAN;
     _mode = CONTROL_MODE_NONE;
     _status = STATUS_NONE;
-    if(!expert_mode)
+    if(!::settings.expert_mode)
     {
         // Reset fixed output if not in export_mode anymore
         _settings.fixed_output_value = 0;
@@ -138,7 +138,7 @@ void PIDLoop::sync_mode()
         case CONTROL_MODE_INACTIVE:
             if(_settings.active)
             {
-                if(expert_mode && _settings.fixed_output_value > 0)
+                if(::settings.expert_mode && _settings.fixed_output_value > 0)
                 {
                     DBG("Activating Fixed-Output.");
                     set_mode(CONTROL_MODE_FIXED);

@@ -9,7 +9,6 @@ GUI gui;
 settings_t settings;
 SettingsManager setman(settings);
 
-bool expert_mode;
 
 PIDLoop pid1(settings.pid1);
 PIDLoop pid2(settings.pid2);

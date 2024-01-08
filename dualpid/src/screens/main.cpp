@@ -448,8 +448,8 @@ bool MainScreen::handle(soogh_event_t key)
 		case KEY_C_LONG:
 			settings.pid2.active = !settings.pid2.active;
 			return true;
-		case KEY_ABC_LONG:
-			expert_mode = true;
+		case KEY_AC_LONG:
+			settings.expert_mode = true;
 			// fallthrough
 		case KEY_B_PRESSED:
 		    gui.pushScreen(std::make_shared<MenuScreen>(gui));

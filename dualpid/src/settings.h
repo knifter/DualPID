@@ -11,6 +11,7 @@ typedef struct
     uint32_t graph_delta;            // Time per point, ms
 	PIDLoop::settings_t pid1;
 	PIDLoop::settings_t pid2;
+    uint32_t expert_mode;
 } settings_t;
 
 class SettingsManager : public NVSettings

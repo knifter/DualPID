@@ -31,8 +31,6 @@ void setup()
 
 	Wire.begin(PIN_SDA, PIN_SCL);
 
-    expert_mode = 0;
-	
 	setman.begin();
 
 	for(PIDLoop* pid : pids)
