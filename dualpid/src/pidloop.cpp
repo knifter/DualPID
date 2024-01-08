@@ -260,7 +260,7 @@ void PIDLoop::do_pid()
         pidres = _pid.calculate();
 
     // always print status
-    Serial.printf("ST%u:%lu, %1d, %.3f, %.3f, %.3f\n", _id, now, _status, _status, _input_value, _settings.fpid.setpoint, _output_value);
+    Serial.printf("ST%u:%lu, %1d, %.3f, %.3f, %.3f\n", _id, now, _status, _input_value, _settings.fpid.setpoint, _output_value);
     // DBG("%lu: PID = %s: Input = %.2f, Setpoint = %.2f, Output = %.2f", 
     //     now, res?"ok":"sat", _input_value, _settings.fpid.setpoint, _output_value);
 
