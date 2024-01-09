@@ -101,7 +101,7 @@ class PIDLoop: private NonCopyable
         FPID _pid;
         double _input_value;
         double _output_value;
-        time_t _next_pid;
+        time_t _next_pid, _last_pid;
 
         // OUTPUT
         // const double &_input_ref;

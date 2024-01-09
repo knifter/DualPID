@@ -60,6 +60,8 @@ bool PIDLoop::begin()
     _output_value = NAN;
     _mode = CONTROL_MODE_NONE;
     _status = STATUS_NONE;
+    _last_pid = 0;
+
     if(!::settings.expert_mode)
     {
         // Reset fixed output if not in export_mode anymore
@@ -197,6 +199,8 @@ void PIDLoop::set_mode(control_mode_t newmode)
                 break;
             };
 
+            _last_pid = 0; // Reset dt timer
+
             // align FPID internals with current _output_value
             _pid.alignOutput();
 
@@ -252,12 +256,20 @@ void PIDLoop::do_pid()
     time_t now = millis();
     if(_next_pid > now)
         return;
-    _next_pid = now + _settings.looptime;
+    _next_pid += _settings.looptime;
 
     // If active: Run the inner pidloop
     bool pidres = false;
     if(_mode == CONTROL_MODE_PID)
-        pidres = _pid.calculate();
+    {
+        // calc dt, first loop is just looptime
+        if(_last_pid == 0)
+            _last_pid = now - _settings.looptime;
+        float dt = (now - _last_pid) / 1000.0;
+        _last_pid = now;
+
+        pidres = _pid.calculate(dt);
+    };
 
     // always print status
     Serial.printf("ST%u:%lu, %1d, %.3f, %.3f, %.3f\n", _id, now, _status, _input_value, _settings.fpid.setpoint, _output_value);
