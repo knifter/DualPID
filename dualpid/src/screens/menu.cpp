@@ -192,12 +192,12 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
     if(settings.expert_mode)
     {
         auto sub = menu.addSubMenu("General");
-        sub->addAction("Exit Expert-mode", [](MenuItem* me, void*){ settings.expert_mode = false; me->close(); });
         sub->addSelector("Measure time", &settings.sensor_loop_ms, /* sensor_loop_times */ pid_loop_times);
         sub = menu.addSubMenu("NVM");
         sub->addAction("Save NVM", [](MenuItem*, void*){ setman.save(); });
         sub->addAction("Erase NVM", [](MenuItem*, void*){ setman.erase(); });    
         // sub->addAction("Begin", [](MenuItem*, void*){ setman.begin(true); });
+        menu.addAction("End Expert-mode", [](MenuItem*, void* me){ settings.expert_mode = false; static_cast<Screen*>(me)->close(); }, this);
     };
 
 	menu.onClose(menu_close_cb, this);
