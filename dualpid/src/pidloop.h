@@ -53,19 +53,19 @@ class PIDLoop: private NonCopyable
         typedef struct
         {
             bool active;
-            uint32_t output_mode;
-            uint32_t pin_n;
-            uint32_t pin_p;
-            uint32_t looptime;
-            uint32_t windowtime;
+            int32_t output_mode;            
+            int32_t pin_n;
+            int32_t pin_p;
+            int32_t looptime;
+            int32_t windowtime;
             double min_output;
             double max_output;
             FPID::fpid_settings_t fpid;
             double lock_window;
-            uint32_t lock_time;
+            int32_t lock_time;
             double input_filter;
-            uint32_t sensor_type;
-            uint32_t fixed_output_value;
+            int32_t sensor_type;
+            int32_t fixed_output_value;
         } settings_t;
 
         PIDLoop(uint32_t id, PIDLoop::settings_t& s);

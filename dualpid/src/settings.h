@@ -7,8 +7,8 @@
 
 typedef struct
 {
-    uint32_t sensor_loop_ms;         // Sensor poll loop-time
-    uint32_t graph_delta;            // Time per point, ms
+    int32_t sensor_loop_ms;         // Sensor poll loop-time
+    int32_t graph_delta;            // Time per point, ms
 	PIDLoop::settings_t pid1;
 	PIDLoop::settings_t pid2;
     uint32_t expert_mode;
