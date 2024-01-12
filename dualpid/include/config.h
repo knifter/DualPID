@@ -54,7 +54,6 @@
 #define PID_DEFAULT_P				1.0
 #define PID_DEFAULT_I				0.0
 #define PID_DEFAULT_D				0.0
-#define PID_DEFAULT_OUTPUTMODE		PIDLoop::OUTPUT_MODE_NONE
 #define PID_DEFAULT_SETPOINT		20.0
 #define PID_DEFAULT_OFILTER			0.0             // PID Output filter, 0 = no filter
 #define PID_DEFAULT_DFILTER			0.0             // PID D-Term filter

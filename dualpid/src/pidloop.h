@@ -7,19 +7,11 @@
 #include "sensors.h"
 #include "driver/gpio.h"
 #include "tools-nocopy.h"
+#include "output.h"
 
 class PIDLoop: private NonCopyable
 {
     public:
-        typedef enum
-        {
-            OUTPUT_MODE_NONE,      // Unconfigured, Display sensor only
-            OUTPUT_MODE_ZP,        // Zero/Positive: heater
-            // MODE_NZP,            // Negative/Zero/Positive: peltier off when in setpoint window
-            OUTPUT_MODE_NP,        // Negative/Positive: peltier
-            OUTPUT_MODE_NZ,        // Negative/Zero: cool only
-        } output_mode_t;
-
         typedef enum
         {
             CONTROL_MODE_NONE,      // initial state
@@ -69,6 +61,7 @@ class PIDLoop: private NonCopyable
         } settings_t;
 
         PIDLoop(uint32_t id, PIDLoop::settings_t& s);
+        ~PIDLoop();
 
         bool begin();
         void loop();
@@ -78,19 +71,19 @@ class PIDLoop: private NonCopyable
         double output_value() { return _output_value; };
         bool set_output_value(double value);
         status_t status() { return _status; };
+        control_mode_t mode() { return _mode; };
         settings_t& _settings;
 
     private: 
-        // priv functions
-        void output_off();  // set output in a safe off-state: no heat, no cool
-
         // Internal loop steps
         void sync_mode();
         void do_sensor();
         void do_pid();
         void do_output();
 
+        uint32_t _channel_id;
         control_mode_t _mode = CONTROL_MODE_NONE;
+        status_t _status;
 
         // SENSOR
         time_t _next_sensor = 0;
@@ -102,15 +95,10 @@ class PIDLoop: private NonCopyable
         double _input_value;
         double _output_value;
         time_t _next_pid, _last_pid;
+        time_t _unlocked_last;
 
         // OUTPUT
-        // const double &_input_ref;
-        status_t _status;
-        time_t _windowstarttime;
-        gpio_num_t _pin_n, _pin_p;
-
-        uint32_t _id;
-        time_t _unlocked_last;
+        OutputDriver* _output;
 };
 
 #endif // __PIDLOOP_H

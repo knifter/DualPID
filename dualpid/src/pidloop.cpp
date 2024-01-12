@@ -40,27 +40,28 @@ const char* status2str(PIDLoop::status_t status)
 };
 
 PIDLoop::PIDLoop(uint32_t id, settings_t& s) :
-    _settings(s), _pid(&(s.fpid), (&_input_value), (&_output_value)), _id(id)
+    _settings(s), 
+    _channel_id(id), 
+    _pid(&(s.fpid), (&_input_value), (&_output_value))
 {
+    _output = new SlowPWMDriver();
+};
+
+PIDLoop::~PIDLoop()
+{
+    if(_output != nullptr)
+        delete _output;
 };
 
 bool PIDLoop::begin()
 {
-    _pin_n = static_cast<gpio_num_t>(_settings.pin_n);
-    _pin_p = static_cast<gpio_num_t>(_settings.pin_p);
-
-    // config hardware
-  	pinMode(_pin_n, OUTPUT);
-  	pinMode(_pin_p, OUTPUT);
-	digitalWrite(_pin_n, LOW);
-	digitalWrite(_pin_p, LOW);
-
-	_windowstarttime = millis();
    	_input_value = NAN;
     _output_value = NAN;
     _mode = CONTROL_MODE_NONE;
     _status = STATUS_NONE;
     _last_pid = 0;
+
+    _output->begin();
 
     if(!::settings.expert_mode)
     {
@@ -80,40 +81,19 @@ bool PIDLoop::begin()
 	    };
     };
 
-    switch(_settings.output_mode)
-    {
-        case OUTPUT_MODE_NONE:
-            DBG("No output mode configured.");
-        	_pid.setOutputLimits(0, 0);
-            _output_value = 0;
-            break;
-        case OUTPUT_MODE_ZP:
-        	_pid.setOutputLimits(_settings.min_output, _settings.max_output);
-            DBG("Output mode: ZP, min:%.0f%% max:%.0f%%", _settings.min_output, _settings.max_output);
-        	_output_value = 50; // 50%
-            _pid.alignOutput();
-            break;
-        case OUTPUT_MODE_NP:
-            DBG("Output mode: NP");
-        	_pid.setOutputLimits(-1*_settings.max_output, _settings.max_output);
-        	_output_value = 0; // 0%
-            _pid.alignOutput();
-            break;
-        case OUTPUT_MODE_NZ:
-            DBG("Output mode: NZ");
-        	_pid.setOutputLimits(-1*_settings.max_output, -1*_settings.min_output);
-	        _output_value = -50;
-            _pid.alignOutput();
-            break;
-    };
+    _pid.setOutputLimits(_settings.min_output, _settings.max_output);
+    DBG("Output mode: ZP, min:%.0f%% max:%.0f%%", _settings.min_output, _settings.max_output);
+    _output_value = 50; // 50%
+    _pid.alignOutput();
 
     // configure initial mode (depends on input/output available)
     control_mode_t initmode = CONTROL_MODE_NONE;
     if(_sensor_read != nullptr)
     {
-        initmode = CONTROL_MODE_SENSOR;
-        if(_settings.output_mode != OUTPUT_MODE_NONE)
+        if(!_output->begin_ok())
             initmode = CONTROL_MODE_INACTIVE;
+        else
+            initmode = CONTROL_MODE_SENSOR;
     };
     DBG("Init with mode %s, output = %.0f%%", control_mode2str(initmode), _output_value);
     set_mode(initmode);
@@ -185,13 +165,13 @@ void PIDLoop::set_mode(control_mode_t newmode)
             break;
         case CONTROL_MODE_NONE:
         case CONTROL_MODE_INACTIVE:
-            output_off();
+            _output->off();
 
             _status = STATUS_INACTIVE;
             _mode = CONTROL_MODE_INACTIVE;
             break;
         case CONTROL_MODE_PID:
-            if(_settings.output_mode == OUTPUT_MODE_NONE)
+            if(!_output->begin_ok())
             {
                 WARNING("No pid output mode set: pid remains in-active.");
                 _mode = CONTROL_MODE_INACTIVE;
@@ -282,7 +262,7 @@ void PIDLoop::do_pid()
     };
 
     // always print status
-    Serial.printf("ST%u:%.3f, %1d, %.3f, %.3f, %.3f\n", _id, dt, _status, _input_value, sp, _output_value);
+    Serial.printf("ST%u:%.3f, %1d, %.3f, %.3f, %.3f\n", _channel_id, dt, _status, _input_value, sp, _output_value);
     // DBG("%lu: PID = %s: Input = %.2f, Setpoint = %.2f, Output = %.2f", 
     //     now, res?"ok":"sat", _input_value, _settings.fpid.setpoint, _output_value);
 
@@ -346,64 +326,22 @@ bool PIDLoop::set_output_value(double value)
     return true;
 };
 
-void PIDLoop::output_off()
-{
-    if(_pin_n)
-        digitalWrite(_pin_n, LOW);
-    if(_pin_p)
-        digitalWrite(_pin_p, LOW);
-};
-
 void PIDLoop::do_output()
 {
     // turn of output if PID loop had an error
     if(isnan(_output_value))
     {
-        output_off();
+        _output->off();
         return;
     };
 
     // Output is only enabled when PID is ruuning or when Fixed Output is set (in expert_mode)
     if(_mode != CONTROL_MODE_PID && _mode != CONTROL_MODE_FIXED)
     {
-        output_off();
+        _output->off();
         return;
     };
 
-    // Process timewindow valve depending on PID Output
-    time_t now = millis();
-    if (now - _windowstarttime > _settings.windowtime)
-    { //time to shift the Relay Window
-        _windowstarttime += _settings.windowtime;
-    };
-
-    // Set output
-    uint8_t N = LOW;
-    uint8_t P = LOW;
-    uint32_t output_time = _output_value * _settings.windowtime / 100;
-    switch(_settings.output_mode)
-    {
-        case OUTPUT_MODE_NONE:
-            break;
-        case OUTPUT_MODE_NZ:   // Negative-Zero
-            if (output_time <= (now - _windowstarttime))
-                N = HIGH;
-            break;
-        case OUTPUT_MODE_NP:   // Negative or Positive
-            if (output_time >= (now - _windowstarttime))
-                P = HIGH;
-            else
-                N = HIGH;
-            break;
-        // case MODE_NZP:
-        //     break;
-        case OUTPUT_MODE_ZP:
-            if (output_time >= (now - _windowstarttime))
-                P = HIGH;
-            break;
-    };
-    if(_pin_n)
-        digitalWrite(_pin_n, N);
-    if(_pin_p)
-        digitalWrite(_pin_p, P);
+    _output->set(_output_value);
+    _output->loop();
 };

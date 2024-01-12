@@ -61,15 +61,6 @@ SelectorField::item_t pid_fixed_values [] = {
     {0, 0, 0}
 };
 
-SelectorField::item_t pid_output_modes [] = {
-    {PIDLoop::OUTPUT_MODE_NONE, "-", "Sensor"},
-    {PIDLoop::OUTPUT_MODE_ZP,   "0+", "ZeroPos"},
-    // {PIDLoop::MODE_NZP,  "-0+", "NegZeroPos"},
-    {PIDLoop::OUTPUT_MODE_NP,   "-+", "NegPos"},
-    {PIDLoop::OUTPUT_MODE_NZ,   "-0", "NegZero"},
-    {0, 0, 0}
-};
-
 SelectorField::item_t graph_delta_times [] = {
 	{100, "100ms", "100 ms"},
 	{200, "200ms", "200 ms"},
@@ -139,7 +130,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
                 break;
         };
 
-        if(set.output_mode != PIDLoop::OUTPUT_MODE_NONE || settings.expert_mode)
+        if(pidloop->mode() > PIDLoop::CONTROL_MODE_SENSOR || settings.expert_mode)
         {
             menu.addSeparator(name);
             menu.addSpinbox("Setpoint", &set.fpid.setpoint, sp_min, sp_max, sp_prec);
@@ -176,8 +167,8 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
             sub->addSelector("Looptime", &set.looptime, pid_loop_times);
             // sub->addCheckbox("Take-Back-Half", &set.fpid.takebackhalf);
             sub->addSeparator("Output");
-            sub->addSelector("Mode", &set.output_mode, pid_output_modes)->onChange(set_need_reboot);
-            sub->addSelector("Pin N (-)", &set.pin_n, hardware_ports)->onChange(set_need_reboot);
+            // sub->addSelector("Mode", &set.output_mode, pid_output_modes)->onChange(set_need_reboot);
+            // sub->addSelector("Pin N (-)", &set.pin_n, hardware_ports)->onChange(set_need_reboot);
             sub->addSelector("Pin P (+)", &set.pin_p, hardware_ports)->onChange(set_need_reboot);
             sub->addSelector("Windowtime", &set.windowtime, window_loop_times)->onChange(set_need_reboot);    
             sub->addSpinbox("Min Output", &set.min_output, 0, 100, 0)->onChange(set_need_reboot);

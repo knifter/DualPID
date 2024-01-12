@@ -36,7 +36,7 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
             settings->graph_delta =                 DEFAULT_GRAPH_DELTA_MS;
 
             settings->pid1.active =                 false;
-            settings->pid1.output_mode =            PID_DEFAULT_OUTPUTMODE;
+            settings->pid1.output_mode =            0;
             settings->pid1.pin_n =                  GPIO_NUM_NC;
             settings->pid1.pin_p =                  GPIO_NUM_NC;
             settings->pid1.looptime =               PID_DEFAULT_LOOPTIME_MS;
@@ -58,7 +58,7 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
             settings->pid1.sensor_type =            SENSOR_NONE;
 
             settings->pid2.active =                 false;
-            settings->pid2.output_mode =            PID_DEFAULT_OUTPUTMODE;
+            settings->pid2.output_mode =            0;
             settings->pid2.pin_n =                  GPIO_NUM_NC;
             settings->pid2.pin_p =                  GPIO_NUM_NC;
             settings->pid2.looptime =               PID_DEFAULT_LOOPTIME_MS;
