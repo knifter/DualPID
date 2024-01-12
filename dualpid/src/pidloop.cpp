@@ -258,21 +258,31 @@ void PIDLoop::do_pid()
         return;
     _next_pid += _settings.looptime;
 
+    // calc dt, first loop is just looptime
+    if(_last_pid == 0)
+        _last_pid = now - _settings.looptime;
+    float dt = (now - _last_pid) / 1000.0;
+    _last_pid = now;
+
     // If active: Run the inner pidloop
     bool pidres = false;
-    if(_mode == CONTROL_MODE_PID)
+    float sp = 0;
+    switch(_mode)
     {
-        // calc dt, first loop is just looptime
-        if(_last_pid == 0)
-            _last_pid = now - _settings.looptime;
-        float dt = (now - _last_pid) / 1000.0;
-        _last_pid = now;
-
-        pidres = _pid.calculate(dt);
+        case CONTROL_MODE_FIXED: 
+            sp = _settings.fixed_output_value; 
+            break;
+        case CONTROL_MODE_PID:   
+            sp = _settings.fpid.setpoint; 
+            pidres = _pid.calculate(dt);
+            break;
+        default: 
+            sp = 0;
+            break;
     };
 
     // always print status
-    Serial.printf("ST%u:%lu, %1d, %.3f, %.3f, %.3f\n", _id, now, _status, _input_value, _settings.fpid.setpoint, _output_value);
+    Serial.printf("ST%u:%.3f, %1d, %.3f, %.3f, %.3f\n", _id, dt, _status, _input_value, sp, _output_value);
     // DBG("%lu: PID = %s: Input = %.2f, Setpoint = %.2f, Output = %.2f", 
     //     now, res?"ok":"sat", _input_value, _settings.fpid.setpoint, _output_value);
 
