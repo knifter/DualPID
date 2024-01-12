@@ -15,7 +15,7 @@
 void menu_close_cb(MenuItem* item, void* data);
 
 SelectorField::item_t hardware_ports[] = {
-	{0, "none", "none/unused"},
+	{GPIO_NUM_NC, "none", "none/unused"},
 	PIDLOOP_PORTS_LIST
 	,{0, 0, 0}
 	};

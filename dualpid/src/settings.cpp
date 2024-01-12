@@ -37,8 +37,8 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
 
             settings->pid1.active =                 false;
             settings->pid1.output_mode =            PID_DEFAULT_OUTPUTMODE;
-            settings->pid1.pin_n =                  0;
-            settings->pid1.pin_p =                  0;
+            settings->pid1.pin_n =                  GPIO_NUM_NC;
+            settings->pid1.pin_p =                  GPIO_NUM_NC;
             settings->pid1.looptime =               PID_DEFAULT_LOOPTIME_MS;
             settings->pid1.min_output =             PID_DEFAULT_MIN_OUTPUT;
             settings->pid1.max_output =             PID_DEFAULT_MAX_OUTPUT;
@@ -59,8 +59,8 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
 
             settings->pid2.active =                 false;
             settings->pid2.output_mode =            PID_DEFAULT_OUTPUTMODE;
-            settings->pid2.pin_n =                  0;
-            settings->pid2.pin_p =                  0;
+            settings->pid2.pin_n =                  GPIO_NUM_NC;
+            settings->pid2.pin_p =                  GPIO_NUM_NC;
             settings->pid2.looptime =               PID_DEFAULT_LOOPTIME_MS;
             settings->pid2.min_output =             PID_DEFAULT_MIN_OUTPUT;
             settings->pid2.max_output =             PID_DEFAULT_MAX_OUTPUT;
