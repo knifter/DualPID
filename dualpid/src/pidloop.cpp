@@ -76,13 +76,13 @@ bool PIDLoop::begin()
     {
     	if(!_sensor_begin())  
     	{
-			gui.showMessage("WARNING:", "Channel x sensor error."); // FIXME x
+			gui.showMessage("WARNING:", "Channel sensor error."); // FIXME x
 			_sensor_read = nullptr;
 	    };
     };
 
     _pid.setOutputLimits(_settings.min_output, _settings.max_output);
-    DBG("Output mode: ZP, min:%.0f%% max:%.0f%%", _settings.min_output, _settings.max_output);
+    DBG("ch%d: Output min:%.0f%% max:%.0f%%", _channel_id, _settings.min_output, _settings.max_output);
     _output_value = 50; // 50%
     _pid.alignOutput();
 
@@ -90,12 +90,12 @@ bool PIDLoop::begin()
     control_mode_t initmode = CONTROL_MODE_NONE;
     if(_sensor_read != nullptr)
     {
-        if(!_output->begin_ok())
+        if(_output->begin_ok())
             initmode = CONTROL_MODE_INACTIVE;
         else
             initmode = CONTROL_MODE_SENSOR;
     };
-    DBG("Init with mode %s, output = %.0f%%", control_mode2str(initmode), _output_value);
+    DBG("ch%d: Init with mode %s, output = %.0f%%", _channel_id, control_mode2str(initmode), _output_value);
     set_mode(initmode);
     // sync_mode will set it active when _settings have stored so
 
@@ -343,5 +343,4 @@ void PIDLoop::do_output()
     };
 
     _output->set(_output_value);
-    _output->loop();
 };

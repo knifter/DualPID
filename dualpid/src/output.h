@@ -14,17 +14,18 @@ class OutputDriver
 			{};
 		virtual ~OutputDriver() {};
 
-		bool begin(int32_t channel_id);
+		virtual bool begin(int32_t channel_id);
+		virtual bool begin_ok() { return _begin_ok; };
 		virtual void off() = 0;
 		virtual void set(float percent) = 0;
-		bool begin_ok() { return _begin_ok; };
 	
-	private:
+	protected:
 		uint32_t _channel_id;
 		bool _begin_ok = false;
 
 		// PIDLoop::settings_t& _settings;
 
+	private:
 		OutputDriver(const OutputDriver&) = delete;
 	    OutputDriver& operator=(OutputDriver const&) = delete;
 };
@@ -39,21 +40,18 @@ class SlowPWMDriver : public OutputDriver
 		bool begin(int32_t channel_id);
 		void off();
 		void set(float percent);
-		void loop();
-
-        // typedef enum
-        // {
-        //     OUTPUT_MODE_NONE,      // Unconfigured, Display sensor only
-        //     OUTPUT_MODE_ZP,        // Zero/Positive: heater
-        //     // MODE_NZP,            // Negative/Zero/Positive: peltier off when in setpoint window
-        //     OUTPUT_MODE_NP,        // Negative/Positive: peltier
-        //     OUTPUT_MODE_NZ,        // Negative/Zero: cool only
-        // } output_mode_t;
+		// void loop();
 
 	private:
+		static void task(void*);
+		TaskHandle_t _taskh;
+		bool _task_running = false;
 		uint32_t _window_len; 		// windowtime in ms (1000/f)
-        time_t _window_start;
-		uint32_t _window_low;
+
+		// task variables
+		uint32_t _state;
+		uint32_t _window_lowtime;
+		uint32_t _window_hightime;
 
         // gpio_num_t _pin_n;
 		gpio_num_t _pin_p;
