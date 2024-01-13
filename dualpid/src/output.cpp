@@ -144,28 +144,7 @@ void SlowPWMDriver::task(void* ptr)
         };
     };
 };
-void SlowPWMDriver::loop()
-{
-    // Process timewindow valve depending on PID Output
-    time_t now = millis();
-    if (now - _window_start > _window_len)
-    { //time to shift the Relay Window
-        _window_start += _window_len;
-    };
 
-    // Set output
-    // uint8_t N = LOW;
-    uint8_t P = LOW;
-
-	// Always MODE_ZP since 01-2024
-	if((now - _window_start) > _window_low)
-		P = HIGH;
-    digitalWrite(_pin_p, P);
-};
-
-// bool FastPWMDriver::begin()
-// {
-//     ledcSetup(_id, 1, 10);
 //     ledcAttachPin(_pin_p, _id);
 //     ledcWrite(_id, 0);
 // };
