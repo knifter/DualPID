@@ -262,7 +262,9 @@ void PIDLoop::do_pid()
     };
 
     // always print status
+#ifdef PIDLOOP_STATUS
     Serial.printf("ST%u:%.3f, %1d, %.3f, %.3f, %.3f\n", _channel_id, dt, _status, _input_value, sp, _output_value);
+#endif
     // DBG("%lu: PID = %s: Input = %.2f, Setpoint = %.2f, Output = %.2f", 
     //     now, res?"ok":"sat", _input_value, _settings.fpid.setpoint, _output_value);
 

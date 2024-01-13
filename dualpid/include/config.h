@@ -42,6 +42,7 @@
 #define PID_PAR_MIN			    0
 #define PID_PAR_MAX			    99
 #define PID_PAR_PRECISION		3
+#define PIDLOOP_STATUS			1				// Print PID statusinfo in pidloop.loop
 
 #define SENSOR_SHT31_ENABLED
 #define SENSOR_M5KMETER_ENABLED
