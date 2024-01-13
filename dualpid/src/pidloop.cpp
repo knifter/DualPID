@@ -61,7 +61,7 @@ bool PIDLoop::begin()
     _status = STATUS_NONE;
     _last_pid = 0;
 
-    _output->begin();
+    _output->begin(_channel_id);
 
     if(!::settings.expert_mode)
     {

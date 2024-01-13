@@ -14,13 +14,13 @@ class OutputDriver
 			{};
 		virtual ~OutputDriver() {};
 
-		bool begin();
+		bool begin(int32_t channel_id);
 		virtual void off() = 0;
 		virtual void set(float percent) = 0;
-		void loop() {};
 		bool begin_ok() { return _begin_ok; };
 	
 	private:
+		uint32_t _channel_id;
 		bool _begin_ok = false;
 
 		// PIDLoop::settings_t& _settings;
@@ -36,7 +36,7 @@ class SlowPWMDriver : public OutputDriver
 			: OutputDriver() 
 			{};
 
-		bool begin();
+		bool begin(int32_t channel_id);
 		void off();
 		void set(float percent);
 		void loop();

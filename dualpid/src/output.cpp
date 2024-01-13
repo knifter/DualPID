@@ -4,14 +4,20 @@
 #include "pidloop.h"
 #include "tools-log.h"
 
-bool OutputDriver::begin()
+bool OutputDriver::begin(int32_t channel_id)
 {
     return _begin_ok = true;
 };
 
-bool SlowPWMDriver::begin()
+bool SlowPWMDriver::begin(int32_t channel_id)
 {
-    PIDLoop::settings_t pidset = settings.pid1;
+    PIDLoop::settings_t pidset;
+    switch(channel_id)
+    {
+        case 1: pidset = settings.pid1; break;
+        case 2: pidset = settings.pid2; break;
+    };
+
     // _pin_n = static_cast<gpio_num_t>(_settings.pin_n);
 	// _pin_n = GPIO_NUM_NC;
     _pin_p = static_cast<gpio_num_t>(pidset.pin_p);
