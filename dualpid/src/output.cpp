@@ -26,8 +26,8 @@ bool SlowPWMDriver::begin(int32_t channel_id)
 
     // _pin_n = static_cast<gpio_num_t>(_settings.pin_n);
 	// _pin_n = GPIO_NUM_NC;
-    _pin_p = static_cast<gpio_num_t>(pidset.pin_p);
-    DBG("channel %d, pin = %x", channel_id, _pin_p);
+    _pin_p = static_cast<gpio_num_t>(pidset.output.slowpwm.pin_p);
+    DBG("ch%d SlowPWM, gpio_num_%u", channel_id, _pin_p);
 
 	// We need atleast a pin..
 	if(_pin_p == GPIO_NUM_NC)
@@ -37,14 +37,11 @@ bool SlowPWMDriver::begin(int32_t channel_id)
 	};
 
     // config hardware
-  	// pinMode(_pin_n, OUTPUT);
-  	pinMode(_pin_p, OUTPUT);
-	// digitalWrite(_pin_n, LOW);
 	digitalWrite(_pin_p, LOW);
+  	pinMode(_pin_p, OUTPUT);
 
 	// _window_start = millis();
-	_window_len = pidset.windowtime;
-    // _window_low = 0;
+	_window_len = pidset.output.slowpwm.windowtime;
 
     // start the output task
     _task_running = true;
@@ -108,7 +105,7 @@ void SlowPWMDriver::task(void* ptr)
             continue;
         };
 
-        time_t now = millis();
+        // time_t now = millis();
         switch(me->_state)
         {
             case HIGH:
@@ -166,7 +163,7 @@ bool FastPWMDriver::begin(int32_t channel_id)
 	// We need atleast a pin..
 	if(_pin_p == GPIO_NUM_NC)
 	{
-		WARNING("FastPWMDriver not configured (pin_p)");
+		WARNING("FastPWMDriver not configured: no pin_p");
 		return false;
 	};
 
@@ -177,7 +174,7 @@ bool FastPWMDriver::begin(int32_t channel_id)
     uint32_t freq = ledcSetup(channel_id, pidset.output.fastpwm.frequency, FASTPWM_BITRES);
     ledcAttachPin(_pin_p, _channel_id);
     ledcWrite(_channel_id, 0);
-    DBG("ch%d: FastPWM Configured on pin %u, actual frequency %u Hz", _channel_id, _pin_p, freq);
+    DBG("ch%d: FastPWM Configured on gpio_num_%u, actual frequency %u Hz", _channel_id, _pin_p, freq);
 
 	return OutputDriver::begin(channel_id);
 };

@@ -33,9 +33,7 @@ class OutputDriver
 class SlowPWMDriver : public OutputDriver
 {
 	public:
-		SlowPWMDriver() 
-			: OutputDriver() 
-			{};
+		SlowPWMDriver() : OutputDriver() {};
 
 		bool begin(int32_t channel_id);
 		void off();
