@@ -57,27 +57,8 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
             settings->pid1.input_filter =           PID_DEFAULT_INPUT_FILTER;
             settings->pid1.sensor_type =            SENSOR_NONE;
 
-            settings->pid2.active =                 false;
-            settings->pid2.output_mode =            0;
-            settings->pid2.pin_n =                  GPIO_NUM_NC;
-            settings->pid2.pin_p =                  GPIO_NUM_NC;
-            settings->pid2.looptime =               PID_DEFAULT_LOOPTIME_MS;
-            settings->pid2.min_output =             PID_DEFAULT_MIN_OUTPUT;
-            settings->pid2.max_output =             PID_DEFAULT_MAX_OUTPUT;
-            settings->pid2.windowtime =             PID_DEFAULT_WINDOWTIME;
-            settings->pid2.fpid.kF =                PID_DEFAULT_F;
-            settings->pid2.fpid.kF_offset =         PID_DEFAULT_F_OFFSET;
-            settings->pid2.fpid.kP =                PID_DEFAULT_P;
-            settings->pid2.fpid.kI =                PID_DEFAULT_I;
-            settings->pid2.fpid.kD =                PID_DEFAULT_D;
-            settings->pid2.fpid.setpoint =          PID_DEFAULT_SETPOINT;
-            settings->pid2.fpid.output_filter =     PID_DEFAULT_OFILTER;
-            settings->pid2.fpid.D_filter =          PID_DEFAULT_DFILTER;
-            settings->pid2.fpid.takebackhalf =      PID_DEFAULT_TBH;
-            settings->pid2.lock_window =            PID_DEFAULT_LOCK_WINDOW;
-            settings->pid2.lock_time =              PID_DEFAULT_LOCK_TIME_MS;
-            settings->pid2.input_filter =           PID_DEFAULT_INPUT_FILTER;
-            settings->pid2.sensor_type =            SENSOR_NONE;
+            // Channel 2 has the same defaults
+            memcpy(&(settings->pid2), &(settings->pid1), sizeof(PIDLoop::settings_t));
 
         // End with the current version:
         case 6:
