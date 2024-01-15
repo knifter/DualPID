@@ -188,7 +188,7 @@ void FastPWMDriver::off()
 void FastPWMDriver::set(float percent)
 {
     uint32_t pwm_val = percent * (1<<FASTPWM_BITRES) / 100;
-    DBG("PWM set %u / %u", pwm_val, (1<<FASTPWM_BITRES));
+    // DBG("PWM set %u / %u", pwm_val, (1<<FASTPWM_BITRES));
     ledcWrite(_channel_id, pwm_val);
     return;
 };
