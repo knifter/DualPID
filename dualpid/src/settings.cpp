@@ -36,13 +36,13 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
             settings->graph_delta =                 DEFAULT_GRAPH_DELTA_MS;
 
             settings->pid1.active =                 false;
-            settings->pid1.output_mode =            0;
-            settings->pid1.pin_n =                  GPIO_NUM_NC;
-            settings->pid1.pin_p =                  GPIO_NUM_NC;
+            settings->pid1.output_drv =             PIDLoop::OUTPUT_DRIVER_NONE;
             settings->pid1.looptime =               PID_DEFAULT_LOOPTIME_MS;
+            settings->pid1.output.param[0] =        GPIO_NUM_NC;
+            settings->pid1.output.param[1] =        GPIO_NUM_NC;
+            settings->pid1.output.param[2] =        0;
             settings->pid1.min_output =             PID_DEFAULT_MIN_OUTPUT;
             settings->pid1.max_output =             PID_DEFAULT_MAX_OUTPUT;
-            settings->pid1.windowtime =             PID_DEFAULT_WINDOWTIME;
             settings->pid1.fpid.kF =                PID_DEFAULT_F;
             settings->pid1.fpid.kF_offset =         PID_DEFAULT_F_OFFSET;
             settings->pid1.fpid.kP =                PID_DEFAULT_P;

@@ -40,15 +40,6 @@ SelectorField::item_t pid_loop_times [] = {
 	{0, 0, 0}
 	};
 
-SelectorField::item_t window_loop_times [] = {
-	{1000, 	"1s",   "1 sec"},
-	{2000, 	"2s",   "2 sec"},
-	{5000, 	"5s",   "5 sec"},
-	{10000, "10s",  "10 sec"},
-	{60000, "1m",   "1 min"},
-	{0, 0, 0}
-	};
-
 SelectorField::item_t pid_fixed_values [] = {
     {0, "-", "Off/PID"},
     // {0, "0", "0%"},
@@ -82,6 +73,31 @@ SelectorField::item_t sensor_types [] = {
     SENSOR_TYPES_LIST,
     {0, 0, 0},
     };
+
+SelectorField::item_t output_drivers [] {
+	{0, 	"none",   "no output"},
+	{1, 	"sPWM",   "SlowPWM"},
+	{2, 	"PWM",   "FastPWM"},
+	{0, 0, 0}
+	};
+
+SelectorField::item_t output_slowpwm_windowtimes [] {
+	{1000, 	"1s",   "1 sec"},
+	{2000, 	"2s",   "2 sec"},
+	{5000, 	"5s",   "5 sec"},
+	{10000, "10s",  "10 sec"},
+	{60000, "1m",   "1 min"},
+	{0, 0, 0}
+	};
+
+SelectorField::item_t output_fastpwm_frequencies [] {
+	{1, 	"1Hz",   "1 Hz"},
+	{100, 	"100Hz",   "100 Hz"},
+	{1000, 	"1kHz",   "1 kHz"},
+	{1000, 	"5kHz",   "5 kHz"},
+	{1000, 	"30kHz",   "30 kHz"},
+	{0, 0, 0}
+	};
 
 bool need_reboot = false;
 void set_need_reboot(MenuItem*, void*)
@@ -167,10 +183,22 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
             sub->addSelector("Looptime", &set.looptime, pid_loop_times);
             // sub->addCheckbox("Take-Back-Half", &set.fpid.takebackhalf);
             sub->addSeparator("Output");
-            // sub->addSelector("Mode", &set.output_mode, pid_output_modes)->onChange(set_need_reboot);
-            // sub->addSelector("Pin N (-)", &set.pin_n, hardware_ports)->onChange(set_need_reboot);
-            sub->addSelector("Pin P (+)", &set.pin_p, hardware_ports)->onChange(set_need_reboot);
-            sub->addSelector("Windowtime", &set.windowtime, window_loop_times)->onChange(set_need_reboot);    
+            sub->addSelector("Driver", &set.output_drv, output_drivers)->onChange(set_need_reboot);
+            switch(set.output_drv)
+            {
+                case PIDLoop::OUTPUT_DRIVER_NONE:
+                    break;;
+                case PIDLoop::OUTPUT_DRIVER_SLOWPWM:
+                    // sub->addSelector("Pin N (-)", &set.pin_n, hardware_ports)->onChange(set_need_reboot);
+                    sub->addSelector("Pin P (+)", &set.output.slowpwm.pin_p, hardware_ports)->onChange(set_need_reboot);
+                    sub->addSelector("Windowtime", &set.output.slowpwm.windowtime, output_slowpwm_windowtimes)->onChange(set_need_reboot);    
+                    break;
+                case PIDLoop::OUTPUT_DRIVER_FASTPWM:
+                    // sub->addSelector("Pin N (-)", &set.pin_n, hardware_ports)->onChange(set_need_reboot);
+                    sub->addSelector("Pin P (+)", &set.output.fastpwm.pin_p, hardware_ports)->onChange(set_need_reboot);
+                    sub->addSelector("Frequency", &set.output.fastpwm.frequency, output_fastpwm_frequencies)->onChange(set_need_reboot);    
+                    break;
+            };
             sub->addSpinbox("Min Output", &set.min_output, 0, 100, 0)->onChange(set_need_reboot);
             sub->addSpinbox("Max Output", &set.max_output, 0, 100, 0)->onChange(set_need_reboot);
         };

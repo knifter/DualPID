@@ -42,14 +42,34 @@ class PIDLoop: private NonCopyable
             STATUS_FIXED,       // Fixed value: set new value
         } status_t;
 
+        typedef enum
+        {
+            OUTPUT_DRIVER_NONE = 0,
+            OUTPUT_DRIVER_SLOWPWM,
+            OUTPUT_DRIVER_FASTPWM,
+        } output_driver_t;
+
         typedef struct
         {
             bool active;
-            int32_t output_mode;            
-            int32_t pin_n;
-            int32_t pin_p;
             int32_t looptime;
-            int32_t windowtime;
+            int32_t output_drv;
+            union {
+                int32_t param[3];
+                struct slowpwm_t
+                {
+                    int32_t pin_n;
+                    int32_t pin_p;
+                    int32_t windowtime;
+                } slowpwm;
+                struct
+                {
+                    int32_t pin_n;
+                    int32_t pin_p;
+                    int32_t frequency;
+                } fastpwm;
+            } output;
+
             double min_output;
             double max_output;
             FPID::fpid_settings_t fpid;
