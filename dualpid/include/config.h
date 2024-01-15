@@ -91,11 +91,11 @@
 #ifdef ARDUINO_M5Stack_Core_ESP32
 #define PIDLOOP_PORTS_LIST	\
 	{GPIO_NUM_2, 	"IO2", 	"GPIO2"},	\
+    {GPIO_NUM_5,    "IO5",  "GPIO5"},   \
 	{GPIO_NUM_12, 	"IO12", "GPIO12"},	\
 	{GPIO_NUM_13, 	"IO13", "GPIO13"},	\
 	{GPIO_NUM_15, 	"IO15", "GPIO15"},	\
-	{GPIO_NUM_26, 	"IO26", "GPIO26"},   \
-    {GPIO_NUM_5,    "IO5",  "GPIO5"},   \
+	{GPIO_NUM_26, 	"IO26", "GPIO26"},  \
     {GPIO_NUM_16,   "IO16", "GPIO16"},  \
     {GPIO_NUM_17,   "IO17", "GPIO17"}    
 #endif
