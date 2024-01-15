@@ -145,18 +145,54 @@ void SlowPWMDriver::task(void* ptr)
     };
 };
 
-//     ledcAttachPin(_pin_p, _id);
-//     ledcWrite(_id, 0);
-// };
+bool FastPWMDriver::begin(int32_t channel_id)
+{
+    PIDLoop::settings_t pidset;
+    switch(channel_id)
+    {
+        case 1: pidset = settings.pid1; break;
+        case 2: pidset = settings.pid2; break;
+        default:
+            ERROR("Unsupported channel-id.");
+            return false;
+    };
 
-// void FastPWMDriver::off()
-// {
-//     ledcWrite(_id, 0);
-//     return;
-// };
+    // _pin_n = static_cast<gpio_num_t>(_settings.pin_n);
+	// _pin_n = GPIO_NUM_NC;
+    _pin_p = static_cast<gpio_num_t>(pidset.output.fastpwm.pin_p);
+    // DBG("FastPWM on channel %d, pin = %x", channel_id, _pin_p);
+    _channel_id = channel_id;
 
-// void FastPWMDriver::set(float percent)
-// {
-//     ledcWrite(_id, _output_value * 1024 / 100);
-//     return;
-// };
+	// We need atleast a pin..
+	if(_pin_p == GPIO_NUM_NC)
+	{
+		WARNING("FastPWMDriver not configured (pin_p)");
+		return false;
+	};
+
+    // config hardware
+  	pinMode(_pin_p, OUTPUT);
+	digitalWrite(_pin_p, LOW);
+
+    uint32_t freq = ledcSetup(channel_id, pidset.output.fastpwm.frequency, FASTPWM_BITRES);
+    ledcAttachPin(_pin_p, _channel_id);
+    ledcWrite(_channel_id, 0);
+    DBG("ch%d: FastPWM Configured on pin %u, actual frequency %u Hz", _channel_id, _pin_p, freq);
+
+	return OutputDriver::begin(channel_id);
+};
+
+void FastPWMDriver::off()
+{
+    ledcWrite(_channel_id, 0);
+    return;
+};
+
+void FastPWMDriver::set(float percent)
+{
+    uint32_t pwm_val = percent * (1<<FASTPWM_BITRES) / 100;
+    DBG("PWM set %u / %u", pwm_val, (1<<FASTPWM_BITRES));
+    ledcWrite(_channel_id, pwm_val);
+    return;
+};
+

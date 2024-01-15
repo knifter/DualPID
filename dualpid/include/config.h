@@ -44,6 +44,8 @@
 #define PID_PAR_PRECISION		3
 #define PIDLOOP_STATUS			1				// Print PID statusinfo in pidloop.loop
 
+#define FASTPWM_BITRES			10				// 10-bit output resolution
+
 #define SENSOR_SHT31_ENABLED
 #define SENSOR_M5KMETER_ENABLED
 #define SENSOR_MCP9600_ENABLED

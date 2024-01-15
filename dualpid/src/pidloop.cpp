@@ -44,7 +44,7 @@ PIDLoop::PIDLoop(uint32_t id, settings_t& s) :
     _channel_id(id), 
     _pid(&(s.fpid), (&_input_value), (&_output_value))
 {
-    _output = new SlowPWMDriver();
+    _output = new FastPWMDriver();
 };
 
 PIDLoop::~PIDLoop()

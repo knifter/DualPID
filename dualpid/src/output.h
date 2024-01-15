@@ -57,17 +57,18 @@ class SlowPWMDriver : public OutputDriver
 		gpio_num_t _pin_p;
 };
 
-// class FastPWMDriver
-// {
-// 	public:
-// 		FastPWMDriver() : _settings(settings) {};
+class FastPWMDriver : public OutputDriver
+{
+	public:
+		FastPWMDriver() : OutputDriver() {};
 
-// 		begin();
-// 		off();
-// 		setDuty();
+		bool begin(int32_t channel_id);
+		void off();
+		void set(float percent);
+		// void loop();
 
-// 	private:
-// 		PIDLoop::settings_t& _settings;
-// };
+	private:
+		gpio_num_t _pin_p;
+};
 
 #endif // __OUTPUT_H
