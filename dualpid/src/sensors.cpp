@@ -16,10 +16,10 @@ const int       Humidity_Precision                      = 0;
 const lv_color_t Humidity_Color                         = COLOR_BLUE;
 
 const char*     CO2_Name                                = "CO2 Content";
-const char*     CO2_Unit_Text                           = "ppm";
+const char*     CO2_Unit_Text                           = "%";
 const double    CO2_Setpoint_Min                        = 0;
-const double    CO2_Setpoint_Max                        = 5000;
-const int       CO2_Precision                           = 0;
+const double    CO2_Setpoint_Max                        = 20;
+const int       CO2_Precision                           = 3;
 const lv_color_t CO2_Color                      		= COLOR_YELLOW;
 
 sensor_begin_fptr find_sensor_begin(uint32_t sensor_type)
@@ -149,11 +149,7 @@ bool sensor_sprintir_begin()
 double sensor_sprintir_read()
 {
 	// CO2 from SprintIR-WX-20
-	int ppm = sensor_sprintir.getPPM();
-	if(ppm < 0)
-	{
-        return NAN;
-	};
-    return ppm;
+	return sensor_sprintir.getPercent();
+	// return sensor_sprintir.getCompensatedPercent(SPRINTIR_PRESSURE_MBAR);
 };
 #endif

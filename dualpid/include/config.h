@@ -51,6 +51,7 @@
 #define SENSOR_MCP9600_ENABLED
 #define SENSOR_MAX31865_ENABLED
 #define SENSOR_SPRINTIR_ENABLED
+// #define SPRINTIR_PRESSURE_MBAR		1200		// 100mbar overpressure is assumed
 
 #define PID_DEFAULT_F				0.0
 #define PID_DEFAULT_F_OFFSET		0.0
