@@ -1,6 +1,8 @@
 #include "sensors.h"
 #include "config.h"
 
+// #include "tools-log.h"
+
 const char*     Temperature_Name                        = "Temperature";
 const char*     Temperature_Unit_Text                   = "\xc2\xb0""C";
 const double    Temperature_Setpoint_Min                = -20;
@@ -129,10 +131,16 @@ double sensor_mcp9600_read()
 MAX31865 max31865(SPI, PIN_MAX31865_CS);
 bool sensor_max31865_begin()
 {
-    return max31865.begin(100, 430, true, true);
+    if(max31865.begin(100, 430, true, true))
+	{
+		max31865.setAutoConvert(true);
+		return true;
+	};
+	return false;
 };
 double sensor_max31865_read()
 {
+	time_t start = millis();
     return max31865.getTemperature();
 };
 #endif
