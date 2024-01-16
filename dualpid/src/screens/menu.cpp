@@ -159,22 +159,25 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
             {
                 menu.addSelector("Fixed Output", &set.fixed_output_value, pid_fixed_values);
             };
-            auto sub = menu.addSubMenu("PID Settings");
-            if(settings.expert_mode)
-                sub->addSeparator("Standard");
-            else
-                sub->addSeparator();
-            sub->addSpinbox("kP", &set.fpid.kP, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-            sub->addSpinbox("kI", &set.fpid.kI, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-            sub->addSpinbox("kD", &set.fpid.kD, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-            sub->addSpinbox("kF", &set.fpid.kF, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
-            sub->addSpinbox("F-Offset", &set.fpid.kF_offset, sp_min, sp_max, sp_prec);
             if(settings.expert_mode)
             {
+                auto sub = menu.addSubMenu("PID Settings");
+                sub->addSwitch("Active", &set.active);                
+
+                sub->addSeparator("Standard");
+                sub->addSpinbox("kP", &set.fpid.kP, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+                sub->addSpinbox("kI", &set.fpid.kI, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+                sub->addSpinbox("kD", &set.fpid.kD, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+                sub->addSpinbox("kF", &set.fpid.kF, PID_PAR_MIN, PID_PAR_MAX, PID_PAR_PRECISION);
+                sub->addSpinbox("F-Offset", &set.fpid.kF_offset, sp_min, sp_max, sp_prec);
+
                 sub->addSeparator("Advanced");
                 sub->addSpinbox("D-Filter", &set.fpid.D_filter, 0, 1, 2);
                 sub->addSelector("Lock Time", &set.lock_time, lock_times);
                 sub->addSpinbox("Lock Window", &set.lock_window, 0, sp_max - sp_min);
+
+                sub->addAction("Save Settings now", [](MenuItem*, void*){ setman.save(); });
+
             };
         };
         if(settings.expert_mode)
