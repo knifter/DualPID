@@ -172,7 +172,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
             if(settings.expert_mode)
             {
                 sub->addSeparator("Advanced");
-                sub->addSpinbox("D-Filter", &set.input_filter, 0, 1, 2);
+                sub->addSpinbox("D-Filter", &set.fpid.D_filter, 0, 1, 2);
                 sub->addSelector("Lock Time", &set.lock_time, lock_times);
                 sub->addSpinbox("Lock Window", &set.lock_window, 0, sp_max - sp_min);
             };
