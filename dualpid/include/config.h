@@ -34,9 +34,11 @@
 #define DEFAULT_GRAPH_DELTA_MS	200		  	    // Time between graph points
 
 // lib-FPID config
+// #define DEBUG_FPID
 #define FPID_D_FILTER
 #define FPID_FORWARD_LINEAR
 #define FPID_OUTPUT_FILTER
+// #define FPID_TAKEBACKHALF
 
 #define NUMBER_OF_CHANNELS      2
 #define PID_PAR_MIN			    0

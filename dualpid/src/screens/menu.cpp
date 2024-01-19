@@ -188,6 +188,9 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
             sub->addSpinbox("Input Filter", &set.input_filter, 0, 1, 2);
             sub->addSeparator("PID");
             sub->addSelector("Looptime", &set.looptime, pid_loop_times);
+#ifdef FPID_TAKEBACKHALF
+            sub->addCheckbox("Take-Back-Half", &set.fpid.takebackhalf);
+#endif
             // sub->addCheckbox("Take-Back-Half", &set.fpid.takebackhalf);
             sub->addSeparator("Output");
             sub->addSelector("Driver", &set.output_drv, output_drivers)->onChange(set_need_reboot);
