@@ -91,7 +91,7 @@ bool PIDLoop::begin()
 
     _pid.setOutputLimits(_settings.min_output, _settings.max_output);
     DBG("ch%d: Output min:%.0f%% max:%.0f%%", _channel_id, _settings.min_output, _settings.max_output);
-    _output_value = 50; // 50%
+    _output_value = NAN;
     _pid.alignOutput();
 
     // configure initial mode (depends on input/output available)
