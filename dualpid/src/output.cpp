@@ -115,12 +115,12 @@ void SlowPWMDriver::task(void* ptr)
                 // DBG("ch%d, %lu: set LOW, wait %d", 
                 //     me->_channel_id, now, me->_window_lowtime);
 
+                // delay = low_time = (1-percent)*windowtime
+                delay(me->_window_lowtime);
+
                 // state LOW only if there is high_time to prevent glitches
                 if(me->_window_hightime)
                     me->_state = LOW;
-
-                // delay = low_time = (1-percent)*windowtime
-                delay(me->_window_lowtime);
 
                 break;
             case LOW:
@@ -130,12 +130,12 @@ void SlowPWMDriver::task(void* ptr)
                 // DBG("ch%d, %lu: set HIGH, wait %d",
                 //     me->_channel_id, now, me->_window_hightime);
 
+                // delay = high_time = percent*windowtime
+                delay(me->_window_hightime);
+
                 // state HIGH only if there is LOW_time
                 if(me->_window_lowtime)
                     me->_state = HIGH;
-
-                // delay = high_time = percent*windowtime
-                delay(me->_window_hightime);
 
                 break;
         };
