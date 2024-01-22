@@ -140,7 +140,6 @@ bool sensor_max31865_begin()
 };
 double sensor_max31865_read()
 {
-	time_t start = millis();
     return max31865.getTemperature();
 };
 #endif
