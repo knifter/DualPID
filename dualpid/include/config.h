@@ -64,11 +64,11 @@
 #define PID_DEFAULT_OFILTER			0.0             // PID Output filter, 0 = no filter
 #define PID_DEFAULT_DFILTER			0.0             // PID D-Term filter
 #define PID_DEFAULT_TBH				0
-#define PID_DEFAULT_LOOPTIME_MS		1000           // time between each pid-loop iteration
+#define PID_DEFAULT_LOOPTIME_MS		1000            // time between each pid-loop iteration
 #define PID_DEFAULT_WINDOWTIME		5000      		// soft-pwm time-window size in ms
 #define PID_DEFAULT_MIN_OUTPUT		0.0
-#define PID_DEFAULT_MAX_OUTPUT		100.0            // Factor max output, between 0..1
-#define PID_DEFAULT_LOCK_WINDOW		5                         
+#define PID_DEFAULT_MAX_OUTPUT		100.0           // Factor max output, between 0..1
+#define PID_DEFAULT_LOCK_WINDOW		1000			// 1%                        
 #define PID_DEFAULT_LOCK_TIME_MS	60000
 #define PID_DEFAULT_INPUT_FILTER	0.0
 

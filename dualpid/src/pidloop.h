@@ -74,7 +74,8 @@ class PIDLoop: private NonCopyable
             double min_output;
             double max_output;
             FPID::fpid_settings_t fpid;
-            double lock_window;
+            int32_t lock_window;    // 1000 == 1%
+            int32_t _reserved; // left from previous double lock_window
             int32_t lock_time;
             double input_filter;
             int32_t sensor_type;

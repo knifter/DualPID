@@ -103,6 +103,15 @@ SelectorField::item_t output_fastpwm_frequencies [] {
 	{0, 0, 0}
 	};
 
+SelectorField::item_t lock_windows [] {
+    // 1000 == 1%
+	{1000, 	"1%",    "1%"},
+	{2000, 	"2%",    "2%"},
+	{5000, 	"5%",    "5%"},
+	{10000, "10%",   "10%"},
+	{0, 0, 0}
+	};
+
 bool need_reboot = false;
 void set_need_reboot(MenuItem*, void*)
 {
@@ -174,7 +183,8 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
                 sub->addSeparator("Advanced");
                 sub->addSpinbox("D-Filter", &set.fpid.D_filter, 0, 1, 2);
                 sub->addSelector("Lock Time", &set.lock_time, lock_times);
-                sub->addSpinbox("Lock Window", &set.lock_window, 0, sp_max - sp_min);
+                // sub->addSpinbox("Lock Window", &set.lock_window, 0, sp_max - sp_min);
+                sub->addSelector("Lock Window", &set.lock_window, lock_windows);
 
                 sub->addAction("Save Settings now", [](MenuItem*, void*){ setman.save(); });
 

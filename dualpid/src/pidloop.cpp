@@ -290,7 +290,11 @@ void PIDLoop::do_pid()
         return;
     };
 
-    if(abs(_input_value - _settings.fpid.setpoint) > _settings.lock_window)
+    // If PV is outside lock window, we're unlocked
+    // 1000 == 1%
+    float window = static_cast<double>(_settings.lock_window)*_settings.fpid.setpoint/1E5;
+    float error = abs(_input_value - _settings.fpid.setpoint);
+    if(error > window)
     {
         // UNLOCKED
         _status = STATUS_UNLOCKED;
