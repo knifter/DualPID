@@ -34,7 +34,7 @@ class PIDLoop: private NonCopyable
             // CONTROL_MODE_OFF
             STATUS_INACTIVE,        // PID off
             // CONTROL_MODE_PID
-            STATUS_SATURATED,       // 3
+            STATUS_ERROR,           // 3
             STATUS_UNLOCKED,        // 
             STATUS_LOCKED_WAIT,     // 
             STATUS_LOCKED,          // 6 

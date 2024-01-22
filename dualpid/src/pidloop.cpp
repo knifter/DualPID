@@ -31,7 +31,7 @@ const char* status2str(PIDLoop::status_t status)
         case PIDLoop::STATUS_NONE:          return "(none)";
         case PIDLoop::STATUS_SENSOR:        return "SENSOR";
         case PIDLoop::STATUS_INACTIVE:      return "OFF";
-        case PIDLoop::STATUS_SATURATED:     return "SATURATED";
+        case PIDLoop::STATUS_ERROR:         return "ERROR";
         case PIDLoop::STATUS_UNLOCKED:      return "UNLOCKED";
         case PIDLoop::STATUS_LOCKED_WAIT:   return "WAIT";
         case PIDLoop::STATUS_LOCKED:        return "LOCKED";
@@ -285,9 +285,16 @@ void PIDLoop::do_pid()
     // If saturated, we're in error
     if(!pidres)
     {
-        _status = STATUS_SATURATED;
+        _status = STATUS_ERROR;
         _unlocked_last = now;
         return;
+    };
+
+    // on sensor/input error, we mark an error
+    if(!isfinite(_input_value))
+    {
+        _status = STATUS_ERROR;
+        _unlocked_last = now;
     };
 
     // If PV is outside lock window, we're unlocked

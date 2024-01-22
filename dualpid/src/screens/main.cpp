@@ -139,7 +139,7 @@ const void PidPanel::setState(PIDLoop::status_t status)
 			// lv_obj_set_style_bg_color(lbl_sp, COLOR_BLUE_GREY, 0);
             lv_obj_set_style_text_color(lbl_sp, COLOR_BLACK, 0);
             break;
-		case PIDLoop::STATUS_SATURATED:
+		case PIDLoop::STATUS_ERROR:
 			// lv_obj_set_style_bg_color(lbl_sp, COLOR_RED_LIGHT(2), 0);
             lv_obj_set_style_text_color(lbl_sp, COLOR_BLACK, 0);
             break;
@@ -174,7 +174,7 @@ const void PidPanel::setState(PIDLoop::status_t status)
 		    lv_obj_set_style_border_color(box, COLOR_WHITE, 0);
 		    lv_obj_set_style_bg_color(box, COLOR_WHITE, 0);
             break;
-		case PIDLoop::STATUS_SATURATED:
+		case PIDLoop::STATUS_ERROR:
 			lv_obj_set_style_bg_color(lbl_value, COLOR_RED, 0);
 		    lv_obj_set_style_border_color(box, COLOR_WHITE, 0);
 		    lv_obj_set_style_bg_color(box, COLOR_WHITE, 0);
@@ -215,7 +215,7 @@ const void PidPanel::setState(PIDLoop::status_t status)
    			lv_style_set_bg_color(&style_indic, COLOR_GREY_LIGHT(1));
 			lv_style_set_bg_grad_color(&style_indic, COLOR_GREY_LIGHT(1));
             break;
-		case PIDLoop::STATUS_SATURATED:
+		case PIDLoop::STATUS_ERROR:
 		case PIDLoop::STATUS_UNLOCKED:
         case PIDLoop::STATUS_LOCKED_WAIT:
         case PIDLoop::STATUS_LOCKED:
