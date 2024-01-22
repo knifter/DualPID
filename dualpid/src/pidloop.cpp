@@ -31,9 +31,10 @@ const char* status2str(PIDLoop::status_t status)
         case PIDLoop::STATUS_NONE:          return "(none)";
         case PIDLoop::STATUS_SENSOR:        return "SENSOR";
         case PIDLoop::STATUS_INACTIVE:      return "OFF";
-        case PIDLoop::STATUS_LOCKED:        return "LOCKED";
-        case PIDLoop::STATUS_UNLOCKED:      return "UNLOCKED";
         case PIDLoop::STATUS_SATURATED:     return "SATURATED";
+        case PIDLoop::STATUS_UNLOCKED:      return "UNLOCKED";
+        case PIDLoop::STATUS_LOCKED_WAIT:   return "WAIT";
+        case PIDLoop::STATUS_LOCKED:        return "LOCKED";
         case PIDLoop::STATUS_FIXED:         return "FIXED";
     };
     return "(unknown)";
@@ -300,7 +301,7 @@ void PIDLoop::do_pid()
     // In lock window, long enough?
     if(now - _unlocked_last < _settings.lock_time)
     {
-        _status = STATUS_UNLOCKED;
+        _status = STATUS_LOCKED_WAIT;
         return;
     };
 

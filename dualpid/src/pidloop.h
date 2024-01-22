@@ -34,9 +34,10 @@ class PIDLoop: private NonCopyable
             // CONTROL_MODE_OFF
             STATUS_INACTIVE,        // PID off
             // CONTROL_MODE_PID
-            STATUS_LOCKED,      
-            STATUS_UNLOCKED,
-            STATUS_SATURATED,       
+            STATUS_SATURATED,       // 3
+            STATUS_UNLOCKED,        // 
+            STATUS_LOCKED_WAIT,     // 
+            STATUS_LOCKED,          // 6 
 
             // CONTROL_MODE_FIXED
             STATUS_FIXED,       // Fixed value: set new value
