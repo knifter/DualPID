@@ -182,10 +182,9 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 
                 sub->addSeparator("Advanced");
                 sub->addSpinbox("D-Filter", &set.fpid.D_filter, 0, 1, 2);
-                sub->addSelector("Lock Time", &set.lock_time, lock_times);
-                // sub->addSpinbox("Lock Window", &set.lock_window, 0, sp_max - sp_min);
-                sub->addSelector("Lock Window", &set.lock_window, lock_windows);
-
+#ifdef FPID_TAKEBACKHALF
+                sub->addCheckbox("Take-Back-Half", &set.fpid.takebackhalf);
+#endif
                 sub->addAction("Save Settings now", [](MenuItem*, void*){ setman.save(); });
 
             };
@@ -198,16 +197,14 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
             sub->addSpinbox("Input Filter", &set.input_filter, 0, 1, 2);
             sub->addSeparator("PID");
             sub->addSelector("Looptime", &set.looptime, pid_loop_times);
-#ifdef FPID_TAKEBACKHALF
-            sub->addCheckbox("Take-Back-Half", &set.fpid.takebackhalf);
-#endif
-            // sub->addCheckbox("Take-Back-Half", &set.fpid.takebackhalf);
+            sub->addSelector("Lock Time", &set.lock_time, lock_times);
+            sub->addSelector("Lock Window", &set.lock_window, lock_windows);
             sub->addSeparator("Output");
             sub->addSelector("Driver", &set.output_drv, output_drivers)->onChange(set_need_reboot);
             switch(set.output_drv)
             {
                 case PIDLoop::OUTPUT_DRIVER_NONE:
-                    break;;
+                    break;
                 case PIDLoop::OUTPUT_DRIVER_SLOWPWM:
                     // sub->addSelector("Pin N (-)", &set.pin_n, hardware_ports)->onChange(set_need_reboot);
                     sub->addSelector("Pin P (+)", &set.output.slowpwm.pin_p, hardware_ports)->onChange(set_need_reboot);
