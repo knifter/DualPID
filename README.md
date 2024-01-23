@@ -27,7 +27,7 @@ Currently used for controlling both temperature and humidity but should be versa
    * [ ] Yaapt is planned
    * [ ] MQtt
 
-![Current version](Pictures/HRsht31valve.jpg)
+![Incubator](Pictures/incubator-internals.jpg)
 
 ## Hardware
 Start with [M5Stack Cushion, mandatory lab equipment](https://shop.m5stack.com/collections/m5-accessory/products/m5stack-cushion)
