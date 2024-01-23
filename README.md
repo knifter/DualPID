@@ -24,7 +24,7 @@ Currently used for controlling both temperature and humidity but should be versa
  * [x] Error graphs
  * [ ] Remote logging (csv, mqtt or other)
 
-![Current version](Pictures/PXL_20230807_150730906.jpg)
+![Current version](Pictures/HRsht31valve.jpg)
 
 ## Hardware
 Start with [M5Stack Cushion, mandatory lab equipment](https://shop.m5stack.com/collections/m5-accessory/products/m5stack-cushion)
