@@ -17,7 +17,11 @@ Currently used for controlling both temperature and humidity but should be versa
  * [x] Fixed output setting to measure step response
  * [x] Lock-detection
  * [ ] Alarms
- * [x] Two H-Bridge outputs able to control most things from heaters, peltiers, valves etc
+ * [ ] Expert-Mode: Hide Setup and PID settings on normal usage (press A+B+C for 2 seconds to open configuration)
+ * [ ] Two H-Bridge outputs able to control most things from heaters, peltiers, valves etc (temporarily removed)
+ * [x] Two single pin positive drive outputs capable of:
+ * [x] SlowPWM (<1Hz) and FastPWM (>1 Hz up to kHz) outputs
+ * [x] Easy to add sensors as inputs or other output methods (implemented in classes and run-time configurable)
  * [x] Multiple sensors: Temperature, Humidity, CO2, more to come
  * [x] Adjustable time intervals per channel (100ms - minutes)
  * [x] run-time configurable: Input sensor and output drive configurable through GUI, no recomile for your combination
