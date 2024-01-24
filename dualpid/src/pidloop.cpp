@@ -44,14 +44,14 @@ PIDLoop::PIDLoop(uint32_t id, settings_t& s) :
     _settings(s), 
     _channel_id(id), 
     _pid(&(s.fpid), (&_input_value), (&_output_value)),
-    _output(nullptr)
+    _outputdrv(nullptr)
 {
 };
 
 PIDLoop::~PIDLoop()
 {
-    if(_output != nullptr)
-        delete _output;
+    if(_outputdrv != nullptr)
+        delete _outputdrv;
 };
 
 bool PIDLoop::begin()
@@ -64,13 +64,13 @@ bool PIDLoop::begin()
 
     switch(_settings.output_drv)
     {
-        case OUTPUT_DRIVER_NONE: _output = nullptr; break;
-        case OUTPUT_DRIVER_SLOWPWM: _output = new SlowPWMDriver(); break;
-        case OUTPUT_DRIVER_FASTPWM: _output = new FastPWMDriver(); break;
+        case OUTPUT_DRIVER_NONE: _outputdrv = nullptr; break;
+        case OUTPUT_DRIVER_SLOWPWM: _outputdrv = new SlowPWMDriver(); break;
+        case OUTPUT_DRIVER_FASTPWM: _outputdrv = new FastPWMDriver(); break;
     };
 
-    if(_output)
-        _output->begin(_channel_id);
+    if(_outputdrv)
+        _outputdrv->begin(_channel_id);
 
     if(!::settings.expert_mode)
     {
@@ -99,7 +99,7 @@ bool PIDLoop::begin()
     control_mode_t initmode = CONTROL_MODE_NONE;
     if(_sensor_read != nullptr)
     {
-        if(_output != nullptr && _output->begin_ok())
+        if(_outputdrv != nullptr && _outputdrv->begin_ok())
             initmode = CONTROL_MODE_INACTIVE;
         else
             initmode = CONTROL_MODE_SENSOR;
@@ -174,14 +174,14 @@ void PIDLoop::set_mode(control_mode_t newmode)
             break;
         case CONTROL_MODE_NONE:
         case CONTROL_MODE_INACTIVE:
-            if(_output)
-                _output->off();
+            if(_outputdrv)
+                _outputdrv->off();
 
             _status = STATUS_INACTIVE;
             _mode = CONTROL_MODE_INACTIVE;
             break;
         case CONTROL_MODE_PID:
-            if(_output == nullptr)
+            if(_outputdrv == nullptr)
             {
                 WARNING("No pid output mode set: pid remains in-active.");
                 _mode = CONTROL_MODE_INACTIVE;
@@ -351,22 +351,22 @@ bool PIDLoop::set_output_value(double value)
 
 void PIDLoop::do_output()
 {
-    if(_output == nullptr)
+    if(_outputdrv == nullptr)
         return;
         
     // turn of output if PID loop had an error
     if(isnan(_output_value))
     {
-        _output->off();
+        _outputdrv->off();
         return;
     };
 
     // Output is only enabled when PID is ruuning or when Fixed Output is set (in expert_mode)
     if(_mode != CONTROL_MODE_PID && _mode != CONTROL_MODE_FIXED)
     {
-        _output->off();
+        _outputdrv->off();
         return;
     };
 
-    _output->set(_output_value);
+    _outputdrv->set(_output_value);
 };
