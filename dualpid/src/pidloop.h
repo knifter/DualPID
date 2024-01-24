@@ -120,7 +120,7 @@ class PIDLoop: private NonCopyable
         time_t _unlocked_last;
 
         // OUTPUT
-        OutputDriver* _output;
+        OutputDriver* _outputdrv;
 };
 
 #endif // __PIDLOOP_H
