@@ -8,7 +8,7 @@
 #include "globals.h"
 #include "settings.h"
 #include "tools-log.h"
-#include "sensors.h"
+#include "inputdrv.h"
 
 const char* control_mode2str(PIDLoop::control_mode_t mode)
 {
@@ -62,6 +62,29 @@ bool PIDLoop::begin()
     _status = STATUS_NONE;
     _last_pid = 0;
 
+    // Configure InputDriver
+    switch(_settings.input_drv)
+    {
+        default: _inputdrv = new NoneInputDriver(); break;
+        case INPUT_SHT31_TEMP: _inputdrv = new SHT31TDriver(); break;
+        case INPUT_SHT31_RH: _inputdrv = new SHT31RHDriver(); break;
+        case INPUT_M5KMETER: _inputdrv = new M5KMeterDriver(); break;
+        case INPUT_MCP9600: _inputdrv = new MCP9600Driver(); break;
+        case INPUT_MAX31865: _inputdrv = new MAX31865Driver(); break;
+        case INPUT_SPRINTIR: _inputdrv = new SprintIR20Driver(); break;
+    };
+    if(_settings.input_drv != INPUT_NONE)
+    {
+        if(!_inputdrv->begin())
+        {
+            gui.showMessage("WARNING:", "Channel sensor error.");
+            ERROR("Channel %d sensor begin() failed.", _channel_id);
+        }else{
+            DBG("Channel %d sensor begin() == ok", _channel_id);
+        };
+    };
+
+    // Configure OutputDriver
     switch(_settings.output_drv)
     {
         case OUTPUT_DRIVER_NONE: _outputdrv = nullptr; break;
@@ -78,18 +101,6 @@ bool PIDLoop::begin()
         _settings.fixed_output_value = 0;
     };
 
-	_sensor_begin = find_sensor_begin(_settings.sensor_type);
-	_sensor_read = find_sensor_read(_settings.sensor_type);
-
-	if(_sensor_begin != nullptr)
-    {
-    	if(!_sensor_begin())  
-    	{
-			gui.showMessage("WARNING:", "Channel sensor error."); // FIXME x
-			_sensor_read = nullptr;
-	    };
-    };
-
     _pid.setOutputLimits(_settings.min_output, _settings.max_output);
     DBG("ch%d: Output min:%.0f%% max:%.0f%%", _channel_id, _settings.min_output, _settings.max_output);
     _output_value = NAN;
@@ -97,12 +108,11 @@ bool PIDLoop::begin()
 
     // configure initial mode (depends on input/output available)
     control_mode_t initmode = CONTROL_MODE_NONE;
-    if(_sensor_read != nullptr)
+    if(_inputdrv != nullptr)
     {
+        initmode = CONTROL_MODE_SENSOR;
         if(_outputdrv != nullptr && _outputdrv->begin_ok())
             initmode = CONTROL_MODE_INACTIVE;
-        else
-            initmode = CONTROL_MODE_SENSOR;
     };
     DBG("ch%d: Init with mode %s, output = %.0f%%", _channel_id, control_mode2str(initmode), _output_value);
     set_mode(initmode);
@@ -218,18 +228,18 @@ void PIDLoop::do_sensor()
 {
     // Read sensor?
 	time_t now = millis();
-	if(_next_sensor > now)
+	if(_next_input > now)
         return;
-    _next_sensor = now + settings.sensor_loop_ms; // FIXME: rather absolute dT
+    _next_input = now + settings.sensor_loop_ms; // FIXME: rather absolute dT
 
     // Read sensors and apply averaging/filter
-    if(_sensor_read == nullptr)
+    if(_inputdrv == nullptr)
     {
         _input_value = NAN;
         return;
     };
 
-    double read = _sensor_read();
+    double read = _inputdrv->read();
 
     // reset filter if previous was NaN
     if(isnan(_input_value))

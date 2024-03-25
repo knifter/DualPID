@@ -6,10 +6,9 @@
 #include "gui.h"
 
 #include "config.h"
-#include "sensors.h"
+#include "inputdrv.h"
 #include "tools-log.h"
 #include "globals.h"
-#include "sensors.h"
 
 /*********************************************************************************************************************************/
 class PidPanel
@@ -39,24 +38,13 @@ class PidPanel
 PidPanel::PidPanel(lv_obj_t* parent, const uint8_t num_in, PIDLoop& pid_in)
 	 : num(num_in), pid(pid_in)
 {
-	uint32_t st = pid._settings.sensor_type;
-    lv_color_t color1;
-	switch(st)
-	{
-		case 100 ... 199: // Temperature
-			unit = Temperature_Unit_Text; prec = Temperature_Precision; color1 = Temperature_Color;
-			break;
-		case 200 ... 299: // Humidity
-			unit = Humidity_Unit_Text; prec = Humidity_Precision; color1 = Humidity_Color; 
-			break;
-		case 300 ... 399: // CO2
-			unit = CO2_Unit_Text; prec = CO2_Precision; color1 = CO2_Color; 
-			break;
-		case SENSOR_NONE: //break;
-		default:
-			unit = "U"; prec = 0; color1 = COLOR_BLACK; 
-			break;
-	};
+	unit = "U";
+	prec = 0;
+	lv_color_t color1 = COLOR_BLACK;
+    InputDriver* indrv = pid.input_drv();
+	unit =   indrv->unit_text();
+	prec =   indrv->precision();
+	color1 = indrv->color1();
 	lv_color_t color2 = lv_color_lighten(color1, 4);
 
 	box = lv_obj_create(parent);
@@ -311,11 +299,15 @@ GraphPanel::GraphPanel(lv_obj_t* parent)
     lv_chart_set_axis_tick(	chart,  LV_CHART_AXIS_PRIMARY_Y, 	1,         0,         3,         1,         true,     40);
     lv_chart_set_axis_tick(	chart,  LV_CHART_AXIS_SECONDARY_Y, 	1,         0,         3,         1,         true,     40);
 
-	color_ch1 = find_sensor_color(pids[0]->_settings.sensor_type);
-	color_ch2 = find_sensor_color(pids[1]->_settings.sensor_type);
+	color_ch1 = COLOR_BLACK;
+	color_ch2 = COLOR_BLACK;
+	if(pids[0]->input_drv())
+		color_ch1 = pids[0]->input_drv()->color1();
+	if(pids[1]->input_drv())
+		color_ch2 = pids[1]->input_drv()->color1();
 	color_ch1 = lv_color_darken(color_ch1, 4);
 	color_ch2 = lv_color_darken(color_ch2, 4);
-	
+
     /*Add two data series*/
 	lv_chart_set_point_count(chart, GRAPH_POINTS);
     ser1 = lv_chart_add_series(chart, color_ch1, LV_CHART_AXIS_PRIMARY_Y);
