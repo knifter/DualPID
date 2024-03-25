@@ -4,7 +4,7 @@
 #include <FPID.h>
 
 #include "config.h"
-#include "sensors.h"
+#include "inputdrv.h"
 #include "driver/gpio.h"
 #include "tools-nocopy.h"
 #include "output.h"
@@ -43,6 +43,7 @@ class PIDLoop: private NonCopyable
             STATUS_FIXED,       // Fixed value: set new value
         } status_t;
 
+        // TODO: move to output?
         typedef enum
         {
             OUTPUT_DRIVER_NONE = 0,
@@ -55,6 +56,7 @@ class PIDLoop: private NonCopyable
             bool active;
             int32_t looptime;
             int32_t output_drv;
+            // TODO: move to output?
             union {
                 int32_t param[3];
                 struct slowpwm_t
@@ -78,7 +80,8 @@ class PIDLoop: private NonCopyable
             int32_t _reserved; // left from previous double lock_window
             int32_t lock_time;
             double input_filter;
-            int32_t sensor_type;
+            // TODO: input union from inputdrv.h?
+            int32_t input_drv;
             int32_t fixed_output_value;
         } settings_t;
 
@@ -90,6 +93,8 @@ class PIDLoop: private NonCopyable
 
         // inspection
         double input_value() { return _input_value; };
+        InputDriver* input_drv() { return _inputdrv; };
+        
         double output_value() { return _output_value; };
         bool set_output_value(double value);
         status_t status() { return _status; };
@@ -108,9 +113,10 @@ class PIDLoop: private NonCopyable
         status_t _status;
 
         // SENSOR
-        time_t _next_sensor = 0;
-        sensor_begin_fptr _sensor_begin = nullptr;
-        sensor_read_fptr _sensor_read = nullptr;
+        time_t _next_input = 0;
+        InputDriver* _inputdrv;
+        // sensor_begin_fptr _sensor_begin = nullptr;
+        // sensor_read_fptr _sensor_read = nullptr;
 
         // PID
         FPID _pid;

@@ -6,7 +6,7 @@
 #include "gui.h"
 
 #include "config.h"
-#include "sensors.h"
+#include "inputdrv.h"
 #include "tools-log.h"
 #include "globals.h"
 #include "soogh-debug.h"
@@ -74,7 +74,7 @@ SelectorField::item_t lock_times [] = {
 	};
 
 SelectorField::item_t sensor_types [] = {
-    SENSOR_TYPES_LIST,
+    INPUTS_LIST,
     {0, 0, 0},
     };
 
@@ -127,38 +127,13 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
     while(++ch < NUMBER_OF_CHANNELS)
     {
         PIDLoop* pidloop = pids[ch];
+        InputDriver* indrv = pidloop->input_drv();
         PIDLoop::settings_t& set = pidloop->_settings;
-        const char* name;
-        float sp_min, sp_max, sp_prec;
-        switch(set.sensor_type)
-        {
-            case 100 ... 199: // Temperature
-                name =   Temperature_Name;
-                sp_min = Temperature_Setpoint_Min;
-                sp_max = Temperature_Setpoint_Max;
-                sp_prec =Temperature_Precision;
-                break;
-            case 200 ... 299: // Humidity
-                name =   Humidity_Name;
-                sp_min = Humidity_Setpoint_Min;
-                sp_max = Humidity_Setpoint_Max;
-                sp_prec =Humidity_Precision;
-                break;
-            case 300 ... 399: // CO2
-                name =   CO2_Name;
-                sp_min = CO2_Setpoint_Min;
-                sp_max = CO2_Setpoint_Max;
-                sp_prec =CO2_Precision;
-                break;
-            case SENSOR_NONE: //break;
-            default:
-                name = "none";
-                sp_min = 0;
-                sp_max = 1;
-                sp_prec = 2;
-                break;
-        };
-
+        const char* name = indrv->name();
+        float sp_min = indrv->setpoint_min();
+        float sp_max = indrv->setpoint_max();
+        float sp_prec = indrv->precision();
+        
         if(pidloop->mode() > PIDLoop::CONTROL_MODE_SENSOR || settings.expert_mode)
         {
             menu.addSeparator(name);
@@ -193,7 +168,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
         {
             auto sub = menu.addSubMenu("Setup");
             sub->addSeparator("Input");
-            sub->addSelector("Sensor", &set.sensor_type, sensor_types)->onChange(set_need_reboot);
+            sub->addSelector("Sensor", &set.input_drv, sensor_types)->onChange(set_need_reboot);
             sub->addSpinbox("Input Filter", &set.input_filter, 0, 1, 2);
             sub->addSeparator("PID");
             sub->addSelector("Looptime", &set.looptime, pid_loop_times);

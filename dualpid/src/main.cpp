@@ -5,7 +5,7 @@
 #include "settings.h"
 #include "pidloop.h"
 #include "screens.h"
-#include "sensors.h"
+#include "inputdrv.h"
 
 #include "tools-log.h"
 

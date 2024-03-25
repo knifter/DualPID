@@ -7,7 +7,7 @@
 #include "tools-log.h"
 #include "globals.h"
 
-#include "sensors.h"
+#include "inputdrv.h"
 
 SettingsManager::SettingsManager(settings_t& settings) : NVSettings(&settings, sizeof(settings_t))
 {
@@ -55,7 +55,7 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
             settings->pid1.lock_window =            PID_DEFAULT_LOCK_WINDOW;
             settings->pid1.lock_time =              PID_DEFAULT_LOCK_TIME_MS;
             settings->pid1.input_filter =           PID_DEFAULT_INPUT_FILTER;
-            settings->pid1.sensor_type =            SENSOR_NONE;
+            settings->pid1.input_drv =              INPUT_NONE;
 
             // Channel 2 has the same defaults
             memcpy(&(settings->pid2), &(settings->pid1), sizeof(PIDLoop::settings_t));
