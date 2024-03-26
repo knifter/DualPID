@@ -7,7 +7,7 @@
 #include "inputdrv.h"
 #include "driver/gpio.h"
 #include "tools-nocopy.h"
-#include "output.h"
+#include "outputdrv.h"
 
 class PIDLoop: private NonCopyable
 {
@@ -43,35 +43,12 @@ class PIDLoop: private NonCopyable
             STATUS_FIXED,       // Fixed value: set new value
         } status_t;
 
-        // TODO: move to output?
-        typedef enum
-        {
-            OUTPUT_DRIVER_NONE = 0,
-            OUTPUT_DRIVER_SLOWPWM,
-            OUTPUT_DRIVER_FASTPWM,
-        } output_driver_t;
-
         typedef struct
         {
             bool active;
             int32_t looptime;
             int32_t output_drv;
-            // TODO: move to output?
-            union {
-                int32_t param[3];
-                struct slowpwm_t
-                {
-                    int32_t pin_n;
-                    int32_t pin_p;
-                    int32_t windowtime;
-                } slowpwm;
-                struct
-                {
-                    int32_t pin_n;
-                    int32_t pin_p;
-                    int32_t frequency;
-                } fastpwm;
-            } output;
+            output_driver_config_t output;
 
             double min_output;
             double max_output;
@@ -80,8 +57,8 @@ class PIDLoop: private NonCopyable
             int32_t _reserved; // left from previous double lock_window
             int32_t lock_time;
             double input_filter;
-            // TODO: input union from inputdrv.h?
             int32_t input_drv;
+            // input_driver_config_t input_cfg;
             int32_t fixed_output_value;
         } settings_t;
 

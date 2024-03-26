@@ -6,29 +6,29 @@
 
 typedef enum
 {
-    INPUT_NONE = 0,
+    INPUT_DRIVER_NONE = 0,
 
     // 100 = TEMP
-    INPUT_SHT31_TEMP = 100,
-    INPUT_M5KMETER,
-    INPUT_MCP9600,
-    INPUT_MAX31865,
+    INPUT_DRIVER_SHT31_TEMP = 100,
+    INPUT_DRIVER_M5KMETER,
+    INPUT_DRIVER_MCP9600,
+    INPUT_DRIVER_MAX31865,
 
     // 200 = HR
-    INPUT_SHT31_RH = 200,
+    INPUT_DRIVER_SHT31_RH = 200,
 
     // 300 = CO2
-    INPUT_SPRINTIR = 300,
-} input_type_t;
+    INPUT_DRIVER_SPRINTIR = 300,
+} input_driver_t;
 
-#define INPUTS_LIST \
-    {INPUT_NONE, "none", "No sensor"},                 \
-    {INPUT_SHT31_TEMP, "sht-t", "SHT31 Temperature"},  \
-    {INPUT_SHT31_RH, "sht-rh", "SHT31 Humidity"},      \
-    {INPUT_M5KMETER, "kmeter", "M5-KMeter"},           \
-    {INPUT_MCP9600, "mcp9600", "MCP9600"},             \
-    {INPUT_MAX31865, "max31865", "MAX31865"},          \
-    {INPUT_SPRINTIR, "sprintir", "SprintIR"}          
+#define INPUT_DRIVER_MENULIST \
+    {INPUT_DRIVER_NONE, "none", "No sensor"},                 \
+    {INPUT_DRIVER_SHT31_TEMP, "sht-t", "SHT31 Temperature"},  \
+    {INPUT_DRIVER_SHT31_RH, "sht-rh", "SHT31 Humidity"},      \
+    {INPUT_DRIVER_M5KMETER, "kmeter", "M5-KMeter"},           \
+    {INPUT_DRIVER_MCP9600, "mcp9600", "MCP9600"},             \
+    {INPUT_DRIVER_MAX31865, "max31865", "MAX31865"},          \
+    {INPUT_DRIVER_SPRINTIR, "sprintir", "SprintIR"}          
 
 class InputDriver
 {

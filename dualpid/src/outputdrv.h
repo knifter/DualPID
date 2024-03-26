@@ -6,6 +6,39 @@
 
 #include <Arduino.h>
 
+
+typedef enum
+{
+	OUTPUT_DRIVER_NONE = 0,
+
+	// PWM
+	OUTPUT_DRIVER_SLOWPWM,
+	OUTPUT_DRIVER_FASTPWM,
+
+	// DAC, Network, another PID input, etc?
+} output_driver_t;
+
+#define OUTPUT_DRIVER_MENULIST \
+	{OUTPUT_DRIVER_NONE, 		"none",   "no output"}, 	\
+	{OUTPUT_DRIVER_SLOWPWM, 	"sPWM",   "SlowPWM"}, 		\
+	{OUTPUT_DRIVER_FASTPWM, 	"PWM",    "FastPWM"}		
+
+typedef union {
+	int32_t param[3];
+	struct
+	{
+		int32_t pin_n;
+		int32_t pin_p;
+		int32_t windowtime;
+	} slowpwm;
+	struct
+	{
+		int32_t pin_n;
+		int32_t pin_p;
+		int32_t frequency;
+	} fastpwm;
+} output_driver_config_t;
+
 class OutputDriver
 {
 	public:

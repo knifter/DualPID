@@ -6,14 +6,16 @@
 #include "gui.h"
 
 #include "config.h"
-#include "inputdrv.h"
 #include "tools-log.h"
 #include "globals.h"
 #include "soogh-debug.h"
+#include "inputdrv.h"
+#include "outputdrv.h"
 
 // C-style callbacks
 void menu_close_cb(MenuItem* item, void* data);
 
+// TODO move to outputs
 SelectorField::item_t hardware_ports[] = {
 	{GPIO_NUM_NC, "none", "none/unused"},
 	PIDLOOP_PORTS_LIST
@@ -73,15 +75,13 @@ SelectorField::item_t lock_times [] = {
 	{0, 0, 0}
 	};
 
-SelectorField::item_t sensor_types [] = {
-    INPUTS_LIST,
+SelectorField::item_t input_drivers [] = {
+    INPUT_DRIVER_MENULIST,
     {0, 0, 0},
     };
 
 SelectorField::item_t output_drivers [] {
-	{0, 	"none",   "no output"},
-	{1, 	"sPWM",   "SlowPWM"},
-	{2, 	"PWM",   "FastPWM"},
+    OUTPUT_DRIVER_MENULIST,
 	{0, 0, 0}
 	};
 
@@ -168,7 +168,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
         {
             auto sub = menu.addSubMenu("Setup");
             sub->addSeparator("Input");
-            sub->addSelector("Sensor", &set.input_drv, sensor_types)->onChange(set_need_reboot);
+            sub->addSelector("Sensor", &set.input_drv, input_drivers)->onChange(set_need_reboot);
             sub->addSpinbox("Input Filter", &set.input_filter, 0, 1, 2);
             sub->addSeparator("PID");
             sub->addSelector("Looptime", &set.looptime, pid_loop_times);
@@ -178,14 +178,14 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
             sub->addSelector("Driver", &set.output_drv, output_drivers)->onChange(set_need_reboot);
             switch(set.output_drv)
             {
-                case PIDLoop::OUTPUT_DRIVER_NONE:
+                case OUTPUT_DRIVER_NONE:
                     break;
-                case PIDLoop::OUTPUT_DRIVER_SLOWPWM:
+                case OUTPUT_DRIVER_SLOWPWM:
                     // sub->addSelector("Pin N (-)", &set.pin_n, hardware_ports)->onChange(set_need_reboot);
                     sub->addSelector("Pin P (+)", &set.output.slowpwm.pin_p, hardware_ports)->onChange(set_need_reboot);
                     sub->addSelector("Windowtime", &set.output.slowpwm.windowtime, output_slowpwm_windowtimes)->onChange(set_need_reboot);    
                     break;
-                case PIDLoop::OUTPUT_DRIVER_FASTPWM:
+                case OUTPUT_DRIVER_FASTPWM:
                     // sub->addSelector("Pin N (-)", &set.pin_n, hardware_ports)->onChange(set_need_reboot);
                     sub->addSelector("Pin P (+)", &set.output.fastpwm.pin_p, hardware_ports)->onChange(set_need_reboot);
                     sub->addSelector("Frequency", &set.output.fastpwm.frequency, output_fastpwm_frequencies)->onChange(set_need_reboot);    

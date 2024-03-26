@@ -66,14 +66,14 @@ bool PIDLoop::begin()
     switch(_settings.input_drv)
     {
         default: _inputdrv = new NoneInputDriver(); break;
-        case INPUT_SHT31_TEMP: _inputdrv = new SHT31TDriver(); break;
-        case INPUT_SHT31_RH: _inputdrv = new SHT31RHDriver(); break;
-        case INPUT_M5KMETER: _inputdrv = new M5KMeterDriver(); break;
-        case INPUT_MCP9600: _inputdrv = new MCP9600Driver(); break;
-        case INPUT_MAX31865: _inputdrv = new MAX31865Driver(); break;
-        case INPUT_SPRINTIR: _inputdrv = new SprintIR20Driver(); break;
+        case INPUT_DRIVER_SHT31_TEMP:   _inputdrv = new SHT31TDriver(); break;
+        case INPUT_DRIVER_SHT31_RH:     _inputdrv = new SHT31RHDriver(); break;
+        case INPUT_DRIVER_M5KMETER:     _inputdrv = new M5KMeterDriver(); break;
+        case INPUT_DRIVER_MCP9600:      _inputdrv = new MCP9600Driver(); break;
+        case INPUT_DRIVER_MAX31865:     _inputdrv = new MAX31865Driver(); break;
+        case INPUT_DRIVER_SPRINTIR:     _inputdrv = new SprintIR20Driver(); break;
     };
-    if(_settings.input_drv != INPUT_NONE)
+    if(_settings.input_drv != INPUT_DRIVER_NONE)
     {
         if(!_inputdrv->begin())
         {
@@ -87,6 +87,7 @@ bool PIDLoop::begin()
     // Configure OutputDriver
     switch(_settings.output_drv)
     {
+        // TODO: default: _outputdrv = new NoneOutputDriver(); break;
         case OUTPUT_DRIVER_NONE: _outputdrv = nullptr; break;
         case OUTPUT_DRIVER_SLOWPWM: _outputdrv = new SlowPWMDriver(); break;
         case OUTPUT_DRIVER_FASTPWM: _outputdrv = new FastPWMDriver(); break;

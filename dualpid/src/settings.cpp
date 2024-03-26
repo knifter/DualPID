@@ -8,6 +8,7 @@
 #include "globals.h"
 
 #include "inputdrv.h"
+#include "outputdrv.h"
 
 SettingsManager::SettingsManager(settings_t& settings) : NVSettings(&settings, sizeof(settings_t))
 {
@@ -36,7 +37,7 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
             settings->graph_delta =                 DEFAULT_GRAPH_DELTA_MS;
 
             settings->pid1.active =                 false;
-            settings->pid1.output_drv =             PIDLoop::OUTPUT_DRIVER_NONE;
+            settings->pid1.output_drv =             OUTPUT_DRIVER_NONE;
             settings->pid1.looptime =               PID_DEFAULT_LOOPTIME_MS;
             settings->pid1.output.param[0] =        GPIO_NUM_NC;
             settings->pid1.output.param[1] =        GPIO_NUM_NC;
@@ -55,7 +56,7 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
             settings->pid1.lock_window =            PID_DEFAULT_LOCK_WINDOW;
             settings->pid1.lock_time =              PID_DEFAULT_LOCK_TIME_MS;
             settings->pid1.input_filter =           PID_DEFAULT_INPUT_FILTER;
-            settings->pid1.input_drv =              INPUT_NONE;
+            settings->pid1.input_drv =              INPUT_DRIVER_NONE;
 
             // Channel 2 has the same defaults
             memcpy(&(settings->pid2), &(settings->pid1), sizeof(PIDLoop::settings_t));
