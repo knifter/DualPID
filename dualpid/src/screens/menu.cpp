@@ -263,10 +263,8 @@ bool MenuScreen::handle(soogh_event_t e)
 			menu.sendKey(LV_KEY_RIGHT);
 			return true;
 		case KEY_AC_LONG:
-            DBG("before AC_LONG");
 			// gui.popScreen();
             close();
-            DBG("after AC_LONG");
 			return true;
 		default: break;
 	};
