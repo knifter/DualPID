@@ -34,6 +34,10 @@
  *Requires `LV_COLOR_DEPTH = 32` colors and the screen's `bg_opa` should be set to non LV_OPA_COVER value*/
 #define LV_COLOR_SCREEN_TRANSP 0
 
+/* Adjust color mix functions rounding. GPUs might calculate color mix (blending) differently.
+ * 0: round down, 64: round up from x.75, 128: round up from half, 192: round up from x.25, 254: round up */
+#define LV_COLOR_MIX_ROUND_OFS 0
+
 /*Images pixels with this color will not be drawn if they are chroma keyed)*/
 #define LV_COLOR_CHROMA_KEY lv_color_hex(0x00ff00)         /*pure green*/
 
@@ -51,6 +55,8 @@
 #  define LV_MEM_ADR 0     /*0: unused*/
 /*Instead of an address give a memory allocator that will be called to get a memory pool for LVGL. E.g. my_malloc*/
 #if LV_MEM_ADR == 0
+  #undef LV_MEM_POOL_INCLUDE
+  #undef LV_MEM_POOL_ALLOC
 //#define LV_MEM_POOL_INCLUDE your_alloc_library  /* Uncomment if using an external allocator*/
 //#define LV_MEM_POOL_ALLOC   your_alloc          /* Uncomment if using an external allocator*/
 #endif
@@ -83,13 +89,13 @@
  *It removes the need to manually update the tick with `lv_tick_inc()`)*/
 #define LV_TICK_CUSTOM 0
 #if LV_TICK_CUSTOM
-#define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
-#define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
+  #define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
+  #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
 #endif   /*LV_TICK_CUSTOM*/
 
 /*Default Dot Per Inch. Used to initialize default sizes such as widgets sized, style paddings.
  *(Not so important, you can adjust it to modify default sizes and spaces)*/
-#define LV_DPI_DEF 152     /*[px/inch]*/
+#define LV_DPI_DEF 130     /*[px/inch]*/
 
 /*=======================
  * FEATURE CONFIGURATION
@@ -117,12 +123,39 @@
 
 #endif /*LV_DRAW_COMPLEX*/
 
+/**
+ * "Simple layers" are used when a widget has `style_opa < 255` to buffer the widget into a layer
+ * and blend it as an image with the given opacity.
+ * Note that `bg_opa`, `text_opa` etc don't require buffering into layer)
+ * The widget can be buffered in smaller chunks to avoid using large buffers.
+ *
+ * - LV_LAYER_SIMPLE_BUF_SIZE: [bytes] the optimal target buffer size. LVGL will try to allocate it
+ * - LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE: [bytes]  used if `LV_LAYER_SIMPLE_BUF_SIZE` couldn't be allocated.
+ *
+ * Both buffer sizes are in bytes.
+ * "Transformed layers" (where transform_angle/zoom properties are used) use larger buffers
+ * and can't be drawn in chunks. So these settings affects only widgets with opacity.
+ */
+// #define LV_LAYER_SIMPLE_BUF_SIZE          (24 * 1024)
+// #define LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE (3 * 1024)
+
 /*Default image cache size. Image caching keeps the images opened.
  *If only the built-in image formats are used there is no real advantage of caching. (I.e. if no new image decoder is added)
  *With complex image decoders (e.g. PNG or JPG) caching can save the continuous open/decode of images.
  *However the opened images might consume additional RAM.
  *0: to disable caching*/
 #define LV_IMG_CACHE_DEF_SIZE 0
+
+/*Allow dithering the gradients (to achieve visual smooth color gradients on limited color depth display)
+ *LV_DITHER_GRADIENT implies allocating one or two more lines of the object's rendering surface
+ *The increase in memory consumption is (32 bits * object width) plus 24 bits * object width if using error diffusion */
+#define LV_DITHER_GRADIENT 0
+#if LV_DITHER_GRADIENT
+    /*Add support for error diffusion dithering.
+     *Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
+     *The increase in memory consumption is (24 bits * object's width)*/
+    #define LV_DITHER_ERROR_DIFFUSION 0
+#endif
 
 /*Maximum buffer size to allocate for rotation. Only used if software rotation is enabled in the display driver.*/
 #define LV_DISP_ROT_MAX_BUF (10*1024)
@@ -139,6 +172,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #define LV_GPU_DMA2D_CMSIS_INCLUDE
 #endif
 
+/*Use SWM341's DMA2D GPU*/
+#define LV_USE_GPU_SWM341_DMA2D 0
+#if LV_USE_GPU_SWM341_DMA2D
+    #define LV_GPU_SWM341_DMA2D_INCLUDE "SWM341.h"
+#endif
+
 /*Use NXP's PXP GPU iMX RTxxx platforms*/
 #define LV_USE_GPU_NXP_PXP 0
 #if LV_USE_GPU_NXP_PXP
@@ -153,13 +192,17 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 /*Use NXP's VG-Lite GPU iMX RTxxx platforms*/
 #define LV_USE_GPU_NXP_VG_LITE 0
 
-/*Use exnternal renderer*/
-#define LV_USE_EXTERNAL_RENDERER 0
+// /*Use exnternal renderer*/
+// #define LV_USE_EXTERNAL_RENDERER 0
 
 /*Use SDL renderer API. Requires LV_USE_EXTERNAL_RENDERER*/
 #define LV_USE_GPU_SDL 0
 #if LV_USE_GPU_SDL
-#  define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
+    #define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
+    /*Texture cache size, 8MB by default*/
+    #define LV_GPU_SDL_LRU_SIZE (1024 * 1024 * 8)
+    /*Custom blend mode for mask drawing, disable if you need to link with older SDL2 lib*/
+    #define LV_GPU_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
 #endif
 
 /*-------------
@@ -223,14 +266,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 /*1: Show CPU usage and FPS count in the right bottom corner*/
 #define LV_USE_PERF_MONITOR 0
 #if LV_USE_PERF_MONITOR
-#define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
+    #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
 #endif
 
 /*1: Show the used memory and the memory fragmentation in the left bottom corner
  * Requires LV_MEM_CUSTOM = 0*/
 #define LV_USE_MEM_MONITOR 0
 #if LV_USE_PERF_MONITOR
-#define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
+    #define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
 #endif
 
 /*1: Draw random colored rectangles over the redrawn areas*/
@@ -430,15 +473,15 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 #define LV_USE_LABEL      1
 #if LV_USE_LABEL
-#  define LV_LABEL_TEXT_SELECTION 1 /*Enable selecting text of the label*/
-#  define LV_LABEL_LONG_TXT_HINT 1  /*Store some extra info in labels to speed up drawing of very long texts*/
+    #define LV_LABEL_TEXT_SELECTION 1 /*Enable selecting text of the label*/
+    #define LV_LABEL_LONG_TXT_HINT 1  /*Store some extra info in labels to speed up drawing of very long texts*/
 #endif
 
 #define LV_USE_LINE       1
 
 #define LV_USE_ROLLER     1   /*Requires: lv_label*/
 #if LV_USE_ROLLER
-#  define LV_ROLLER_INF_PAGES 7 /*Number of extra "pages" when the roller is infinite*/
+    #define LV_ROLLER_INF_PAGES 7 /*Number of extra "pages" when the roller is infinite*/
 #endif
 
 #define LV_USE_SLIDER     1   /*Requires: lv_bar*/
@@ -447,7 +490,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 #define LV_USE_TEXTAREA   1   /*Requires: lv_label*/
 #if LV_USE_TEXTAREA != 0
-#  define LV_TEXTAREA_DEF_PWD_SHOW_TIME 1500    /*ms*/
+    #define LV_TEXTAREA_DEF_PWD_SHOW_TIME 1500    /*ms*/
 #endif
 
 #define LV_USE_TABLE      1
@@ -543,18 +586,36 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  * 3rd party libraries
  *--------------------*/
 
-/*File system interfaces for common APIs
- *To enable set a driver letter for that API*/
-#define LV_USE_FS_STDIO '\0'        /*Uses fopen, fread, etc*/
-//#define LV_FS_STDIO_PATH "/home/john/"    /*Set the working directory. If commented it will be "./" */
+/*API for fopen, fread, etc*/
+#define LV_USE_FS_STDIO 0
+#if LV_USE_FS_STDIO
+    #define LV_FS_STDIO_LETTER 'S'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+    #define LV_FS_STDIO_PATH "/sdcard"         /*Set the working directory. File/directory paths will be appended to it.*/
+    #define LV_FS_STDIO_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+#endif
 
-#define LV_USE_FS_POSIX '\0'        /*Uses open, read, etc*/
-//#define LV_FS_POSIX_PATH "/home/john/"    /*Set the working directory. If commented it will be "./" */
+/*API for open, read, etc*/
+#define LV_USE_FS_POSIX 0
+#if LV_USE_FS_POSIX
+    #define LV_FS_POSIX_LETTER 'F'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+    #define LV_FS_POSIX_PATH "/spiffs"         /*Set the working directory. File/directory paths will be appended to it.*/
+    #define LV_FS_POSIX_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+#endif
 
-#define LV_USE_FS_WIN32 '\0'        /*Uses CreateFile, ReadFile, etc*/
-//#define LV_FS_WIN32_PATH "C:\\Users\\john\\"    /*Set the working directory. If commented it will be ".\\" */
+/*API for CreateFile, ReadFile, etc*/
+#define LV_USE_FS_WIN32 0
+#if LV_USE_FS_WIN32
+    #define LV_FS_WIN32_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+    #define LV_FS_WIN32_PATH ""         /*Set the working directory. File/directory paths will be appended to it.*/
+    #define LV_FS_WIN32_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+#endif
 
-#define LV_USE_FS_FATFS '\0'        /*Uses f_open, f_read, etc*/
+/*API for FATFS (needs to be added separately). Uses f_open, f_read, etc*/
+#define LV_USE_FS_FATFS 0
+#if LV_USE_FS_FATFS
+    #define LV_FS_FATFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+    #define LV_FS_FATFS_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+#endif
 
 /*PNG decoder library*/
 #define LV_USE_PNG 0
@@ -575,19 +636,70 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 /*FreeType library*/
 #define LV_USE_FREETYPE 0
 #if LV_USE_FREETYPE
-/*Memory used by FreeType to cache characters [bytes] (-1: no caching)*/
-# define LV_FREETYPE_CACHE_SIZE (16 * 1024)
+    /*Memory used by FreeType to cache characters [bytes] (-1: no caching)*/
+    #define LV_FREETYPE_CACHE_SIZE (16 * 1024)
+    #if LV_FREETYPE_CACHE_SIZE >= 0
+        /* 1: bitmap cache use the sbit cache, 0:bitmap cache use the image cache. */
+        /* sbit cache:it is much more memory efficient for small bitmaps(font size < 256) */
+        /* if font size >= 256, must be configured as image cache */
+        #define LV_FREETYPE_SBIT_CACHE 0
+        /* Maximum number of opened FT_Face/FT_Size objects managed by this cache instance. */
+        /* (0:use system defaults) */
+        #define LV_FREETYPE_CACHE_FT_FACES 0
+        #define LV_FREETYPE_CACHE_FT_SIZES 0
+    #endif
 #endif
 
 /*Rlottie library*/
 #define LV_USE_RLOTTIE 0
+
+/*FFmpeg library for image decoding and playing videos
+ *Supports all major image formats so do not enable other image decoder with it*/
+#define LV_USE_FFMPEG 0
+#if LV_USE_FFMPEG
+    /*Dump input information to stderr*/
+    #define LV_FFMPEG_DUMP_FORMAT 0
+#endif
 
 /*-----------
  * Others
  *----------*/
 
 /*1: Enable API to take snapshot for object*/
-#define LV_USE_SNAPSHOT 1
+#define LV_USE_SNAPSHOT 0
+
+/*1: Enable Monkey test*/
+#define LV_USE_MONKEY 0
+
+/*1: Enable grid navigation*/
+#define LV_USE_GRIDNAV 0
+
+/*1: Enable lv_obj fragment*/
+#define LV_USE_FRAGMENT 0
+
+/*1: Support using images as font in label or span widgets */
+#define LV_USE_IMGFONT 0
+
+/*1: Enable a published subscriber based messaging system */
+#define LV_USE_MSG 0
+
+/*1: Enable Pinyin input method*/
+/*Requires: lv_keyboard*/
+#define LV_USE_IME_PINYIN 0
+#if LV_USE_IME_PINYIN
+    /*1: Use default thesaurus*/
+    /*If you do not use the default thesaurus, be sure to use `lv_ime_pinyin` after setting the thesauruss*/
+    #define LV_IME_PINYIN_USE_DEFAULT_DICT 1
+    /*Set the maximum number of candidate panels that can be displayed*/
+    /*This needs to be adjusted according to the size of the screen*/
+    #define LV_IME_PINYIN_CAND_TEXT_NUM 6
+
+    /*Use 9 key input(k9)*/
+    #define LV_IME_PINYIN_USE_K9_MODE      1
+    #if LV_IME_PINYIN_USE_K9_MODE == 1
+        #define LV_IME_PINYIN_K9_CAND_TEXT_NUM 3
+    #endif // LV_IME_PINYIN_USE_K9_MODE
+#endif
 
 
 /*==================
@@ -595,7 +707,40 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 *==================*/
 
 /*Enable the examples to be built with the library*/
-#define LV_BUILD_EXAMPLES 1
+#define LV_BUILD_EXAMPLES 0
+
+/*===================
+ * DEMO USAGE
+ ====================*/
+
+/*Show some widget. It might be required to increase `LV_MEM_SIZE` */
+#define LV_USE_DEMO_WIDGETS 0
+#if LV_USE_DEMO_WIDGETS
+#define LV_DEMO_WIDGETS_SLIDESHOW 0
+#endif
+
+/*Demonstrate the usage of encoder and keyboard*/
+#define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
+
+/*Benchmark your system*/
+#define LV_USE_DEMO_BENCHMARK 0
+#if LV_USE_DEMO_BENCHMARK
+/*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
+#define LV_DEMO_BENCHMARK_RGB565A8 0
+#endif
+
+/*Stress test for LVGL*/
+#define LV_USE_DEMO_STRESS 0
+
+/*Music player demo*/
+#define LV_USE_DEMO_MUSIC 0
+#if LV_USE_DEMO_MUSIC
+    #define LV_DEMO_MUSIC_SQUARE    0
+    #define LV_DEMO_MUSIC_LANDSCAPE 0
+    #define LV_DEMO_MUSIC_ROUND     0
+    #define LV_DEMO_MUSIC_LARGE     0
+    #define LV_DEMO_MUSIC_AUTO_PLAY 0
+#endif
 
 /*--END OF LV_CONF_H--*/
 
