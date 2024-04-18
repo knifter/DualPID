@@ -10,6 +10,9 @@
 	// Enable DBG(...) globally:
 	#define TOOLS_LOG_DEBUG
 
+	#if ARDUINO_USB_CDC_ON_BOOT
+		#define TOOLS_DEBUG_DEVICE		Serial0
+	#endif
 	// Or per file:
 
 	// Specific parts:
@@ -76,42 +79,68 @@
 // #define DISPLAY_HEIGHT			240
 // #define LV_BUF_SIZE				(DISPLAY_WIDTH*DISPLAY_WIDTH/10)
 
-//// PINS 
-#define PIN_RX                  GPIO_NUM_16
-#define PIN_TX                  GPIO_NUM_17
+#ifdef SOOGH_DEV_M5CORE
+	#define PIN_RX                  GPIO_NUM_16
+	#define PIN_TX                  GPIO_NUM_17
+	#define PIN_SDA					GPIO_NUM_21
+	#define PIN_SCL					GPIO_NUM_22
+	#define PIN_SPEAKER				GPIO_NUM_25
+	#define PIN_BACKLIGHT			GPIO_NUM_32
+	#define PIN_BTN_A				GPIO_NUM_39
+	#define PIN_BTN_B				GPIO_NUM_38
+	#define PIN_BTN_C				GPIO_NUM_37
+	#define PIN_SD_CS				GPIO_NUM_4
+	#define PIN_MAX31865_CS			GPIO_NUM_26
 
-#define PIN_SDA					GPIO_NUM_21
-#define PIN_SCL					GPIO_NUM_22
-
-#define PIN_SPEAKER				GPIO_NUM_25
-#define PIN_BACKLIGHT			GPIO_NUM_32
-
-#define PIN_BTN_A				GPIO_NUM_39
-#define PIN_BTN_B				GPIO_NUM_38
-#define PIN_BTN_C				GPIO_NUM_37
-
-#define PIN_SD_CS				GPIO_NUM_4
-#define PIN_MAX31865_CS			GPIO_NUM_26
-
-#ifdef ARDUINO_M5Stack_Core_ESP32
-#define PIDLOOP_PORTS_LIST	\
-	{GPIO_NUM_2, 	"IO2", 	"GPIO2"},	\
-    {GPIO_NUM_5,    "IO5",  "GPIO5"},   \
-	{GPIO_NUM_12, 	"IO12", "GPIO12"},	\
-	{GPIO_NUM_13, 	"IO13", "GPIO13"},	\
-	{GPIO_NUM_15, 	"IO15", "GPIO15"},	\
-	{GPIO_NUM_26, 	"IO26", "GPIO26"},  \
-    {GPIO_NUM_16,   "IO16", "GPIO16"},  \
-    {GPIO_NUM_17,   "IO17", "GPIO17"}    
+	#define PIDLOOP_PORTS_LIST	\
+		{GPIO_NUM_2, 	"IO2", 	"GPIO2"},	\
+		{GPIO_NUM_5,    "IO5",  "GPIO5"},   \
+		{GPIO_NUM_12, 	"IO12", "GPIO12"},	\
+		{GPIO_NUM_13, 	"IO13", "GPIO13"},	\
+		{GPIO_NUM_15, 	"IO15", "GPIO15"},	\
+		{GPIO_NUM_26, 	"IO26", "GPIO26"},  \
+		{GPIO_NUM_16,   "IO16", "GPIO16"},  \
+		{GPIO_NUM_17,   "IO17", "GPIO17"}    
 #endif
 
-#ifdef ARDUINO_M5Stack_Core2_ESP32
-#define PIDLOOP_PORTS_LIST	\
-	{GPIO_NUM_2, 	"IO2", 	"GPIO2"},	\
-	{GPIO_NUM_12, 	"IO12", "GPIO12"},	\
-	{GPIO_NUM_13, 	"IO13", "GPIO13"},	\
-	{GPIO_NUM_15, 	"IO15", "GPIO15"},	\
-	{GPIO_NUM_26, 	"IO26", "GPIO26"}   
+#ifdef SOOGH_DEV_M5CORE2
+	#define PIN_RX                  GPIO_NUM_16
+	#define PIN_TX                  GPIO_NUM_17
+	#define PIN_SDA					GPIO_NUM_21
+	#define PIN_SCL					GPIO_NUM_22
+	#define PIN_SPEAKER				GPIO_NUM_25
+	#define PIN_BACKLIGHT			GPIO_NUM_32
+	#define PIN_SD_CS				GPIO_NUM_4
+	#define PIN_MAX31865_CS			GPIO_NUM_26
+
+	#define PIDLOOP_PORTS_LIST	\
+		{GPIO_NUM_2, 	"IO2", 	"GPIO2"},	\
+		{GPIO_NUM_12, 	"IO12", "GPIO12"},	\
+		{GPIO_NUM_13, 	"IO13", "GPIO13"},	\
+		{GPIO_NUM_15, 	"IO15", "GPIO15"},	\
+		{GPIO_NUM_26, 	"IO26", "GPIO26"}   
 #endif // M5CORE2
+
+#ifdef SOOGH_DEV_SC01
+	#define PIN_RX                  GPIO_NUM_NC
+	#define PIN_TX                  GPIO_NUM_NC
+	#define PIN_SDA					GPIO_NUM_NC
+	#define PIN_SCL					GPIO_NUM_NC
+	#define PIN_SPEAKER				GPIO_NUM_NC
+	#define PIN_BACKLIGHT			GPIO_NUM_NC
+	#define PIN_BTN_A				GPIO_NUM_NC
+	#define PIN_BTN_B				GPIO_NUM_NC
+	#define PIN_BTN_C				GPIO_NUM_NC
+	#define PIN_SD_CS				GPIO_NUM_NC
+	#define PIN_MAX31865_CS			GPIO_NUM_NC
+
+	#define PIDLOOP_PORTS_LIST	\
+		{GPIO_NUM_10, 	"IO1", "EXT_IO_1"},	\
+		{GPIO_NUM_11, 	"IO2", "EXT_IO_2"},	\
+		{GPIO_NUM_12, 	"IO3", "EXT_IO_3"},	\
+		{GPIO_NUM_13, 	"IO4", "EXT_IO_4"},	\
+		{GPIO_NUM_14, 	"IO5", "EXT_IO_5"}, \
+		{GPIO_NUM_21, 	"IO6", "EXT_IO_6"}   
+#endif // TINYS3
 
 #endif // __CONFIG_H
