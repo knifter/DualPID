@@ -27,7 +27,12 @@
 #define LV_COLOR_DEPTH 16
 
 /*Swap the 2 bytes of RGB565 color. Useful if the display has an 8-bit interface (e.g. SPI)*/
-#define LV_COLOR_16_SWAP 0
+#ifdef SOOGH_DEV_M5CORE
+    #define LV_COLOR_16_SWAP 0
+#endif
+#ifdef SOOGH_DEV_WT32SC01
+    #define LV_COLOR_16_SWAP 1
+#endif
 
 /*Enable more complex drawing routines to manage screens transparency.
  *Can be used if the UI is above another layer, e.g. an OSD menu or video player.
@@ -49,7 +54,7 @@
 #define LV_MEM_CUSTOM 0
 #if LV_MEM_CUSTOM == 0
 /*Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB)*/
-#  define LV_MEM_SIZE (32U * 1024U)          /*[bytes]*/
+    #define LV_MEM_SIZE (32U * 1024U)          /*[bytes]*/
 
 /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
 #  define LV_MEM_ADR 0     /*0: unused*/
@@ -146,6 +151,17 @@
  *0: to disable caching*/
 #define LV_IMG_CACHE_DEF_SIZE 0
 
+/*Number of stops allowed per gradient. Increase this to allow more stops.
+ *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
+#define LV_GRADIENT_MAX_STOPS 2
+
+/*Default gradient buffer size.
+ *When LVGL calculates the gradient "maps" it can save them into a cache to avoid calculating them again.
+ *LV_GRAD_CACHE_DEF_SIZE sets the size of this cache in bytes.
+ *If the cache is too small the map will be allocated only while it's required for the drawing.
+ *0 mean no caching.*/
+#define LV_GRAD_CACHE_DEF_SIZE 0
+
 /*Allow dithering the gradients (to achieve visual smooth color gradients on limited color depth display)
  *LV_DITHER_GRADIENT implies allocating one or two more lines of the object's rendering surface
  *The increase in memory consumption is (32 bits * object width) plus 24 bits * object width if using error diffusion */
@@ -163,6 +179,7 @@
 /*-------------
  * GPU
  *-----------*/
+#define LV_USE_GPU_ARM2D 0
 
 /*Use STM32's DMA2D (aka Chrom Art) GPU*/
 #define LV_USE_GPU_STM32_DMA2D 0
@@ -504,7 +521,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  *----------*/
 #define LV_USE_CALENDAR   1
 #if LV_USE_CALENDAR
-# define LV_CALENDAR_WEEK_STARTS_MONDAY 0
+# define LV_CALENDAR_WEEK_STARTS_MONDAY 1
 # if LV_CALENDAR_WEEK_STARTS_MONDAY
 #  define LV_CALENDAR_DEFAULT_DAY_NAMES {"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"}
 # else
