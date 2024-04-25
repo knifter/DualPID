@@ -15,7 +15,8 @@ class MainScreen : public Screen
 {
     public:
 		MainScreen(SooghGUI& g);
-
+		~MainScreen();
+		
 		virtual ScreenType type() { return ScreenType::MAIN; };
 
         virtual void loop();
