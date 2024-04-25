@@ -417,6 +417,13 @@ MainScreen::MainScreen(SooghGUI& g) : Screen(g)
 	lv_obj_align(gw->box, LV_ALIGN_BOTTOM_MID, 0, 0);
 };
 
+MainScreen::~MainScreen()
+{
+	delete(pw1);
+	delete(pw2);
+	delete(gw);
+};
+
 void MainScreen::loop()
 {
 	time_t now = millis();
