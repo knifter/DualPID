@@ -28,3 +28,6 @@
 [submodule "dualpid/lib/lib-MAX31865"]
 	path = dualpid/lib/lib-MAX31865
 	url = https://github.com/knifter/lib-MAX31865
+[submodule "dualpid/lib/lib-BM8563"]
+	path = dualpid/lib/lib-BM8563
+	url = https://github.com/knifter/lib-BM8563.git
