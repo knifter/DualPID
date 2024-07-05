@@ -63,6 +63,7 @@ Start with [M5Stack Cushion, mandatory lab equipment](https://shop.m5stack.com/c
  * [x] [Mini 3A Relay Unit](https://shop.m5stack.com/products/mini-3a-relay-unit)
  * [x] [M5 2-Channel SPST Relay Unit](https://shop.m5stack.com/collections/m5-sensor/products/2-channel-spst-relay-unit)
  * [x] [M5 4-Relay Unit](https://shop.m5stack.com/collections/m5-sensor/products/4-relay-unit)
+ * [ ] [(Planned)](https://github.com/knifter/DualPID/issues/75) [M5 DAC 2 I2C Unit (GP8413)](https://shop.m5stack.com/products/dac-2-i2c-unit-gp8413)
  * [ ] [(Planned)](https://github.com/knifter/DualPID/issues/72) [M5 H-bridge Unit v1.1](https://shop.m5stack.com/collections/m5-sensor/products/h-bridge-unit-v1-1-stm32f030)
  * [ ] [Single-phase DC SSR Unit (RS485)](https://shop.m5stack.com/collections/m5-sensor/products/single-phase-dc-ssr-unit-cdg1-1dd-10a)
  * [ ] [M5 Solid State Relay Unit](https://shop.m5stack.com/products/solid-state-relay-unit-bt136s)
