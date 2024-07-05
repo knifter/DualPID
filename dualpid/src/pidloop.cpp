@@ -153,7 +153,17 @@ void PIDLoop::sync_mode()
         case CONTROL_MODE_SENSOR:
             if(_settings.active)
             {
-                WARNING("Setting sensor-only channel to inactive. Should not be active.");
+                if(::settings.expert_mode && _settings.fixed_output_value > 0)
+                {
+                    set_mode(CONTROL_MODE_FIXED);
+                    if(_mode == CONTROL_MODE_FIXED)
+                    {
+                        DBG("Activating Fixed-Output.");
+                        set_output_value(_settings.fixed_output_value);
+                        break;
+                    };
+                };
+                WARNING("Setting sensor-only/no-output channel to inactive. Should not be active.");
                 _settings.active = false;
             };
             break;
@@ -251,7 +261,7 @@ void PIDLoop::set_mode(control_mode_t newmode)
         case CONTROL_MODE_FIXED:
             if(!_outputdrv_ok)
             {
-                WARNING("No pid output driver available: pid remains in-active.");
+                WARNING("No pid output driver available: Can't set Fixed Output.");
                 set_mode(CONTROL_MODE_SENSOR); // try input-only mode, otherwise disable
                 return;
             };
