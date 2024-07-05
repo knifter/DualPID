@@ -42,7 +42,7 @@ class InputDriver
 
 		InputDriver() {};
 
-		bool begin() { return _begin_ok = true; };
+		virtual bool begin() { return true; };
 		virtual float read() = 0;
 		virtual data_type_t data_type() { return TYPE_NONE; };
 

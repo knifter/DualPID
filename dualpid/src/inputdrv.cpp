@@ -69,10 +69,15 @@ lv_color_t InputDriver::color1()
 SHT3X sensor_sht31(Wire);
 bool SHT31TDriver::begin()
 {
-	if(!sensor_sht31.begin(SHT3X_ADDRESS_DEFAULT))
-		if(!sensor_sht31.begin(SHT3X_ADDRESS_ALT))
-			return false;
-	return InputDriver::begin();
+	if(sensor_sht31.begin(SHT3X_ADDRESS_DEFAULT))
+	{
+		return InputDriver::begin();
+	};
+	if(sensor_sht31.begin(SHT3X_ADDRESS_ALT))
+	{
+		return InputDriver::begin();
+	};
+	return false;
 };
 float SHT31TDriver::read() 
 {
@@ -84,10 +89,15 @@ float SHT31TDriver::read()
 };
 bool SHT31RHDriver::begin()
 {
-	if(!sensor_sht31.begin(SHT3X_ADDRESS_DEFAULT))
-		if(!sensor_sht31.begin(SHT3X_ADDRESS_ALT))
-			return false;
-	return InputDriver::begin();
+	if(sensor_sht31.begin(SHT3X_ADDRESS_DEFAULT))
+	{
+		return InputDriver::begin();
+	};
+	if(sensor_sht31.begin(SHT3X_ADDRESS_ALT))
+	{
+		return InputDriver::begin();
+	};
+	return false;
 };
 float SHT31RHDriver::read()
 {
