@@ -2,6 +2,8 @@
 
 #include <SHT3x.h>
 
+// #include "tools-log.h"
+
 // Base
 const char* InputDriver::name()
 {

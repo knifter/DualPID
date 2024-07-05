@@ -15,7 +15,7 @@ class PIDLoop: private NonCopyable
         typedef enum
         {
             CONTROL_MODE_NONE,      // initial state
-            // CONTROL_MODE_OFF,       // Channel is completly off
+            CONTROL_MODE_DISABLED,  // Channel is completly off
             CONTROL_MODE_SENSOR,    // sensor is polled, no output
             CONTROL_MODE_INACTIVE,  // _output_value is set to approriate off-state
             CONTROL_MODE_PID,       // _output_value controlled by PID output
@@ -32,6 +32,7 @@ class PIDLoop: private NonCopyable
             STATUS_SENSOR,
 
             // CONTROL_MODE_OFF
+            STATUS_DISABLED,        // PID off, display channel off
             STATUS_INACTIVE,        // PID off
             // CONTROL_MODE_PID
             STATUS_ERROR,           // 3
@@ -92,6 +93,7 @@ class PIDLoop: private NonCopyable
         // SENSOR
         time_t _next_input = 0;
         InputDriver* _inputdrv;
+        bool _inputdrv_ok;
         // sensor_begin_fptr _sensor_begin = nullptr;
         // sensor_read_fptr _sensor_read = nullptr;
 
@@ -104,6 +106,7 @@ class PIDLoop: private NonCopyable
 
         // OUTPUT
         OutputDriver* _outputdrv;
+        bool _outputdrv_ok;
 };
 
 #endif // __PIDLOOP_H

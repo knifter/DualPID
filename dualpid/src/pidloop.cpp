@@ -14,12 +14,12 @@ const char* control_mode2str(PIDLoop::control_mode_t mode)
 {
     switch(mode)
     {
-        case PIDLoop::CONTROL_MODE_NONE:    return "(none)";
-        // case PIDLoop::CONTROL_MODE_OFF:     return "CHANNEL_OFF";
-        case PIDLoop::CONTROL_MODE_SENSOR:  return "SENSOR";
-        case PIDLoop::CONTROL_MODE_INACTIVE:return "INACTIVE";
-        case PIDLoop::CONTROL_MODE_PID:     return "PID";
-        case PIDLoop::CONTROL_MODE_FIXED:   return "FIXED";
+        case PIDLoop::CONTROL_MODE_NONE:     return "(none)";
+        case PIDLoop::CONTROL_MODE_DISABLED: return "DISABLED";
+        case PIDLoop::CONTROL_MODE_SENSOR:   return "SENSOR";
+        case PIDLoop::CONTROL_MODE_INACTIVE: return "INACTIVE";
+        case PIDLoop::CONTROL_MODE_PID:      return "PID";
+        case PIDLoop::CONTROL_MODE_FIXED:    return "FIXED";
     };
     return "(unknown)";
 };
@@ -29,6 +29,7 @@ const char* status2str(PIDLoop::status_t status)
     switch(status)
     {
         case PIDLoop::STATUS_NONE:          return "(none)";
+        case PIDLoop::STATUS_DISABLED:      return "DISABLED";
         case PIDLoop::STATUS_SENSOR:        return "SENSOR";
         case PIDLoop::STATUS_INACTIVE:      return "OFF";
         case PIDLoop::STATUS_ERROR:         return "ERROR";
@@ -61,8 +62,11 @@ bool PIDLoop::begin()
     _mode = CONTROL_MODE_NONE;
     _status = STATUS_NONE;
     _last_pid = 0;
+    _inputdrv_ok = false;
+    _outputdrv_ok = false;
 
     // Configure InputDriver
+    //  if configured and works mode can go up to SENSOR
     switch(_settings.input_drv)
     {
         default: _inputdrv = new NoneInputDriver(); break;
@@ -77,10 +81,12 @@ bool PIDLoop::begin()
     {
         if(!_inputdrv->begin())
         {
-            gui.showMessage("WARNING:", "Channel sensor error.");
-            ERROR("Channel %d sensor begin() failed.", _channel_id);
+            gui.showMessage("WARNING:", "Channel InputDriver error.");
+            ERROR("Channel %d input.begin() failed.", _channel_id);
+            _inputdrv_ok = false;
         }else{
-            DBG("Channel %d sensor begin() == ok", _channel_id);
+            DBG("Channel %d: input(%d).begin() == ok", _channel_id, _settings.input_drv);
+            _inputdrv_ok = true;
         };
     };
 
@@ -88,13 +94,23 @@ bool PIDLoop::begin()
     switch(_settings.output_drv)
     {
         // TODO: default: _outputdrv = new NoneOutputDriver(); break;
-        case OUTPUT_DRIVER_NONE: _outputdrv = nullptr; break;
+        case OUTPUT_DRIVER_NONE:    _outputdrv = nullptr; break;
         case OUTPUT_DRIVER_SLOWPWM: _outputdrv = new SlowPWMDriver(); break;
         case OUTPUT_DRIVER_FASTPWM: _outputdrv = new FastPWMDriver(); break;
     };
 
-    if(_outputdrv)
-        _outputdrv->begin(_channel_id);
+    if(_settings.output_drv != OUTPUT_DRIVER_NONE)
+    {
+        if(!_outputdrv->begin(_channel_id))
+        {
+            gui.showMessage("WARNING:", "Channel OutputDriver error.");
+            ERROR("Channel %d output.begin() failed.", _channel_id);
+            _outputdrv_ok = false;
+        }else{
+            DBG("Channel %d output.begin() == ok", _channel_id);
+            _outputdrv_ok = true;
+        };
+    };
 
     if(!::settings.expert_mode)
     {
@@ -108,12 +124,14 @@ bool PIDLoop::begin()
     _pid.alignOutput();
 
     // configure initial mode (depends on input/output available)
-    control_mode_t initmode = CONTROL_MODE_NONE;
-    if(_inputdrv != nullptr)
+    control_mode_t initmode = CONTROL_MODE_DISABLED;
+    if(_inputdrv_ok)
     {
         initmode = CONTROL_MODE_SENSOR;
-        if(_outputdrv != nullptr && _outputdrv->begin_ok())
-            initmode = CONTROL_MODE_INACTIVE;
+    };
+    if(_outputdrv_ok) // even if input failed: set fixed is available
+    {
+        initmode = CONTROL_MODE_INACTIVE;
     };
     DBG("ch%d: Init with mode %s, output = %.0f%%", _channel_id, control_mode2str(initmode), _output_value);
     set_mode(initmode);
@@ -130,6 +148,7 @@ void PIDLoop::sync_mode()
     switch(_mode)
     {
         case CONTROL_MODE_NONE:
+        case CONTROL_MODE_DISABLED:
         case CONTROL_MODE_SENSOR:
             if(_settings.active)
             {
@@ -179,25 +198,45 @@ void PIDLoop::set_mode(control_mode_t newmode)
 
     switch(newmode)
     {
+        case CONTROL_MODE_DISABLED:
+            if(_outputdrv)
+                _outputdrv->off();
+
+            _status = STATUS_DISABLED;
+            _mode = CONTROL_MODE_DISABLED;
+            break;
+
         case CONTROL_MODE_SENSOR:
+            if(!_inputdrv_ok)
+            {
+                WARNING("Can't set channeld to SENSOR: No valid input.");
+                _status = STATUS_DISABLED;
+                _mode = CONTROL_MODE_DISABLED;
+                break;
+            };
+
             _status = STATUS_SENSOR;
             _mode = CONTROL_MODE_SENSOR;
             break;
+
         case CONTROL_MODE_NONE:
         case CONTROL_MODE_INACTIVE:
-            if(_outputdrv)
-                _outputdrv->off();
+            if(!_outputdrv_ok)
+            {
+                WARNING("Can't set channel to INACTIVE: No working output driver.");
+                set_mode(CONTROL_MODE_SENSOR); // try input-only mode, otherwise disable
+                return;
+            };
 
             _status = STATUS_INACTIVE;
             _mode = CONTROL_MODE_INACTIVE;
             break;
         case CONTROL_MODE_PID:
-            if(_outputdrv == nullptr)
+            if(!_outputdrv_ok)
             {
-                WARNING("No pid output mode set: pid remains in-active.");
-                _mode = CONTROL_MODE_INACTIVE;
-                _status = STATUS_INACTIVE;
-                break;
+                WARNING("No pid output driver available: pid remains in-active.");
+                set_mode(CONTROL_MODE_SENSOR); // try input-only mode, otherwise disable
+                return;
             };
 
             _last_pid = 0; // Reset dt timer
@@ -209,7 +248,13 @@ void PIDLoop::set_mode(control_mode_t newmode)
             _mode = CONTROL_MODE_PID;
             break;
         case CONTROL_MODE_FIXED:
-        
+            if(!_outputdrv_ok)
+            {
+                WARNING("No pid output driver available: pid remains in-active.");
+                set_mode(CONTROL_MODE_SENSOR); // try input-only mode, otherwise disable
+                return;
+            };
+
             _status = STATUS_FIXED;
             _mode = CONTROL_MODE_FIXED;
             break;
@@ -234,7 +279,7 @@ void PIDLoop::do_sensor()
     _next_input = now + settings.sensor_loop_ms; // FIXME: rather absolute dT
 
     // Read sensors and apply averaging/filter
-    if(_inputdrv == nullptr)
+    if(!_inputdrv_ok)
     {
         _input_value = NAN;
         return;
@@ -336,6 +381,7 @@ bool PIDLoop::set_output_value(double value)
     // Do not touch output if PID is in control (or if we don't have an output..)
     switch(_mode)
     {
+        case CONTROL_MODE_DISABLED:
         case CONTROL_MODE_INACTIVE:
         case CONTROL_MODE_FIXED:
             break;
@@ -362,7 +408,7 @@ bool PIDLoop::set_output_value(double value)
 
 void PIDLoop::do_output()
 {
-    if(_outputdrv == nullptr)
+    if(!_outputdrv_ok)
         return;
         
     // turn of output if PID loop had an error

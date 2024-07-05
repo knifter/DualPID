@@ -47,14 +47,12 @@ class OutputDriver
 			{};
 		virtual ~OutputDriver() {};
 
-		virtual bool begin(int32_t channel_id);
-		virtual bool begin_ok() { return _begin_ok; };
+		virtual bool begin(int32_t channel_id) { return true; };
 		virtual void off() = 0;
 		virtual void set(float percent) = 0;
 	
 	protected:
 		uint32_t _channel_id;
-		bool _begin_ok = false;
 
 		// PIDLoop::settings_t& _settings;
 

@@ -54,9 +54,6 @@ class InputDriver
 		virtual float setpoint_max();
 		virtual int precision();
 		virtual lv_color_t color1();
-
-	protected:
-		bool _begin_ok = false;
 };
 
 // Dummy driver to save testing for nullptr everywhere
