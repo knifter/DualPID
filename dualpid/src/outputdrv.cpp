@@ -7,11 +7,6 @@
 
 #include "freertos/task.h"
 
-bool OutputDriver::begin(int32_t channel_id)
-{
-    return _begin_ok = true;
-};
-
 bool SlowPWMDriver::begin(int32_t channel_id)
 {
     PIDLoop::settings_t pidset;
@@ -192,4 +187,38 @@ void FastPWMDriver::set(float percent)
     ledcWrite(_channel_id, pwm_val);
     return;
 };
+
+#ifdef OUTPUTDRV_GP8413_ENABLED
+#include <GP8413.h>
+bool GP8413Driver::begin(int32_t channel_id)
+{
+    for(uint8_t addr = 0; addr < 8; addr++)
+    {
+        if(_dac.begin(GP8413_ADDRESS_DEFAULT + addr))
+        {
+            _dac_channel = (GP8413::channel_num_t) (channel_id == 2);
+
+            _dac.setOutputRange(GP8413::RANGE_10V);
+
+            return true;
+        };
+
+        // DBG("DAC-GP8413(0x%x) Not Found!", GP8413_ADDRESS_DEFAULT + addr);
+    };
+    ERROR("DAC-GP8413(0x%x - 0x%x) Not Found!", GP8413_ADDRESS_DEFAULT, GP8413_ADDRESS_DEFAULT + 7);
+    return false;
+};
+
+void GP8413Driver::off()
+{
+    _dac.setOutput(_dac_channel, 0x0000);
+};
+
+void GP8413Driver::set(float percent)
+{
+    uint16_t value = 0x7FFF * (percent / 100.0);
+    // DBG("set value = ch:%d = %f %% =  %d", _dac_channel, percent, value);
+    _dac.setOutput(_dac_channel, value);
+};
+#endif // OUTPUTDRV_GP8413_ENABLED
 
