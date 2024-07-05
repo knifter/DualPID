@@ -31,3 +31,6 @@
 [submodule "dualpid/lib/lib-BM8563"]
 	path = dualpid/lib/lib-BM8563
 	url = https://github.com/knifter/lib-BM8563.git
+[submodule "dualpid/lib/lib-GP8413"]
+	path = dualpid/lib/lib-GP8413
+	url = https://github.com/knifter/lib-GP8413
