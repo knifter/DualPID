@@ -67,7 +67,7 @@ class NoneInputDriver : public InputDriver
 		data_type_t data_type() { return TYPE_NONE; };
 };
 
-#ifdef SENSOR_SHT31_ENABLED
+#ifdef INPUTDRV_SHT31_ENABLED
 #include <SHT3x.h>
 class SHT31TDriver : public InputDriver
 {
@@ -87,9 +87,9 @@ class SHT31RHDriver : public InputDriver
 		float read();
 		data_type_t data_type() { return TYPE_RH; };
 };
-#endif // SENSOR_SHT31_ENABLED
+#endif // INPUTDRV_SHT31_ENABLED
 
-#ifdef SENSOR_M5KMETER_ENABLED
+#ifdef INPUTDRV_M5KMETER_ENABLED
 #include <M5_KMeter.h>
 class M5KMeterDriver : public InputDriver
 {
@@ -103,9 +103,9 @@ class M5KMeterDriver : public InputDriver
 	private:
 		M5_KMeter _sensor;
 };
-#endif // SENSOR_M5KMETER_ENABLED
+#endif // INPUTDRV_M5KMETER_ENABLED
 
-#ifdef SENSOR_MCP9600_ENABLED
+#ifdef INPUTDRV_MCP9600_ENABLED
 #include <MCP9600.h>
 class MCP9600Driver : public InputDriver
 {
@@ -119,9 +119,9 @@ class MCP9600Driver : public InputDriver
 	private:
 		MCP9600 _sensor;
 };
-#endif // SENSOR_MCP9600_ENABLED
+#endif // INPUTDRV_MCP9600_ENABLED
 
-#ifdef SENSOR_MAX31865_ENABLED
+#ifdef INPUTDRV_MAX31865_ENABLED
 #include <MAX31865.h>
 class MAX31865Driver : public InputDriver
 {
@@ -135,9 +135,9 @@ class MAX31865Driver : public InputDriver
 	private:
 		MAX31865 _sensor;
 };
-#endif // SENSOR_MAX31865_ENABLED
+#endif // INPUTDRV_MAX31865_ENABLED
 
-#ifdef SENSOR_SPRINTIR_ENABLED
+#ifdef INPUTDRV_SPRINTIR_ENABLED
 #include <SprintIR.h>
 class SprintIR20Driver : public InputDriver
 {
@@ -151,6 +151,6 @@ class SprintIR20Driver : public InputDriver
 	private:
 		SprintIR _sensor;
 };
-#endif // SENSOR_SPRINTIR_ENABLED
+#endif // INPUTDRV_SPRINTIR_ENABLED
 
 #endif // __INPUTDRV_H
