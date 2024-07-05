@@ -58,6 +58,8 @@
 #define INPUTDRV_SPRINTIR_ENABLED
 // #define SPRINTIR_PRESSURE_MBAR		1200		// 100mbar overpressure is assumed
 
+#define OUTPUTDRV_GP8413_ENABLED
+
 #define PID_DEFAULT_F				0.0
 #define PID_DEFAULT_F_OFFSET		0.0
 #define PID_DEFAULT_P				1.0
