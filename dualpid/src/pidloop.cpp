@@ -121,7 +121,7 @@ bool PIDLoop::begin()
     };
 
     // Fixed output is always disabled on startup
-    if(_settings.fixed_output_value != 0)
+    if(isfinite(_settings.fixed_output_value) && _settings.active)
     {
         DBG("Disabling Fixed-output on startup.");
         _settings.active = false;
