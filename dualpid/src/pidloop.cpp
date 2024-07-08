@@ -113,10 +113,18 @@ bool PIDLoop::begin()
         };
     };
 
+    // Fixed output is only available in Export-mode
     if(!::settings.expert_mode)
     {
         // Reset fixed output if not in export_mode anymore
         _settings.fixed_output_value = 0;
+    };
+
+    // Fixed output is always disabled on startup
+    if(_settings.fixed_output_value != 0)
+    {
+        DBG("Disabling Fixed-output on startup.");
+        _settings.active = false;
     };
 
     _pid.setOutputLimits(_settings.min_output, _settings.max_output);
