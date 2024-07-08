@@ -217,6 +217,7 @@ void PIDLoop::set_mode(control_mode_t newmode)
 
     switch(newmode)
     {
+        case CONTROL_MODE_NONE:
         case CONTROL_MODE_DISABLED:
             if(_outputdrv)
                 _outputdrv->off();
@@ -229,16 +230,14 @@ void PIDLoop::set_mode(control_mode_t newmode)
             if(!_inputdrv_ok)
             {
                 WARNING("Can't set channeld to SENSOR: No valid input.");
-                _status = STATUS_DISABLED;
-                _mode = CONTROL_MODE_DISABLED;
-                break;
+                set_mode(CONTROL_MODE_DISABLED);
+                return;
             };
 
             _status = STATUS_SENSOR;
             _mode = CONTROL_MODE_SENSOR;
             break;
 
-        case CONTROL_MODE_NONE:
         case CONTROL_MODE_INACTIVE:
             if(!_outputdrv_ok)
             {
