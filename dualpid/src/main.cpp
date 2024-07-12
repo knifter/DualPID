@@ -6,6 +6,7 @@
 #include "pidloop.h"
 #include "screens.h"
 #include "inputdrv.h"
+#include "rtc.h"
 
 #include "tools-log.h"
 
@@ -26,6 +27,8 @@ void setup()
 	
 	// Hold startup if C pressed
 	while(scan_keys() == KEY_C);
+
+	rtc_begin();
 
 	gui.begin();
 

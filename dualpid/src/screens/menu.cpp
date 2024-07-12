@@ -11,8 +11,15 @@
 #include "soogh-debug.h"
 #include "inputdrv.h"
 #include "outputdrv.h"
+#include "rtc.h"
+
+// Temporary storage to convert from selector:float to int
+double tmp_mday, tmp_year, tmp_hour, tmp_min;
+int tmp_mon;
 
 // C-style callbacks
+void datetime_open_cb(MenuItem* item, void* data);
+void datetime_close_cb(MenuItem* item, void* data);
 void menu_close_cb(MenuItem* item, void* data);
 
 // TODO move to outputs
@@ -112,6 +119,22 @@ SelectorField::item_t lock_windows [] {
 	{0, 0, 0}
 	};
 
+SelectorField::item_t months [] {
+    {0,  "Jan", "January"},
+    {1,  "Feb", "February"},
+    {2,  "Mar", "March"},
+    {3,  "Apr", "April"},
+    {4,  "May", "May"},
+    {5,  "Jun", "June"},
+    {6,  "Jul", "July"},
+    {7,  "Aug", "August"},
+    {8,  "Sep", "September"},
+    {9,  "Okt", "Oktober"},
+    {10, "Nov", "November"},
+    {11, "Dec", "December"},
+    {0, 0, 0}
+    };
+
 bool need_reboot = false;
 void set_need_reboot(MenuItem*, void*)
 {
@@ -121,6 +144,23 @@ void set_need_reboot(MenuItem*, void*)
 MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 {
     menu.addCloseMenuButton();
+    
+    if(rtc_available())
+    {
+        auto sub = menu.addSubMenu("Set Date");
+        // FIXME: add onOpen() to TreeMenu
+        datetime_open_cb(nullptr, nullptr);
+
+        sub->addSpinbox("Day", &tmp_mday, 1, 31, 0);
+        sub->addSelector("Month", &tmp_mon, months);
+        sub->addSpinbox("Year", &tmp_year, 1900, 2099, 0);
+        sub->onClose(datetime_close_cb);
+
+        sub = menu.addSubMenu("Set Time");
+        sub->addSpinbox("Hour", &tmp_hour, 0, 23, 0);
+        sub->addSpinbox("Minute", &tmp_min, 0, 59, 0);
+        sub->onClose(datetime_close_cb);
+    };
     
     // Add menu for each active channel
     int ch = -1;
@@ -213,6 +253,29 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 
 	menu.onClose(menu_close_cb, this);
 	menu.open();
+};
+
+void datetime_open_cb(MenuItem* item, void* data)
+{
+    rtc_read();
+
+    tmp_mday    = today.tm_mday;
+    tmp_mon     = today.tm_mon ;
+    tmp_year    = today.tm_year;
+    tmp_hour    = today.tm_hour;
+    tmp_min     = today.tm_min;
+};
+
+void datetime_close_cb(MenuItem* item, void* data)
+{
+    today.tm_mday = (int) tmp_mday;
+    today.tm_mon = (int) tmp_mon;
+    today.tm_year = (int) tmp_year;
+    today.tm_hour = (int) tmp_hour;
+    today.tm_min = (int) tmp_min;
+    today.tm_sec = 0;
+
+    rtc_write();
 };
 
 void menu_close_cb(MenuItem* item, void* data)
