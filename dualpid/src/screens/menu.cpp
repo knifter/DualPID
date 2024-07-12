@@ -144,24 +144,7 @@ void set_need_reboot(MenuItem*, void*)
 MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
 {
     menu.addCloseMenuButton();
-    
-    if(rtc_available())
-    {
-        auto sub = menu.addSubMenu("Set Date");
-        // FIXME: add onOpen() to TreeMenu
-        datetime_open_cb(nullptr, nullptr);
-
-        sub->addSpinbox("Day", &tmp_mday, 1, 31, 0);
-        sub->addSelector("Month", &tmp_mon, months);
-        sub->addSpinbox("Year", &tmp_year, 1900, 2099, 0);
-        sub->onClose(datetime_close_cb);
-
-        sub = menu.addSubMenu("Set Time");
-        sub->addSpinbox("Hour", &tmp_hour, 0, 23, 0);
-        sub->addSpinbox("Minute", &tmp_min, 0, 59, 0);
-        sub->onClose(datetime_close_cb);
-    };
-    
+        
     // Add menu for each active channel
     int ch = -1;
     while(++ch < NUMBER_OF_CHANNELS)
@@ -237,17 +220,33 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
     };
 
     menu.addSeparator("Config");
-    menu.addSelector("Graph Delta", &settings.graph_delta, graph_delta_times);
 
     // General
+    if(rtc_available())
+    {
+            // FIXME: add onOpen() to TreeMenu
+            datetime_open_cb(nullptr, nullptr);
+
+            auto sub = menu.addSubMenu("Set Date/Time");
+            sub->addSpinbox("Day", &tmp_mday, 1, 31, 0);
+            sub->addSelector("Month", &tmp_mon, months);
+            sub->addSpinbox("Year", &tmp_year, 1900, 2099, 0);
+            sub->addSpinbox("Hour", &tmp_hour, 0, 23, 0);
+            sub->addSpinbox("Minute", &tmp_min, 0, 59, 0);
+            sub->onClose(datetime_close_cb);
+    };
+    
+    menu.addSelector("Graph Delta", &settings.graph_delta, graph_delta_times);
+
     if(settings.expert_mode)
     {
-        auto sub = menu.addSubMenu("General");
-        sub->addSelector("Measure time", &settings.sensor_loop_ms, /* sensor_loop_times */ pid_loop_times);
-        sub = menu.addSubMenu("NVM");
-        sub->addAction("Save NVM", [](MenuItem*, void*){ setman.save(); });
-        sub->addAction("Erase NVM", [](MenuItem*, void*){ setman.erase(); });    
-        // sub->addAction("Begin", [](MenuItem*, void*){ setman.begin(true); });
+        menu.addSelector("Measure time", &settings.sensor_loop_ms, /* sensor_loop_times */ pid_loop_times);
+        {
+            auto sub = menu.addSubMenu("NVM");
+            sub->addAction("Save NVM", [](MenuItem*, void*){ setman.save(); });
+            sub->addAction("Erase NVM", [](MenuItem*, void*){ setman.erase(); });    
+            // sub->addAction("Begin", [](MenuItem*, void*){ setman.begin(true); });
+        };
         menu.addAction("End Expert-mode", [](MenuItem*, void* me){ settings.expert_mode = false; static_cast<Screen*>(me)->close(); }, this);
     };
 
