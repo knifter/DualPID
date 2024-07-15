@@ -4,6 +4,8 @@
 #include <BM8563.h>
 
 extern struct tm today;
+extern const char* rtc_month_str[];
+extern const char* rtc_wday_str[];
 
 bool rtc_begin();
 bool rtc_available();

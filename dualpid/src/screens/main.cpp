@@ -438,13 +438,14 @@ MainScreen::MainScreen(SooghGUI& g) : Screen(g)
 	gw = new GraphPanel(_screen);
 	lv_obj_align(gw->box, LV_ALIGN_BOTTOM_MID, 0, 0);
 
-	clk_lbl = lv_label_create(_screen);
+	if(rtc_available())
 	{
-		lv_obj_align_to(clk_lbl, gw->box, LV_ALIGN_TOP_MID, 0, 0);
-		lv_label_set_text(clk_lbl, "--:--");
-		lv_obj_set_style_border_width(clk_lbl, 1, 0);
-		if(!rtc_available())
-			lv_obj_add_flag(clk_lbl, LV_OBJ_FLAG_HIDDEN);
+		clk_lbl = lv_label_create(_screen);
+		{
+			lv_obj_align_to(clk_lbl, gw->box, LV_ALIGN_TOP_MID, 0, 0);
+			lv_label_set_text(clk_lbl, "--:--");
+			lv_obj_set_style_border_width(clk_lbl, 1, 0);
+		};
 	};
 };
 
@@ -467,7 +468,11 @@ void MainScreen::loop()
 	pw1->update();
 	pw2->update();
 
-	lv_label_set_text_fmt(clk_lbl, "%02d:%02d", today.tm_hour, today.tm_min);
+	if(clk_lbl != nullptr)
+	{
+		rtc_read();
+		lv_label_set_text_fmt(clk_lbl, "%02d:%02d", today.tm_hour, today.tm_min);
+	};
 
 	if(now < _next_chart)
 		return;

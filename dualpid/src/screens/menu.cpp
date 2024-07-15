@@ -258,8 +258,8 @@ void datetime_open_cb(MenuItem* item, void* data)
 {
     rtc_read();
 
-    tmp_mday    = today.tm_mday;
-    tmp_mon     = today.tm_mon ;
+    tmp_mday    = today.tm_mday + 1;
+    tmp_mon     = today.tm_mon;
     tmp_year    = today.tm_year;
     tmp_hour    = today.tm_hour;
     tmp_min     = today.tm_min;
@@ -267,8 +267,8 @@ void datetime_open_cb(MenuItem* item, void* data)
 
 void datetime_close_cb(MenuItem* item, void* data)
 {
-    today.tm_mday = (int) tmp_mday;
-    today.tm_mon = (int) tmp_mon;
+    today.tm_mday = (int) tmp_mday - 1; // Correct for mday 0..30 = 1..31
+    today.tm_mon = (int) tmp_mon;   // month is 0..11 but Selector list is as well
     today.tm_year = (int) tmp_year;
     today.tm_hour = (int) tmp_hour;
     today.tm_min = (int) tmp_min;

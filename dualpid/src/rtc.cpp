@@ -7,6 +7,8 @@
 BM8563 bmrtc;
 
 struct tm today;
+const char* rtc_month_str[] = {"Jan", "Feb", "Mar", "Apr", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec", "OVRFLW"};
+const char* rtc_wday_str[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "OVRFLW"};
 
 bool _available = false;
 time_t _lastread = 0;
@@ -42,11 +44,14 @@ bool rtc_available()
 
 bool rtc_read()
 {
-	if(millis() - _lastread > 1000)
+	// We'll throttle the reads a bit
+	if(millis() - _lastread < 1000)
 		return true;
 	_lastread = millis();
 
-	return bmrtc.readDateTime(&today);
+	bool ok = bmrtc.readDateTime(&today);
+
+	return ok;
 };
 
 bool rtc_write()
