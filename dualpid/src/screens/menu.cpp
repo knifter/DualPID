@@ -277,7 +277,6 @@ void datetime_close_cb(MenuItem* item, void* data)
 
 void menu_close_cb(MenuItem* item, void* data)
 {
-	DBG("Menu closing!");
 	setman.saveDelayed();
 
 	if(need_reboot)
