@@ -7,6 +7,7 @@
 #include "screens.h"
 #include "inputdrv.h"
 #include "rtc.h"
+#include "cli.h"
 
 #include "tools-log.h"
 
@@ -43,6 +44,9 @@ void setup()
 
     ScreenPtr scr = std::make_shared<BootScreen>(gui);
     gui.pushScreen(scr);
+
+	cli_begin();
+
 };
 
 void loop()
@@ -59,6 +63,8 @@ void loop()
 		pid->loop();
 	};
 	gui.loop();
+
+	cli_loop();
 };
 
 void halt(const char* error)
