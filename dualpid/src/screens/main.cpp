@@ -430,7 +430,6 @@ void GraphPanel::autoScale(const lv_chart_axis_t axis, const float inc_sp)
 /*********************************************************************************************************************************/
 MainScreen::MainScreen(SooghGUI& g) : Screen(g)
 {	
-	// pw1 = new PidPanel(_screen, "\xe2\x84\x83");
 	pw1 = new PidPanel(_screen, 1, *(pids[0]));
 	pw2 = new PidPanel(_screen, 2, *(pids[1]));
 	lv_obj_align_to(pw2->box, pw1->box, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
@@ -442,7 +441,7 @@ MainScreen::MainScreen(SooghGUI& g) : Screen(g)
 	{
 		clk_lbl = lv_label_create(_screen);
 		{
-			lv_obj_align_to(clk_lbl, gw->box, LV_ALIGN_TOP_MID, 0, 0);
+			lv_obj_align_to(clk_lbl, _screen, LV_ALIGN_TOP_MID, 0, 0);
 			lv_label_set_text(clk_lbl, "--:--");
 			lv_obj_set_style_border_width(clk_lbl, 1, 0);
 		};
