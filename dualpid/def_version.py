@@ -23,3 +23,4 @@ if(branch in ['master', 'main']):
     devbuild = "-DDEVELOPMENT_BUILD"
 
 print("-DBUILD_DATE_YMD=%s -DBUILD_DATE_YM=%s -DGIT_BRANCH=%s -DGIT_REVISION=%s %s" % (date_ymd, date_ym, branch, revision[-8:], devbuild))
+# print("-DBUILD_DATE_YMD=00000000 -DBUILD_DATE_YM=000000 -DGIT_BRANCH=turbobuild -DGIT_REVISION=turbobuild")
