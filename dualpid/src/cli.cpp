@@ -10,12 +10,12 @@
 bool process_line(const char* line);
 bool process_tokens(const size_t n, const char* tokens[]);
 
-bool cmd_reboot(size_t len, const char* tokens[]);
+bool cmd_save(size_t len, const char* tokens[]);
 bool cmd_setpoint(size_t len, const char* tokens[]);
 
 #define CLI_STREAM_DEVICE	Serial
 #define CLI_MAX_TOKENS		8
-#define REPLY(msg, ...)      CLI_STREAM_DEVICE.printf("> " msg "\n", ##__VA_ARGS__)
+#define REPLY(msg, ...)     CLI_STREAM_DEVICE.printf("> " msg "\n", ##__VA_ARGS__)
 
 typedef bool (*cli_callback_t)(size_t toklen, const char* tokens[]);
 
@@ -27,8 +27,8 @@ typedef struct
 } cli_cmddef_t;
 
 cli_cmddef_t commands[] = {
-	{"reboot", "Reboots the device", cmd_reboot},
-	{"setpoint", "Read (setpoint 1 ?) or set (setpoint 1 = 5) the setpoint", cmd_setpoint},
+	{"save", "Save settings to NVS", cmd_save},
+	{"setpoint", "Set the setpoint", cmd_setpoint},
 	{0, 0, 0},
 };
 
@@ -145,14 +145,13 @@ bool process_tokens(const size_t n, const char* tokens[])
 	};
 	REPLY("Unknown command: %s", tokens[0]);
 	return false;
-
 };
 
 bool cmd_save(size_t n, const char* params[])
 {
 	if(n != 0)
 	{
-		REPLY("<save> requires no parameters.", n);
+		REPLY("<save> requires no parameters.");
 		return false;
 	};
 
