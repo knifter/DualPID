@@ -437,6 +437,14 @@ MainScreen::MainScreen(SooghGUI& g) : Screen(g)
 	gw = new GraphPanel(_screen);
 	lv_obj_align(gw->box, LV_ALIGN_BOTTOM_MID, 0, 0);
 
+	border = lv_obj_create(_screen);
+	{
+		lv_obj_set_size(border, lv_pct(100), lv_pct(100));
+		lv_obj_set_style_bg_opa(border, LV_OPA_0, 0);
+		lv_obj_set_style_border_color(border, COLOR_ORANGE, 0);
+		lv_obj_set_style_border_width(border, 2, 0);	
+	};
+
 	if(rtc_available())
 	{
 		clk_lbl = lv_label_create(_screen);
@@ -451,6 +459,7 @@ MainScreen::MainScreen(SooghGUI& g) : Screen(g)
 MainScreen::~MainScreen()
 {
 	lv_obj_del(clk_lbl); clk_lbl = nullptr;
+	lv_obj_del(border); border = nullptr;
 	delete(pw1);
 	delete(pw2);
 	delete(gw);
@@ -461,8 +470,12 @@ void MainScreen::loop()
 	time_t now = millis();
 	if(now < _next_update)
 		return;
-
 	_next_update = now + MAIN_LOOP_MS;
+
+	if(setman.isDirty())
+		lv_obj_clear_flag(border, LV_OBJ_FLAG_HIDDEN);
+	else
+		lv_obj_add_flag(border, LV_OBJ_FLAG_HIDDEN);
 
 	pw1->update();
 	pw2->update();

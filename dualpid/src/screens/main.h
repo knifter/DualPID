@@ -27,6 +27,7 @@ class MainScreen : public Screen
 		PidPanel* pw2 = nullptr;
 		GraphPanel* gw = nullptr;
 		lv_obj_t* clk_lbl = nullptr;
+		lv_obj_t* border = nullptr;
 
 		time_t _next_update = 0;
 		time_t _next_chart = 0;
