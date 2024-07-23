@@ -11,7 +11,7 @@ bool process_line(const char* line);
 bool process_tokens(const size_t n, const char* tokens[]);
 
 bool cmd_save(size_t len, const char* tokens[]);
-bool cmd_setpoint(size_t len, const char* tokens[]);
+bool cmd_pidx_setpoint(size_t len, const char* tokens[]);
 
 #define CLI_STREAM_DEVICE	Serial
 #define CLI_MAX_TOKENS		8
@@ -28,7 +28,8 @@ typedef struct
 
 cli_cmddef_t commands[] = {
 	{"save", "Save settings to NVS", cmd_save},
-	{"setpoint", "Set the setpoint", cmd_setpoint},
+	{"pid1.setpoint", "Set SP", cmd_pidx_setpoint},
+	{"pid2.setpoint", "Set SP", cmd_pidx_setpoint},
 	{0, 0, 0},
 };
 
@@ -139,7 +140,7 @@ bool process_tokens(const size_t n, const char* tokens[])
 			// for(int i = 0; i < n-1; i++)
 			// 	DBG("param[%d] = '%s'", i, tokens[i+1]);
 
-			return cmd->cb(n-1, &(tokens[1]));
+			return cmd->cb(n, tokens);
 		};
 		cmd++;
 	};
@@ -147,9 +148,9 @@ bool process_tokens(const size_t n, const char* tokens[])
 	return false;
 };
 
-bool cmd_save(size_t n, const char* params[])
+bool cmd_save(size_t n, const char* tokens[])
 {
-	if(n != 0)
+	if(n > 1)
 	{
 		REPLY("<save> requires no parameters.");
 		return false;
@@ -161,35 +162,55 @@ bool cmd_save(size_t n, const char* params[])
 	return true;
 };
 
-bool cmd_setpoint(size_t n, const char* params[])
+bool cmd_pidx_setpoint(size_t n, const char* tokens[])
 {
-	if(n != 2)
+	// Determine channel nummer from command
+	uint32_t channel;
+	if(1 != sscanf(tokens[0], "pid%u.", &channel))
 	{
-		REPLY("<setpoint> requires 2 parameters: \"setpoint <int:channel> <float:value>\"");
+		REPLY("Could not determine channel from '%s'", tokens[0]);
 		return false;
 	};
-
-	int channel = atoi(params[0]);
-	double setpoint = atof(params[1]);
-
 	if(channel < 1 || channel > NUMBER_OF_CHANNELS)
 	{
 		REPLY("Invalid channel: %d, use 1..%d", channel, NUMBER_OF_CHANNELS);
 		return false;
 	};
-
 	PIDLoop* pidloop = pids[channel - 1];
-    InputDriver* indrv = pidloop->input_drv();
-    PIDLoop::settings_t& pset = pidloop->_settings;
-	float sp_min = indrv->setpoint_min();
-	float sp_max = indrv->setpoint_max();
-	if(setpoint < sp_min || setpoint > sp_max)
+	InputDriver* indrv = pidloop->input_drv();
+	PIDLoop::settings_t& pset = pidloop->_settings;
+
+	// const char* varname = tokens[0] + 5; // everything after "pidx."
+
+	// See if it is more than a 'read'
+	if(n == 1)
 	{
-		REPLY("Setpoint out of range: min=%f < %f < max=%f", sp_min, setpoint, sp_max);
+		REPLY("%f", pset.fpid.setpoint);
+		return true;		
+	};
+
+	if(n != 3)
+	{
+		REPLY("Unknown syntax: no parameters or <name> = <value>");
+		return false;
+	};
+	if(strcmp(tokens[1], "=") != 0)
+	{
+		REPLY("Unknown parameter '%s', expected '='.", tokens[1]);
 		return false;
 	};
 
-	pset.fpid.setpoint = setpoint;
-	
+	double value = atof(tokens[2]);
+
+	float min = indrv->setpoint_min();
+	float max = indrv->setpoint_max();
+	if(value < min || value > max)
+	{
+		REPLY("%s out of range: min..max=%f .. %f (%f given)", tokens[0], min, max, value);
+		return false;
+	};
+
+	pset.fpid.setpoint = value;
+	REPLY("%f", pset.fpid.setpoint);
 	return true;
 };
