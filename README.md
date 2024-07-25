@@ -13,7 +13,7 @@ Currently used for controlling both temperature and humidity but should be versa
    * [x] On-Device editable PID settings
    * [x] Input filter
    * [x] D-term filter
-   * [ ] [Take-back-half](https://github.com/knifter/DualPID/issues/26)
+   * [ ] [Planned: Take-back-half](https://github.com/knifter/DualPID/issues/26)
  * [x] Fixed output setting to measure step response
  * [x] Lock-detection
  * [ ] Alarms
@@ -63,15 +63,15 @@ Start with [M5Stack Cushion, mandatory lab equipment](https://shop.m5stack.com/c
  * [x] [Mini 3A Relay Unit](https://shop.m5stack.com/products/mini-3a-relay-unit)
  * [x] [M5 2-Channel SPST Relay Unit](https://shop.m5stack.com/collections/m5-sensor/products/2-channel-spst-relay-unit)
  * [x] [M5 4-Relay Unit](https://shop.m5stack.com/collections/m5-sensor/products/4-relay-unit)
- * [ ] [(Planned)](https://github.com/knifter/DualPID/issues/75) [M5 DAC 2 I2C Unit (GP8413)](https://shop.m5stack.com/products/dac-2-i2c-unit-gp8413)
+ * [x] [M5 DAC 2 I2C Unit (GP8413), 0..5V/10V](https://shop.m5stack.com/products/dac-2-i2c-unit-gp8413)
  * [ ] [(Planned)](https://github.com/knifter/DualPID/issues/72) [M5 H-bridge Unit v1.1](https://shop.m5stack.com/collections/m5-sensor/products/h-bridge-unit-v1-1-stm32f030)
  * [ ] [Single-phase DC SSR Unit (RS485)](https://shop.m5stack.com/collections/m5-sensor/products/single-phase-dc-ssr-unit-cdg1-1dd-10a)
  * [ ] [M5 Solid State Relay Unit](https://shop.m5stack.com/products/solid-state-relay-unit-bt136s)
  * [ ] [M5 Single-phase AC SSR Unit](https://shop.m5stack.com/products/single-phase-ac-ssr-unit-cdg1-1da-10a)
 
 ### Ideas which could be added/supported/implemented:
+ * [x] [RTC Module](https://shop.m5stack.com/products/real-time-clock-rtc-unit-hym8563)
  * [ ] [(Planned)](https://github.com/knifter/DualPID/issues/71) [WT32 SC01 3.2" TFT Touch Screen module](https://www.tinytronics.nl/en/development-boards/microcontroller-boards/with-wi-fi/wt32-sc01-esp32-development-board-with-3.5-inch-ips-capacitive-touchscreen)
- * [ ] [(Planned)](https://github.com/knifter/DualPID/issues/67) [RTC Module](https://shop.m5stack.com/products/real-time-clock-rtc-unit-hym8563)
  * [ ] [Core2 with touch interface](https://shop.m5stack.com/products/m5stack-core2-esp32-iot-development-kit)
  * [ ] [I2C HUB 1-to-6 Expansion Unit](https://shop.m5stack.com/products/i2c-hub-1-to-6-expansion-unit-pca9548apw) (External for TwoWireDevice)
  * [ ] [4Ch Lego Motor module](https://shop.m5stack.com/collections/m5-module/products/lego-module)
@@ -91,12 +91,7 @@ Start with [M5Stack Cushion, mandatory lab equipment](https://shop.m5stack.com/c
  * Tools library [lib-tools](https://github.com/knifter/lib-Tools)
 
 ## Credits
-Originally this design was based upon https://github.com/sciunto-org/humidity_regulator, an arduino sketch for an Ardiuno Uno. But since I've replaced even the PID loop library, I don't think there is much left of that design. But the idea came from them so credit where credit is due ;)
-
-They (sciunto) quoted this paper as well, I will too:
-F. Boulogne, "Cheap and versatile humidity regulator for environmentally controlled experiments", The European Physical Journal E, vol. 42, no. 4, 2019, pp. 51.
-* EPJE: <https://doi.org/10.1140/epje/i2019-11813-0>
-* On arxiv: <https://arxiv.org/abs/1903.08952>
+Originally this design was based upon https://github.com/sciunto-org/humidity_regulator, an arduino sketch for an Ardiuno Uno. But since I've replaced even the PID loop library, I don't think there is anything left of that design. But the idea came from them so credit where credit is due ;)
 
 The user interface is build with the Light Weight Versatile Graphics library: [LVGL](https://github.com/lvgl/lvgl)
 The screen library is written by lovyan03, [LovyanGFX](https://github.com/lovyan03/LovyanGFX)
