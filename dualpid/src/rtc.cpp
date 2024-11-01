@@ -7,11 +7,14 @@
 BM8563 bmrtc;
 
 struct tm today;
-const char* rtc_month_str[] = {"Jan", "Feb", "Mar", "Apr", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec", "OVRFLW"};
-const char* rtc_wday_str[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "OVRFLW"};
+const char* rtc_month_str[] = {"Jan", "Feb", "Mar", "Apr", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"};
+const char* rtc_wday_str[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
 bool _available = false;
 time_t _lastread = 0;
+
+void rtc_ext2int();
+void rtc_int2ext();
 
 bool rtc_begin()
 {
@@ -49,11 +52,40 @@ bool rtc_read()
 		return true;
 	_lastread = millis();
 
-	bool ok = bmrtc.readDateTime(&today);
+	// Get time/date from external RTC
+	if(!bmrtc.readDateTime(&today))
+	{
+		ERROR("Read RTC failed.");
+		return false;
+	};
 
-	return ok;
+	// rtc_ext2int();
+
+	return true;
 };
 
+void rtc_ext2int()
+{
+	// Set internal RTC from &today
+	struct timeval tv;
+	struct timezone tz;
+	tv.tv_usec = 0;
+	localtime_r(&(tv.tv_sec), &today);
+	settimeofday(&tv, nullptr);
+};
+
+void rtc_int2ext()
+{
+	// Fill &today from internal rtc
+	struct timeval tv;
+	gettimeofday(&tv, nullptr);
+	struct tm *tmp = localtime(&(tv.tv_sec));
+	memcpy(&today, &tmp, sizeof(struct tm));
+
+	// updated global 'today' still needs to be written to ext RTC!
+};
+
+// Write internal -> external RTC
 bool rtc_write()
 {
 	return bmrtc.writeDateTime(&today);

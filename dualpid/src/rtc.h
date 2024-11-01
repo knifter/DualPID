@@ -11,6 +11,5 @@ bool rtc_begin();
 bool rtc_available();
 bool rtc_read();
 bool rtc_write();
-// struct tm* rtc();
 
 #endif // __RTC_H
