@@ -151,6 +151,18 @@ float MAX31865Driver::read()
 	return _sensor.getTemperature();
 };
 
+// MLX90614
+bool MLX90614Driver::begin()
+{
+	if(!_sensor.begin())
+		return false;
+	return InputDriver::begin();
+};
+float MLX90614Driver::read()
+{
+	return _sensor.readObjectTemp();
+};
+
 // SprintIR20
 bool SprintIR20Driver::begin()
 {

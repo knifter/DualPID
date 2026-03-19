@@ -34,3 +34,6 @@
 [submodule "dualpid/lib/lib-GP8413"]
 	path = dualpid/lib/lib-GP8413
 	url = https://github.com/knifter/lib-GP8413
+[submodule "dualpid/lib/lib-MLX90614"]
+	path = dualpid/lib/lib-MLX90614
+	url = https://github.com/knifter/lib-MLX90614

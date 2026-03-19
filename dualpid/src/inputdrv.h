@@ -13,6 +13,7 @@ typedef enum
     INPUT_DRIVER_M5KMETER,
     INPUT_DRIVER_MCP9600,
     INPUT_DRIVER_MAX31865,
+    INPUT_DRIVER_MLX90614,
 
     // 200 = HR
     INPUT_DRIVER_SHT31_RH = 200,
@@ -28,7 +29,8 @@ typedef enum
     {INPUT_DRIVER_M5KMETER, "kmeter", "M5-KMeter"},           \
     {INPUT_DRIVER_MCP9600, "mcp9600", "MCP9600"},             \
     {INPUT_DRIVER_MAX31865, "max31865", "MAX31865"},          \
-    {INPUT_DRIVER_SPRINTIR, "sprintir", "SprintIR"}          
+    {INPUT_DRIVER_MLX90614, "NCIR", "MLX90614"},          	  \
+    {INPUT_DRIVER_SPRINTIR, "sprintir", "SprintIR"}
 
 class InputDriver
 {
@@ -136,6 +138,22 @@ class MAX31865Driver : public InputDriver
 		MAX31865 _sensor;
 };
 #endif // INPUTDRV_MAX31865_ENABLED
+
+#ifdef INPUTDRV_MLX90614_ENABLED
+#include <MLX90614.h>
+class MLX90614Driver : public InputDriver
+{
+	public:
+		MLX90614Driver() : InputDriver(), _sensor(Wire) {};
+
+		bool begin();
+		float read();
+		data_type_t data_type() { return TYPE_TEMPERATURE; };
+
+	private:
+		MLX90614 _sensor;
+};
+#endif // INPUTDRV_MLX90614_ENABLED
 
 #ifdef INPUTDRV_SPRINTIR_ENABLED
 #include <SprintIR.h>

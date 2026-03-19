@@ -75,6 +75,7 @@ bool PIDLoop::begin()
         case INPUT_DRIVER_M5KMETER:     _inputdrv = new M5KMeterDriver(); break;
         case INPUT_DRIVER_MCP9600:      _inputdrv = new MCP9600Driver(); break;
         case INPUT_DRIVER_MAX31865:     _inputdrv = new MAX31865Driver(); break;
+        case INPUT_DRIVER_MLX90614:     _inputdrv = new MLX90614Driver(); break;
         case INPUT_DRIVER_SPRINTIR:     _inputdrv = new SprintIR20Driver(); break;
     };
     if(_settings.input_drv != INPUT_DRIVER_NONE)
