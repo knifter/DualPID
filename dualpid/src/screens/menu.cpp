@@ -314,6 +314,7 @@ bool MenuScreen::handle(soogh_event_t e)
 			menu.sendKey(LV_KEY_ENTER);
 			return true;
 		case KEY_B_LONG:
+        case KEY_B_DOUBLE_PRESSED:
 			menu.sendKey(LV_KEY_ESC);
 			return true;
 		case KEY_C_SHORT:
