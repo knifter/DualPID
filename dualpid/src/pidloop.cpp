@@ -103,7 +103,7 @@ bool PIDLoop::begin()
 
     if(_settings.output_drv != OUTPUT_DRIVER_NONE)
     {
-        if(!_outputdrv->begin(_channel_id))
+        if(!_outputdrv->begin(_settings.output, _channel_id))
         {
             gui.showMessage("WARNING:", "Channel OutputDriver error.");
             ERROR("Channel %d output.begin() failed.", _channel_id);

@@ -22,8 +22,8 @@ typedef enum
 
 #define OUTPUT_DRIVER_MENULIST \
 	{OUTPUT_DRIVER_NONE, 		"none",   "no output"}, 	\
-	{OUTPUT_DRIVER_SLOWPWM, 	"sPWM",   "SlowPWM"}, 		\
-	{OUTPUT_DRIVER_FASTPWM, 	"PWM",    "FastPWM"},		\
+	{OUTPUT_DRIVER_SLOWPWM, 	"sPWM",   "SlowPWM-IO"}, 		\
+	{OUTPUT_DRIVER_FASTPWM, 	"PWM",    "FastPWM-IO"},		\
 	{OUTPUT_DRIVER_GP8413,		"DAC",	  "GP8413"}
 
 typedef union {
@@ -50,7 +50,9 @@ class OutputDriver
 			{};
 		virtual ~OutputDriver() {};
 
-		virtual bool begin(int32_t channel_id) { return true; };
+		virtual bool begin(output_driver_config_t &cfg, int32_t channel_id) { return true; };
+		    
+
 		virtual void off() = 0;
 		virtual void set(float percent) = 0;
 	
@@ -64,17 +66,20 @@ class OutputDriver
 	    OutputDriver& operator=(OutputDriver const&) = delete;
 };
 
-class SlowPWMDriver : public OutputDriver
+class SlowPWMBase : public OutputDriver
 {
 	public:
-		SlowPWMDriver() : OutputDriver() {};
+		SlowPWMBase() : OutputDriver() {};
 
-		bool begin(int32_t channel_id);
+		bool begin(output_driver_config_t &cfg, int32_t channel_id);
 		void off();
 		void set(float percent);
 		// void loop();
 
-	private:
+	protected:
+		virtual void _on() = 0;
+		virtual void _off() = 0;
+
 		static void task(void*);
 		TaskHandle_t _taskh;
 		bool _task_running = false;
@@ -85,6 +90,18 @@ class SlowPWMDriver : public OutputDriver
 		uint32_t _window_lowtime;
 		uint32_t _window_hightime;
 
+};
+
+class SlowPWMDriver : public SlowPWMBase
+{
+	public:
+		bool begin(output_driver_config_t &cfg, int32_t channel_id);
+		void off();
+
+	private:
+		void _on();
+		void _off();
+
         // gpio_num_t _pin_n;
 		gpio_num_t _pin_p;
 };
@@ -94,7 +111,7 @@ class FastPWMDriver : public OutputDriver
 	public:
 		FastPWMDriver() : OutputDriver() {};
 
-		bool begin(int32_t channel_id);
+		bool begin(output_driver_config_t &cfg, int32_t channel_id);
 		void off();
 		void set(float percent);
 		// void loop();
@@ -110,7 +127,7 @@ class GP8413Driver : public OutputDriver
 	public:
 		GP8413Driver() : OutputDriver() {};
 
-		bool begin(int32_t channel_id);
+		bool begin(output_driver_config_t &cfg, int32_t channel_id);
 		void off();
 		void set(float percent);
 		// void loop();
