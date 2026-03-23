@@ -68,7 +68,7 @@ void rtc_ext2int()
 {
 	// Set internal RTC from &today
 	struct timeval tv;
-	struct timezone tz;
+	// struct timezone tz;
 	tv.tv_usec = 0;
 	localtime_r(&(tv.tv_sec), &today);
 	settimeofday(&tv, nullptr);
@@ -88,5 +88,5 @@ void rtc_int2ext()
 // Write internal -> external RTC
 bool rtc_write()
 {
-	return bmrtc.writeDateTime(&today);
+	return bmrtc.writeDateTime(today);
 };
