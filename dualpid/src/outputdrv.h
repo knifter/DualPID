@@ -18,13 +18,17 @@ typedef enum
 
 	// DAC, Network, another PID input, etc?
 	OUTPUT_DRIVER_GP8413 = 10,
+	OUTPUT_DRIVER_UNITSSR,
+	OUTPUT_DRIVER_UNITACSSR,
 } output_driver_t;
 
 #define OUTPUT_DRIVER_MENULIST \
 	{OUTPUT_DRIVER_NONE, 		"none",   "no output"}, 	\
 	{OUTPUT_DRIVER_SLOWPWM, 	"sPWM",   "SlowPWM-IO"}, 		\
 	{OUTPUT_DRIVER_FASTPWM, 	"PWM",    "FastPWM-IO"},		\
-	{OUTPUT_DRIVER_GP8413,		"DAC",	  "GP8413"}
+	{OUTPUT_DRIVER_GP8413,		"DAC",	  "GP8413"},		\
+	{OUTPUT_DRIVER_UNITSSR,		"UnitSSR", "Unit SSR"},		\
+	{OUTPUT_DRIVER_UNITACSSR,	"ACSSR",   "Unit ACSSR"}
 
 typedef union {
 	int32_t param[3];
@@ -40,6 +44,18 @@ typedef union {
 		int32_t pin_p;
 		int32_t frequency;
 	} fastpwm;
+	struct
+	{
+		int32_t i2c_addr;	// 0 = use default (0x25)
+		int32_t _unused;
+		int32_t windowtime;
+	} unitssr;
+	struct
+	{
+		int32_t i2c_addr;	// 0 = use default (0x50)
+		int32_t _unused;
+		int32_t windowtime;
+	} unitacssr;
 } output_driver_config_t;
 
 class OutputDriver
@@ -50,7 +66,7 @@ class OutputDriver
 			{};
 		virtual ~OutputDriver() {};
 
-		virtual bool begin(output_driver_config_t &cfg, int32_t channel_id) { return true; };
+		virtual bool begin(const output_driver_config_t &cfg, const int32_t channel_id) { return true; };
 		    
 
 		virtual void off() = 0;
@@ -71,7 +87,7 @@ class SlowPWMBase : public OutputDriver
 	public:
 		SlowPWMBase() : OutputDriver() {};
 
-		bool begin(output_driver_config_t &cfg, int32_t channel_id);
+		bool begin(const output_driver_config_t &cfg, const int32_t channel_id);
 		void off();
 		void set(float percent);
 		// void loop();
@@ -95,7 +111,7 @@ class SlowPWMBase : public OutputDriver
 class SlowPWMDriver : public SlowPWMBase
 {
 	public:
-		bool begin(output_driver_config_t &cfg, int32_t channel_id);
+		bool begin(const output_driver_config_t &cfg, const int32_t channel_id);
 		void off();
 
 	private:
@@ -111,7 +127,7 @@ class FastPWMDriver : public OutputDriver
 	public:
 		FastPWMDriver() : OutputDriver() {};
 
-		bool begin(output_driver_config_t &cfg, int32_t channel_id);
+		bool begin(const output_driver_config_t &cfg, const int32_t channel_id);
 		void off();
 		void set(float percent);
 		// void loop();
@@ -127,7 +143,7 @@ class GP8413Driver : public OutputDriver
 	public:
 		GP8413Driver() : OutputDriver() {};
 
-		bool begin(output_driver_config_t &cfg, int32_t channel_id);
+		bool begin(const output_driver_config_t &cfg, const int32_t channel_id);
 		void off();
 		void set(float percent);
 		// void loop();
@@ -138,5 +154,37 @@ class GP8413Driver : public OutputDriver
 		GP8413::channel_num_t _dac_channel;
 };
 #endif // OUTPUT_DAC_GP8413
+
+#ifdef OUTPUTDRV_UNITSSR_ENABLED
+#include <UnitSSR.h>
+class UnitSSRDriver : public SlowPWMBase
+{
+	public:
+		bool begin(const output_driver_config_t &cfg, const int32_t channel_id);
+		void off();
+
+	private:
+		void _on();
+		void _off();
+
+		UnitSSR _ssr;
+};
+#endif // OUTPUTDRV_UNITSSR_ENABLED
+
+#ifdef OUTPUTDRV_UNITACSSR_ENABLED
+#include <UnitACSSR.h>
+class UnitACSSRDriver : public SlowPWMBase
+{
+	public:
+		bool begin(const output_driver_config_t &cfg, const int32_t channel_id);
+		void off();
+
+	private:
+		void _on();
+		void _off();
+
+		UnitACSSR _ssr;
+};
+#endif // OUTPUTDRV_UNITACSSR_ENABLED
 
 #endif // __OUTPUT_H

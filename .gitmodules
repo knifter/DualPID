@@ -37,3 +37,6 @@
 [submodule "dualpid/lib/lib-MLX90614"]
 	path = dualpid/lib/lib-MLX90614
 	url = https://github.com/knifter/lib-MLX90614
+[submodule "dualpid/lib/lib-UnitSSR"]
+	path = dualpid/lib/lib-UnitSSR
+	url = https://github.com/knifter/lib-UnitSSR

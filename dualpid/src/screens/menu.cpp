@@ -110,6 +110,22 @@ SelectorField::item_t output_fastpwm_frequencies [] {
 	{0, 0, 0}
 	};
 
+SelectorField::item_t output_unitssr_addresses [] {
+	{0,    "def",  "Default (0x25)"},
+	{0x25, "0x25", "0x25"},
+	{0x26, "0x26", "0x26"},
+	{0x27, "0x27", "0x27"},
+	{0, 0, 0}
+	};
+
+SelectorField::item_t output_unitacssr_addresses [] {
+	{0,    "def",  "Default (0x50)"},
+	{0x50, "0x50", "0x50"},
+	{0x51, "0x51", "0x51"},
+	{0x52, "0x52", "0x52"},
+	{0, 0, 0}
+	};
+
 SelectorField::item_t lock_windows [] {
     // 1000 == 1%
 	{1000, 	"1%",    "1%"},
@@ -211,7 +227,15 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
                 case OUTPUT_DRIVER_FASTPWM:
                     // sub->addSelector("Pin N (-)", &set.pin_n, hardware_ports)->onChange(set_need_reboot);
                     sub->addSelector("Pin P (+)", &set.output.fastpwm.pin_p, hardware_ports)->onChange(set_need_reboot);
-                    sub->addSelector("Frequency", &set.output.fastpwm.frequency, output_fastpwm_frequencies)->onChange(set_need_reboot);    
+                    sub->addSelector("Frequency", &set.output.fastpwm.frequency, output_fastpwm_frequencies)->onChange(set_need_reboot);
+                    break;
+                case OUTPUT_DRIVER_UNITSSR:
+                    sub->addSelector("I2C Address", &set.output.unitssr.i2c_addr, output_unitssr_addresses)->onChange(set_need_reboot);
+                    sub->addSelector("Windowtime", &set.output.unitssr.windowtime, output_slowpwm_windowtimes)->onChange(set_need_reboot);
+                    break;
+                case OUTPUT_DRIVER_UNITACSSR:
+                    sub->addSelector("I2C Address", &set.output.unitacssr.i2c_addr, output_unitacssr_addresses)->onChange(set_need_reboot);
+                    sub->addSelector("Windowtime", &set.output.unitacssr.windowtime, output_slowpwm_windowtimes)->onChange(set_need_reboot);
                     break;
             };
             sub->addSpinbox("Min Output", &set.min_output, 0, 100, 0)->onChange(set_need_reboot);

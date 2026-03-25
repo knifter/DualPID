@@ -5,7 +5,7 @@
 
 #include "freertos/task.h"
 
-bool SlowPWMBase::begin(output_driver_config_t &cfg, int32_t channel_id)
+bool SlowPWMBase::begin(const output_driver_config_t &cfg, const int32_t channel_id)
 {
 	_window_len = cfg.slowpwm.windowtime;
 
@@ -95,7 +95,7 @@ void SlowPWMBase::task(void* ptr)
     };
 };
 
-bool SlowPWMDriver::begin(output_driver_config_t &cfg, int32_t channel_id)
+bool SlowPWMDriver::begin(const output_driver_config_t &cfg, const int32_t channel_id)
 {
     _pin_p = static_cast<gpio_num_t>(cfg.slowpwm.pin_p);
     DBG("ch%d SlowPWM (IO) on gpio_num_%u", channel_id, _pin_p);
@@ -129,8 +129,7 @@ void SlowPWMDriver::_off()
     digitalWrite(_pin_p, HIGH);
 };
 
-
-bool FastPWMDriver::begin(output_driver_config_t &cfg, int32_t channel_id)
+bool FastPWMDriver::begin(const output_driver_config_t &cfg, const int32_t channel_id)
 {
     _pin_p = static_cast<gpio_num_t>(cfg.fastpwm.pin_p);
     _channel_id = channel_id;
@@ -170,7 +169,7 @@ void FastPWMDriver::set(float percent)
 
 #ifdef OUTPUTDRV_GP8413_ENABLED
 #include <GP8413.h>
-bool GP8413Driver::begin(output_driver_config_t &cfg, int32_t channel_id)
+bool GP8413Driver::begin(const output_driver_config_t &cfg, const int32_t channel_id)
 {
     for(uint8_t addr = 0; addr < 8; addr++)
     {
@@ -201,4 +200,48 @@ void GP8413Driver::set(float percent)
     _dac.setOutput(_dac_channel, value);
 };
 #endif // OUTPUTDRV_GP8413_ENABLED
+
+#ifdef OUTPUTDRV_UNITSSR_ENABLED
+bool UnitSSRDriver::begin(const output_driver_config_t &cfg, const int32_t channel_id)
+{
+    uint8_t addr = cfg.unitssr.i2c_addr ? (uint8_t)cfg.unitssr.i2c_addr : UNITSSR_ADDRESS_DEFAULT;
+    if(!_ssr.begin(addr))
+    {
+        ERROR("UnitSSR not found at 0x%02x", addr);
+        return false;
+    };
+    return SlowPWMBase::begin(cfg, channel_id);
+};
+
+void UnitSSRDriver::off()
+{
+    _ssr.setRelay(false);
+    SlowPWMBase::off();
+};
+
+void UnitSSRDriver::_on()  { _ssr.setRelay(true); };
+void UnitSSRDriver::_off() { _ssr.setRelay(false); };
+#endif // OUTPUTDRV_UNITSSR_ENABLED
+
+#ifdef OUTPUTDRV_UNITACSSR_ENABLED
+bool UnitACSSRDriver::begin(const output_driver_config_t &cfg, const int32_t channel_id)
+{
+    uint8_t addr = cfg.unitacssr.i2c_addr ? (uint8_t)cfg.unitacssr.i2c_addr : UNITACSSR_ADDRESS_DEFAULT;
+    if(!_ssr.begin(addr))
+    {
+        ERROR("UnitACSSR not found at 0x%02x", addr);
+        return false;
+    };
+    return SlowPWMBase::begin(cfg, channel_id);
+};
+
+void UnitACSSRDriver::off()
+{
+    _ssr.setRelay(false);
+    SlowPWMBase::off();
+};
+
+void UnitACSSRDriver::_on()  { _ssr.setRelay(true); };
+void UnitACSSRDriver::_off() { _ssr.setRelay(false); };
+#endif // OUTPUTDRV_UNITACSSR_ENABLED
 

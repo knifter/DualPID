@@ -99,6 +99,8 @@ bool PIDLoop::begin()
         case OUTPUT_DRIVER_SLOWPWM: _outputdrv = new SlowPWMDriver(); break;
         case OUTPUT_DRIVER_FASTPWM: _outputdrv = new FastPWMDriver(); break;
         case OUTPUT_DRIVER_GP8413:  _outputdrv = new GP8413Driver(); break;
+        case OUTPUT_DRIVER_UNITSSR:   _outputdrv = new UnitSSRDriver(); break;
+        case OUTPUT_DRIVER_UNITACSSR: _outputdrv = new UnitACSSRDriver(); break;
     };
 
     if(_settings.output_drv != OUTPUT_DRIVER_NONE)
