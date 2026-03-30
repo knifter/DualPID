@@ -1,6 +1,7 @@
 #ifndef __VERSION_H
 #define __VERSION_H
 
+#include "version_auto.h"
 // A few defines here are set during build in def_version.py
 
 #define _STRINGIFY(x)      #x
