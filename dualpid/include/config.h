@@ -115,6 +115,10 @@
 	#define PIN_SD_CS				GPIO_NUM_4
 	#define PIN_MAX31865_CS			GPIO_NUM_26
 
+	#define PIN_BTN_A				GPIO_NUM_NC
+	#define PIN_BTN_B				GPIO_NUM_NC
+	#define PIN_BTN_C				GPIO_NUM_NC
+
 	#define PIDLOOP_PORTS_LIST	\
 		{GPIO_NUM_2, 	"IO2", 	"GPIO2"},	\
 		{GPIO_NUM_12, 	"IO12", "GPIO12"},	\
