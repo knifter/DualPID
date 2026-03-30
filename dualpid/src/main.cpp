@@ -37,6 +37,7 @@ void setup()
 
 	setman.begin();
 
+	// Start initializing PIDs and their hardware
 	for(PIDLoop* pid : pids)
 	{
 		pid->begin();
@@ -56,13 +57,13 @@ void loop()
     //     DBG("event: %s", soogh_event_name(e));
 
 	gui.handle(e);
+	gui.loop();
 
 	setman.loop();
 	for(PIDLoop* pid : pids)
 	{
 		pid->loop();
 	};
-	gui.loop();
 
 	cli_loop();
 };
