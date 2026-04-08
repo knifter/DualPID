@@ -1,12 +1,6 @@
 [submodule "dualpid/lib/lib-soogh"]
 	path = dualpid/lib/lib-soogh
 	url = https://github.com/knifter/lib-soogh
-[submodule "dualpid/lib/lib-BM8563"]
-	path = dualpid/lib/lib-BM8563
-	url = https://github.com/knifter/lib-BM8563.git
-[submodule "dualpid/lib/lib-GP8413"]
-	path = dualpid/lib/lib-GP8413
-	url = https://github.com/knifter/lib-GP8413
 [submodule "dualpid/lib/lib-MLX90614"]
 	path = dualpid/lib/lib-MLX90614
 	url = https://github.com/knifter/lib-MLX90614
