@@ -1,33 +1,6 @@
-[submodule "dualpid/lib/lib-TwoWireDevice"]
-	path = dualpid/lib/lib-TwoWireDevice
-	url = https://github.com/knifter/lib-TwoWireDevice
 [submodule "dualpid/lib/lib-soogh"]
 	path = dualpid/lib/lib-soogh
 	url = https://github.com/knifter/lib-soogh
-[submodule "dualpid/lib/lib-tools"]
-	path = dualpid/lib/lib-tools
-	url = https://github.com/knifter/lib-tools
-[submodule "dualpid/lib/lib-FPID"]
-	path = dualpid/lib/lib-FPID
-	url = https://github.com/knifter/lib-FPID
-[submodule "dualpid/lib/lib-SHT3x"]
-	path = dualpid/lib/lib-SHT3x
-	url = https://github.com/knifter/lib-SHT3x
-[submodule "dualpid/lib/lib-SprintIR"]
-	path = dualpid/lib/lib-SprintIR
-	url = https://github.com/knifter/lib-SprintIR
-[submodule "dualpid/lib/lib-M5KMeter"]
-	path = dualpid/lib/lib-M5KMeter
-	url = https://github.com/knifter/lib-M5KMeter.git
-[submodule "dualpid/lib/lib-MCP9600"]
-	path = dualpid/lib/lib-MCP9600
-	url = https://github.com/knifter/lib-MCP9600.git
-[submodule "dualpid/lib/lib-SPIDevice"]
-	path = dualpid/lib/lib-SPIDevice
-	url = https://github.com/knifter/lib-SPIDevice
-[submodule "dualpid/lib/lib-MAX31865"]
-	path = dualpid/lib/lib-MAX31865
-	url = https://github.com/knifter/lib-MAX31865
 [submodule "dualpid/lib/lib-BM8563"]
 	path = dualpid/lib/lib-BM8563
 	url = https://github.com/knifter/lib-BM8563.git
@@ -37,6 +10,3 @@
 [submodule "dualpid/lib/lib-MLX90614"]
 	path = dualpid/lib/lib-MLX90614
 	url = https://github.com/knifter/lib-MLX90614
-[submodule "dualpid/lib/lib-UnitSSR"]
-	path = dualpid/lib/lib-UnitSSR
-	url = https://github.com/knifter/lib-UnitSSR
