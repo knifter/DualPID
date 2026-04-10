@@ -286,13 +286,17 @@ class GraphPanel
 		void appendVals(const float val1, const float val2);
 		void setScaleY(const lv_chart_axis_t, float min, float max);
 		void autoScale(const lv_chart_axis_t axis, const float inc_sp);
-		static void draw_lbl_cb(lv_event_t* e);
+		void updateXLabels();
 
 		lv_obj_t *box;
 	    lv_obj_t *chart;
+		lv_obj_t *scale_y1, *scale_y2, *scale_x;
 		lv_chart_series_t *ser1, *ser2;
   	    bool redraw = true;
 		lv_color_t color_ch1, color_ch2;
+		char     x_label_bufs[GRAPH_XTICKS][8];
+		const char* x_labels[GRAPH_XTICKS + 1];
+		uint32_t last_graph_delta = 0;
 };
 
 GraphPanel::GraphPanel(lv_obj_t* parent)
@@ -309,17 +313,9 @@ GraphPanel::GraphPanel(lv_obj_t* parent)
 
     lv_chart_set_type(chart, LV_CHART_TYPE_LINE);
     lv_chart_set_div_line_count(chart, GRAPH_YDIVS, GRAPH_XDIVS);
-    lv_obj_set_style_size(chart, 0, LV_PART_INDICATOR);
+    lv_obj_set_style_size(chart, 0, 0, LV_PART_INDICATOR);
 
-    lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_X, 1, 0, GRAPH_XTICKS, 1, true, 20);
-	lv_chart_set_update_mode(chart, LV_CHART_UPDATE_MODE_SHIFT );
-
-	// Primary = Temp, secondary = Rh
-	// setScaleY(LV_CHART_AXIS_PRIMARY_Y, -10*GRAPH_MULTIPLIER, 30*GRAPH_MULTIPLIER);
-	// setScaleY(LV_CHART_AXIS_SECONDARY_Y, 0*GRAPH_MULTIPLIER, 100*GRAPH_MULTIPLIER);
-	// void lv_chart_set_axis_tick(obj, axis, 						major_len, minor_len, major_cnt, minor_cnt, label_en, draw_size)
-    lv_chart_set_axis_tick(	chart,  LV_CHART_AXIS_PRIMARY_Y, 	1,         0,         3,         1,         true,     40);
-    lv_chart_set_axis_tick(	chart,  LV_CHART_AXIS_SECONDARY_Y, 	1,         0,         3,         1,         true,     40);
+	lv_chart_set_update_mode(chart, LV_CHART_UPDATE_MODE_SHIFT);
 
 	color_ch1 = COLOR_BLACK;
 	color_ch2 = COLOR_BLACK;
@@ -334,57 +330,59 @@ GraphPanel::GraphPanel(lv_obj_t* parent)
 	lv_chart_set_point_count(chart, GRAPH_POINTS);
     ser1 = lv_chart_add_series(chart, color_ch1, LV_CHART_AXIS_PRIMARY_Y);
     ser2 = lv_chart_add_series(chart, color_ch2, LV_CHART_AXIS_SECONDARY_Y);
-	
-	lv_obj_add_event_cb(chart, draw_lbl_cb, LV_EVENT_DRAW_PART_BEGIN, this);
+
+	const int32_t chart_w = DISPLAY_WIDTH - 55;
+	const int32_t chart_h = DISPLAY_HEIGHT - 80 - 20;
+
+	// Primary Y scale (left)
+	scale_y1 = lv_scale_create(box);
+	lv_scale_set_mode(scale_y1, LV_SCALE_MODE_VERTICAL_LEFT);
+	lv_obj_set_size(scale_y1, 27, chart_h);
+	lv_obj_align_to(scale_y1, chart, LV_ALIGN_OUT_LEFT_MID, 0, 0);
+	lv_scale_set_total_tick_count(scale_y1, 5);
+	lv_scale_set_major_tick_every(scale_y1, 1);
+	lv_obj_set_style_text_color(scale_y1, color_ch1, 0);
+
+	// Secondary Y scale (right)
+	scale_y2 = lv_scale_create(box);
+	lv_scale_set_mode(scale_y2, LV_SCALE_MODE_VERTICAL_RIGHT);
+	lv_obj_set_size(scale_y2, 27, chart_h);
+	lv_obj_align_to(scale_y2, chart, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
+	lv_scale_set_total_tick_count(scale_y2, 5);
+	lv_scale_set_major_tick_every(scale_y2, 1);
+	lv_obj_set_style_text_color(scale_y2, color_ch2, 0);
+
+	// X scale (bottom) with pre-formatted time labels
+	scale_x = lv_scale_create(box);
+	lv_scale_set_mode(scale_x, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
+	lv_obj_set_size(scale_x, chart_w, 20);
+	lv_obj_align_to(scale_x, chart, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
+	lv_scale_set_total_tick_count(scale_x, 2 * GRAPH_XTICKS - 1);
+	lv_scale_set_major_tick_every(scale_x, 2);
+	updateXLabels();
 };
 
-void GraphPanel::draw_lbl_cb(lv_event_t* e)
+void GraphPanel::updateXLabels()
 {
-	lv_obj_draw_part_dsc_t * dsc = lv_event_get_draw_part_dsc(e);
-    if(!lv_obj_draw_part_check_type(dsc, &lv_chart_class, LV_CHART_DRAW_PART_TICK_LABEL)) 
-		return;
-
-    // if no target buffer, forget about it
-    if(!dsc->text)
-    {
-        WARNING("No target buffer for tick-label?");
-        return;
-    };
-
-	GraphPanel* me = static_cast<GraphPanel*>(e->user_data);
-
-    // tmp value, don't allocate
-    static int this_sec;
-
-// #define GRAPH_TOTAL_SEC         ((int)(GRAPH_POINTS * GRAPH_DELTA_MS / 1000))
-// #define GRAPH_SEC_PER_DEV       (GRAPH_TOTAL_SEC / (GRAPH_XTICKS-1))
-    uint32_t graph_total_sec = (GRAPH_POINTS * settings.graph_delta) / 1000;
-    uint32_t graph_sec_per_div = graph_total_sec / (GRAPH_XTICKS-1);
-
-	// GraphPanel* me = static_cast<GraphPanel*>(e->user_data);
-    switch(dsc->id)
-    {
-        case LV_CHART_AXIS_PRIMARY_X:
-            this_sec = graph_sec_per_div * (GRAPH_XTICKS-1-dsc->value);
-            lv_snprintf(dsc->text, dsc->text_length, "-%d:%02d", this_sec / 3600, (this_sec % 3600) / 60);
-    		return;
-        case LV_CHART_AXIS_PRIMARY_Y:
-		    dsc->label_dsc->color = me->color_ch1;
-            lv_snprintf(dsc->text, dsc->text_length, "%d", dsc->value / GRAPH_MULTIPLIER);
-            return;
-	    case LV_CHART_AXIS_SECONDARY_Y:
-		    dsc->label_dsc->color = me->color_ch2;
-            lv_snprintf(dsc->text, dsc->text_length, "%d", dsc->value / GRAPH_MULTIPLIER);
-            return;
-        default:
-            return;  
-    };
+	uint32_t total_sec = (GRAPH_POINTS * settings.graph_delta) / 1000;
+	uint32_t step = total_sec / (GRAPH_XTICKS - 1);
+	for(int i = 0; i < GRAPH_XTICKS; i++) {
+		uint32_t sec = step * (GRAPH_XTICKS - 1 - i);
+		lv_snprintf(x_label_bufs[i], sizeof(x_label_bufs[i]), "-%d:%02d", (int)(sec / 3600), (int)((sec % 3600) / 60));
+		x_labels[i] = x_label_bufs[i];
+	}
+	x_labels[GRAPH_XTICKS] = nullptr;
+	lv_scale_set_text_src(scale_x, x_labels);
+	last_graph_delta = settings.graph_delta;
 };
 
 void GraphPanel::appendVals(const float val1, const float val2)
 {
 	lv_chart_set_next_value(chart, ser1, isnan(val1) ? LV_CHART_POINT_NONE : val1*GRAPH_MULTIPLIER);
 	lv_chart_set_next_value(chart, ser2, isnan(val2) ? LV_CHART_POINT_NONE : val2*GRAPH_MULTIPLIER);
+
+	if(settings.graph_delta != last_graph_delta)
+		updateXLabels();
 
 	autoScale(LV_CHART_AXIS_PRIMARY_Y, settings.pid1.fpid.setpoint);
 	autoScale(LV_CHART_AXIS_SECONDARY_Y, settings.pid2.fpid.setpoint);
@@ -395,8 +393,8 @@ void GraphPanel::setScaleY(const lv_chart_axis_t axis, const float miny, const f
 	// DBG("axis: %d min/max: %f %f", axis, miny, maxy);
 
 	lv_chart_set_range(chart, axis, miny*GRAPH_MULTIPLIER, maxy*GRAPH_MULTIPLIER);
-	// void lv_chart_set_axis_tick(obj, axis, major_len, minor_len, major_cnt, minor_cnt, label_en, draw_size)
-    lv_chart_set_axis_tick(		chart,  axis, 1,         0,         3,         1,         true,     20);
+	lv_obj_t* scale = (axis == LV_CHART_AXIS_PRIMARY_Y) ? scale_y1 : scale_y2;
+	lv_scale_set_range(scale, (int32_t)miny, (int32_t)maxy);
     // redraw = true;
 };
 
@@ -410,12 +408,13 @@ void GraphPanel::autoScale(const lv_chart_axis_t axis, const float inc_sp)
 	// find min/max
 	int cnt = lv_chart_get_point_count(chart);
 	lv_chart_series_t *ser = axis == LV_CHART_AXIS_PRIMARY_Y ? ser1 : ser2;
+	int32_t* y_pts = lv_chart_get_y_array(chart, ser);
 	while(cnt--)
 	{
-        if(ser->y_points[cnt] == LV_CHART_POINT_NONE)
+        if(y_pts[cnt] == LV_CHART_POINT_NONE)
             continue;
 
-        float point = static_cast<float>(ser->y_points[cnt]);
+        float point = static_cast<float>(y_pts[cnt]);
 
 		minyM = min(minyM, point);
 		maxyM = max(maxyM, point);
@@ -423,8 +422,9 @@ void GraphPanel::autoScale(const lv_chart_axis_t axis, const float inc_sp)
 	minyM = floor(minyM/(GRAPH_SCALE_ROUND*GRAPH_MULTIPLIER)) *(GRAPH_SCALE_ROUND*GRAPH_MULTIPLIER);
 	maxyM = ceil(maxyM/(GRAPH_SCALE_ROUND*GRAPH_MULTIPLIER)) *(GRAPH_SCALE_ROUND*GRAPH_MULTIPLIER);
 
-	// setScaleY(axis, (minyM/GRAPH_MULTIPLIER) - GRAPH_SCALE_ROOUND, (maxyM/GRAPH_MULTIPLIER) + GRAPH_SCALE_ROOUND);
 	lv_chart_set_range(chart, axis, minyM, maxyM);
+	lv_obj_t* scale = (axis == LV_CHART_AXIS_PRIMARY_Y) ? scale_y1 : scale_y2;
+	lv_scale_set_range(scale, (int32_t)(minyM / GRAPH_MULTIPLIER), (int32_t)(maxyM / GRAPH_MULTIPLIER));
 };
 
 /*********************************************************************************************************************************/
