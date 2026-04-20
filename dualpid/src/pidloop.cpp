@@ -447,4 +447,6 @@ void PIDLoop::do_output()
     };
 
     _outputdrv->set(_output_value);
+
+    _outputdrv->loop();
 };

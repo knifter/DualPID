@@ -69,6 +69,7 @@ class OutputDriver
 		virtual bool begin(const output_driver_config_t &cfg, const int32_t channel_id) { return true; };
 		    
 
+		virtual void loop() {};
 		virtual void off() = 0;
 		virtual void set(float percent) = 0;
 	
@@ -88,23 +89,21 @@ class SlowPWMBase : public OutputDriver
 		SlowPWMBase() : OutputDriver() {};
 
 		bool begin(const output_driver_config_t &cfg, const int32_t channel_id);
+		void loop() override;
 		void off();
 		void set(float percent);
-		// void loop();
 
 	protected:
 		virtual void _on() = 0;
 		virtual void _off() = 0;
 
-		static void task(void*);
-		TaskHandle_t _taskh;
-		bool _task_running = false;
 		uint32_t _window_len; 		// windowtime in ms (1000/f)
-
-		// task variables
 		uint32_t _state;
 		uint32_t _window_lowtime;
 		uint32_t _window_hightime;
+
+	private:
+		uint32_t _next_transition_ms = 0;
 
 };
 
@@ -130,7 +129,6 @@ class FastPWMDriver : public OutputDriver
 		bool begin(const output_driver_config_t &cfg, const int32_t channel_id);
 		void off();
 		void set(float percent);
-		// void loop();
 
 	private:
 		gpio_num_t _pin_p;
