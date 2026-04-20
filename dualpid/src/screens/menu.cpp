@@ -238,6 +238,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
                     sub->addSelector("Windowtime", &set.output.unitacssr.windowtime, output_slowpwm_windowtimes)->onChange(set_need_reboot);
                     break;
             };
+            sub->addSwitch("Inverted", &set.output.inverted)->onChange(set_need_reboot);
             sub->addSpinbox("Min Output", &set.min_output, 0, 100, 0)->onChange(set_need_reboot);
             sub->addSpinbox("Max Output", &set.max_output, 0, 100, 0)->onChange(set_need_reboot);
         };
@@ -330,6 +331,7 @@ bool MenuScreen::handle(soogh_event_t e)
 	switch(e)
 	{
 		case KEY_A_SHORT:
+        case KEY_A_DOUBLE_PRESSED:
 		case KEY_A_LONG:
 		case KEY_A_LONG_REPEAT:
 			menu.sendKey(LV_KEY_LEFT);
@@ -342,6 +344,7 @@ bool MenuScreen::handle(soogh_event_t e)
 			menu.sendKey(LV_KEY_ESC);
 			return true;
 		case KEY_C_SHORT:
+        case KEY_C_DOUBLE_PRESSED:
 		case KEY_C_LONG:
 		case KEY_C_LONG_REPEAT:
 			menu.sendKey(LV_KEY_RIGHT);

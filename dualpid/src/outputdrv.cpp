@@ -3,95 +3,56 @@
 #include "config.h"
 #include "tools-log.h"
 
-#include "freertos/task.h"
+bool OutputDriver::begin(const output_driver_config_t &cfg, const int32_t channel_id)
+{
+    _inverted = cfg.inverted;
+
+    return true;
+};
 
 bool SlowPWMBase::begin(const output_driver_config_t &cfg, const int32_t channel_id)
 {
 	_window_len = cfg.slowpwm.windowtime;
+	_state = LOW;
 
-    // start the output task
-    _task_running = true;
-    _channel_id = channel_id;
-
-    uint32_t core = xPortGetCoreID();
-    uint32_t taskcore = (core + 1) & 0x01;
-    DBG("ch%d: Starting SlowPWM task on core %d", channel_id, taskcore);
-
-    xTaskCreatePinnedToCore(
-        task,               // pcTaskCode
-        "SlowPWM",          // const char *const pcName,
-        2048,               // ulStackDepth,
-        this,               // pvParameters,
-        8,                  // uxPriority,
-        &_taskh,            // pvCreatedTask
-        taskcore            // xCoreID
-    );
-
+	DBG("ch%d: SlowPWM window %d ms", channel_id, _window_len);
 	return OutputDriver::begin(cfg, channel_id);
 };
 
 void SlowPWMBase::off()
 {
-    // make sure task doesn't turn it on and also set lowtime low so task responds fast
-    _window_lowtime = 100;
+    _state = LOW;
     _window_hightime = 0;
+    _window_lowtime = _window_len;
 };
 
 void SlowPWMBase::set(float percent)
 {
-    float duty = percent / 100.0;
-
+    float duty = percent / 100.0f;
     _window_hightime = duty * _window_len;
-    _window_lowtime = (1-duty) * _window_len;
-    // DBG("set duty = %.2f, low = %d, high = %d", duty, _window_lowtime, _window_hightime);
+    _window_lowtime = (1.0f - duty) * _window_len;
 };
 
-void SlowPWMBase::task(void* ptr)
-{       
-    SlowPWMBase* me = static_cast<SlowPWMBase*>(ptr);
+void SlowPWMBase::loop()
+{
+    uint32_t now = millis();
+    if(_next_transition_ms > now)
+        return;
 
-    DBG("ch%dtask: Starting up on core %d", me->_channel_id, xPortGetCoreID());
-
-    me->_state = LOW;
-    me->_window_lowtime = 100;
-    me->_window_hightime = 0;
-    
-    while(me->_task_running)
+    switch(_state)
     {
-        // time_t now = millis();
-        switch(me->_state)
-        {
-            case HIGH:
-                // set pin LOW
-                me->_off();
-
-                // DBG("ch%d, %lu: set LOW, wait %d", 
-                //     me->_channel_id, now, me->_window_lowtime);
-
-                // delay = low_time = (1-percent)*windowtime
-                delay(me->_window_lowtime);
-
-                // state LOW only if there is high_time to prevent glitches
-                if(me->_window_hightime)
-                    me->_state = LOW;
-
-                break;
-            case LOW:
-                // set pin HIGH
-                me->_on();
-
-                // DBG("ch%d, %lu: set HIGH, wait %d",
-                //     me->_channel_id, now, me->_window_hightime);
-
-                // delay = high_time = percent*windowtime
-                delay(me->_window_hightime);
-
-                // state HIGH only if there is LOW_time
-                if(me->_window_lowtime)
-                    me->_state = HIGH;
-
-                break;
-        };
+        case LOW:
+            _off();
+            _next_transition_ms = now + _window_lowtime;
+            if(_window_hightime)
+                _state = HIGH;
+            break;
+        case HIGH:
+            _on();
+            _next_transition_ms = now + _window_hightime;
+            if(_window_lowtime)
+                _state = LOW;
+            break;
     };
 };
 
@@ -114,19 +75,18 @@ bool SlowPWMDriver::begin(const output_driver_config_t &cfg, const int32_t chann
 
 void SlowPWMDriver::off()
 {
-    if(_pin_p != GPIO_NUM_NC)
-        digitalWrite(_pin_p, LOW);
+    _off();
 
     SlowPWMBase::off();
 };
 
 void SlowPWMDriver::_on()
 {
-    digitalWrite(_pin_p, LOW);
+    digitalWrite(_pin_p, _inverted ? LOW : HIGH);
 };
 void SlowPWMDriver::_off()
 {
-    digitalWrite(_pin_p, HIGH);
+    digitalWrite(_pin_p, _inverted ? HIGH : LOW);
 };
 
 bool FastPWMDriver::begin(const output_driver_config_t &cfg, const int32_t channel_id)
@@ -155,12 +115,15 @@ bool FastPWMDriver::begin(const output_driver_config_t &cfg, const int32_t chann
 
 void FastPWMDriver::off()
 {
-    ledcWrite(_channel_id, 0);
+    ledcWrite(_channel_id, _inverted ? (1<<FASTPWM_BITRES) : 0);
     return;
 };
 
 void FastPWMDriver::set(float percent)
 {
+    if(_inverted)
+        percent = 100.0f - percent;
+
     uint32_t pwm_val = percent * (1<<FASTPWM_BITRES) / 100;
     // DBG("PWM set %u / %u", pwm_val, (1<<FASTPWM_BITRES));
     ledcWrite(_channel_id, pwm_val);
@@ -190,11 +153,13 @@ bool GP8413Driver::begin(const output_driver_config_t &cfg, const int32_t channe
 
 void GP8413Driver::off()
 {
-    _dac.setOutput(_dac_channel, 0x0000);
+    _dac.setOutput(_dac_channel, _inverted ? 0x7FFF : 0x0000);
 };
 
 void GP8413Driver::set(float percent)
 {
+    if(_inverted)
+        percent = 100.0f - percent;
     uint16_t value = 0x7FFF * (percent / 100.0);
     // DBG("set value = ch:%d = %f %% =  %d", _dac_channel, percent, value);
     _dac.setOutput(_dac_channel, value);
@@ -219,8 +184,8 @@ void UnitSSRDriver::off()
     SlowPWMBase::off();
 };
 
-void UnitSSRDriver::_on()  { _ssr.setRelay(true); };
-void UnitSSRDriver::_off() { _ssr.setRelay(false); };
+void UnitSSRDriver::_on()  { _ssr.setRelay(!_inverted); };
+void UnitSSRDriver::_off() { _ssr.setRelay(_inverted); };
 #endif // OUTPUTDRV_UNITSSR_ENABLED
 
 #ifdef OUTPUTDRV_UNITACSSR_ENABLED

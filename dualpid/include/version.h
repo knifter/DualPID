@@ -5,7 +5,7 @@
 #include "_version.h"
 
 #define VERSION_MAJOR           1
-#define VERSION_MINOR           9
+#define VERSION_MINOR           10
 
 #define _STRINGIFY(x)           #x
 #define STRINGIFY(x)            _STRINGIFY(x)
@@ -17,9 +17,9 @@
 
 #if GIT_BRANCH_MAIN
     #define VERSION_PATCH         BUILD_DATE_YM_STR
-    #if GIT_DIRTY
-        #pragma message "Compiling main branch release from dirty git checkout!"
-    #endif
+    // #if GIT_DIRTY
+    //     #pragma message "Compiling main branch release from dirty git checkout!"
+    // #endif
     #define VERSION_STR           VERSION_MAJOR_STR "." VERSION_MINOR_STR "." VERSION_DIRTY_STR
 #else
     #define VERSION_PATCH         GIT_REVISION
