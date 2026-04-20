@@ -1,8 +1,8 @@
 #ifndef __VERSION_H
 #define __VERSION_H
 
+// _version is generated during build:
 #include "_version.h"
-// A few defines here are set during build in def_version.py
 
 #define VERSION_MAJOR           1
 #define VERSION_MINOR           9
