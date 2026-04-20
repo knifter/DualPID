@@ -3,6 +3,13 @@
 #include "config.h"
 #include "tools-log.h"
 
+bool OutputDriver::begin(const output_driver_config_t &cfg, const int32_t channel_id)
+{
+    _inverted = cfg.inverted;
+
+    return true;
+};
+
 bool SlowPWMBase::begin(const output_driver_config_t &cfg, const int32_t channel_id)
 {
 	_window_len = cfg.slowpwm.windowtime;
@@ -75,11 +82,11 @@ void SlowPWMDriver::off()
 
 void SlowPWMDriver::_on()
 {
-    digitalWrite(_pin_p, HIGH);
+    digitalWrite(_pin_p, _inverted ? LOW : HIGH);
 };
 void SlowPWMDriver::_off()
 {
-    digitalWrite(_pin_p, LOW);
+    digitalWrite(_pin_p, _inverted ? HIGH : LOW);
 };
 
 bool FastPWMDriver::begin(const output_driver_config_t &cfg, const int32_t channel_id)
@@ -108,12 +115,15 @@ bool FastPWMDriver::begin(const output_driver_config_t &cfg, const int32_t chann
 
 void FastPWMDriver::off()
 {
-    ledcWrite(_channel_id, 0);
+    ledcWrite(_channel_id, _inverted ? (1<<FASTPWM_BITRES) : 0);
     return;
 };
 
 void FastPWMDriver::set(float percent)
 {
+    if(_inverted)
+        percent = 100.0f - percent;
+
     uint32_t pwm_val = percent * (1<<FASTPWM_BITRES) / 100;
     // DBG("PWM set %u / %u", pwm_val, (1<<FASTPWM_BITRES));
     ledcWrite(_channel_id, pwm_val);
@@ -143,11 +153,13 @@ bool GP8413Driver::begin(const output_driver_config_t &cfg, const int32_t channe
 
 void GP8413Driver::off()
 {
-    _dac.setOutput(_dac_channel, 0x0000);
+    _dac.setOutput(_dac_channel, _inverted ? 0x7FFF : 0x0000);
 };
 
 void GP8413Driver::set(float percent)
 {
+    if(_inverted)
+        percent = 100.0f - percent;
     uint16_t value = 0x7FFF * (percent / 100.0);
     // DBG("set value = ch:%d = %f %% =  %d", _dac_channel, percent, value);
     _dac.setOutput(_dac_channel, value);
@@ -172,8 +184,8 @@ void UnitSSRDriver::off()
     SlowPWMBase::off();
 };
 
-void UnitSSRDriver::_on()  { _ssr.setRelay(true); };
-void UnitSSRDriver::_off() { _ssr.setRelay(false); };
+void UnitSSRDriver::_on()  { _ssr.setRelay(!_inverted); };
+void UnitSSRDriver::_off() { _ssr.setRelay(_inverted); };
 #endif // OUTPUTDRV_UNITSSR_ENABLED
 
 #ifdef OUTPUTDRV_UNITACSSR_ENABLED

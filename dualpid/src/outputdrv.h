@@ -30,33 +30,38 @@ typedef enum
 	{OUTPUT_DRIVER_UNITSSR,		"UnitSSR", "Unit SSR"},		\
 	{OUTPUT_DRIVER_UNITACSSR,	"ACSSR",   "Unit ACSSR"}
 
-typedef union {
-	int32_t param[3];
-	struct
-	{
-		int32_t pin_n;
-		int32_t pin_p;
-		int32_t windowtime;
-	} slowpwm;
-	struct
-	{
-		int32_t pin_n;
-		int32_t pin_p;
-		int32_t frequency;
-	} fastpwm;
-	struct
-	{
-		int32_t i2c_addr;	// 0 = use default (0x25)
-		int32_t _unused;
-		int32_t windowtime;
-	} unitssr;
-	struct
-	{
-		int32_t i2c_addr;	// 0 = use default (0x50)
-		int32_t _unused;
-		int32_t windowtime;
-	} unitacssr;
+typedef struct
+{
+	bool inverted;
+	union {
+		int32_t param[3];
+		struct
+		{
+			int32_t pin_n;
+			int32_t pin_p;
+			int32_t windowtime;
+		} slowpwm;
+		struct
+		{
+			int32_t pin_n;
+			int32_t pin_p;
+			int32_t frequency;
+		} fastpwm;
+		struct
+		{
+			int32_t i2c_addr;	// 0 = use default (0x25)
+			int32_t _unused;
+			int32_t windowtime;
+		} unitssr;
+		struct
+		{
+			int32_t i2c_addr;	// 0 = use default (0x50)
+			int32_t _unused;
+			int32_t windowtime;
+		} unitacssr;
+	};
 } output_driver_config_t;
+
 
 class OutputDriver
 {
@@ -66,17 +71,16 @@ class OutputDriver
 			{};
 		virtual ~OutputDriver() {};
 
-		virtual bool begin(const output_driver_config_t &cfg, const int32_t channel_id) { return true; };
-		    
+		virtual bool begin(const output_driver_config_t &cfg, const int32_t channel_id);		    
 
 		virtual void loop() {};
 		virtual void off() = 0;
 		virtual void set(float percent) = 0;
+		virtual void setInverted(bool inverted) { _inverted = inverted; };
 	
 	protected:
+		bool	 _inverted = false;	// Output is inverted
 		uint32_t _channel_id;
-
-		// PIDLoop::settings_t& _settings;
 
 	private:
 		OutputDriver(const OutputDriver&) = delete;

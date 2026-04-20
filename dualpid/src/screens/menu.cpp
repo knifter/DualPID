@@ -238,6 +238,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
                     sub->addSelector("Windowtime", &set.output.unitacssr.windowtime, output_slowpwm_windowtimes)->onChange(set_need_reboot);
                     break;
             };
+            sub->addSwitch("Inverted", &set.output.inverted)->onChange(set_need_reboot);
             sub->addSpinbox("Min Output", &set.min_output, 0, 100, 0)->onChange(set_need_reboot);
             sub->addSpinbox("Max Output", &set.max_output, 0, 100, 0)->onChange(set_need_reboot);
         };
