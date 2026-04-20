@@ -330,6 +330,7 @@ bool MenuScreen::handle(soogh_event_t e)
 	switch(e)
 	{
 		case KEY_A_SHORT:
+        case KEY_A_DOUBLE_PRESSED:
 		case KEY_A_LONG:
 		case KEY_A_LONG_REPEAT:
 			menu.sendKey(LV_KEY_LEFT);
@@ -342,6 +343,7 @@ bool MenuScreen::handle(soogh_event_t e)
 			menu.sendKey(LV_KEY_ESC);
 			return true;
 		case KEY_C_SHORT:
+        case KEY_C_DOUBLE_PRESSED:
 		case KEY_C_LONG:
 		case KEY_C_LONG_REPEAT:
 			menu.sendKey(LV_KEY_RIGHT);
