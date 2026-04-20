@@ -82,7 +82,7 @@ class PIDLoop: private NonCopyable
     private: 
         // Internal loop steps
         void sync_mode();
-        void do_sensor();
+        void do_input();
         void do_pid();
         void do_output();
 

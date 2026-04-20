@@ -286,12 +286,12 @@ void PIDLoop::set_mode(control_mode_t newmode)
 void PIDLoop::loop()
 {
     sync_mode();
-    do_sensor();
+    do_input();
     do_pid();
     do_output();
 };
 
-void PIDLoop::do_sensor()
+void PIDLoop::do_input()
 {
     // Read sensor?
 	time_t now = millis();
