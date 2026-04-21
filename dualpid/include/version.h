@@ -4,8 +4,8 @@
 // _version is generated during build:
 #include "_version.h"
 
-#define VERSION_MAJOR           1
-#define VERSION_MINOR           10
+#define VERSION_MAJOR           2
+#define VERSION_MINOR           5
 
 #define _STRINGIFY(x)           #x
 #define STRINGIFY(x)            _STRINGIFY(x)

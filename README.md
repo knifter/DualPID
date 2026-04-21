@@ -17,7 +17,7 @@ Currently used for controlling both temperature and humidity but should be versa
  * [x] Fixed output setting to measure step response
  * [x] Lock-detection
  * [ ] Alarms
- * [ ] Expert-Mode: Hide Setup and PID settings on normal usage (press A+B+C for 2 seconds to open configuration)
+ * [x] Expert-Mode: Hide Setup and PID settings on normal usage (press A+B+C for 2 seconds to open configuration)
  * [ ] Two H-Bridge outputs able to control most things from heaters, peltiers, valves etc (temporarily removed)
  * [x] Two single pin positive drive outputs capable of:
  * [x] SlowPWM (<1Hz) and FastPWM (>1 Hz up to kHz) outputs
@@ -51,7 +51,7 @@ Start with [M5Stack Cushion, mandatory lab equipment](https://shop.m5stack.com/c
  * [x] [SprintIR CO2 sensors](https://www.co2meter.com/products/sprintir-wr-20-pct-co2-sensor)
  * [x] [MCP9600 Thermocouple Amplifier](https://www.adafruit.com/product/4101)
  * [x] [MAX31856 Precision Thermocouple to Digital Converter](https://www.analog.com/media/en/technical-documentation/data-sheets/MAX31856.pdf)
- * [ ] [(planned)](https://github.com/knifter/DualPID/issues/73) [M5 NCIR Non-Contact Infrared Thermometer Sensor Unit (MLX90614) (v1)](https://shop.m5stack.com/products/ncir-sensor-unit)
+ * [.] [(planned)](https://github.com/knifter/DualPID/issues/73) [M5 NCIR Non-Contact Infrared Thermometer Sensor Unit (MLX90614) (v1)](https://shop.m5stack.com/products/ncir-sensor-unit)
  * [ ] [DS18B20 1-Wire thermometer variants](https://www.analog.com/media/en/technical-documentation/data-sheets/ds18b20.pdf)
  * [ ] [M5 Temperature Humidity Air Pressure Sensor (SHT40+BMP280)](https://shop.m5stack.com/products/env-iv-unit-with-temperature-humidity-air-pressure-sensor-sht40-bmp280?mc_cid=4195edd3e8&mc_eid=9d94b48854)
  * [ ] [M5 ENV III Unit with Temperature Humidity Air Pressure Sensor (SHT30+QMP6988)](https://shop.m5stack.com/collections/m5-sensor/products/env-iii-unit-with-temperature-humidity-air-pressure-sensor-sht30-qmp6988)
@@ -64,10 +64,10 @@ Start with [M5Stack Cushion, mandatory lab equipment](https://shop.m5stack.com/c
  * [x] [M5 2-Channel SPST Relay Unit](https://shop.m5stack.com/collections/m5-sensor/products/2-channel-spst-relay-unit)
  * [x] [M5 4-Relay Unit](https://shop.m5stack.com/collections/m5-sensor/products/4-relay-unit)
  * [x] [M5 DAC 2 I2C Unit (GP8413), 0..5V/10V](https://shop.m5stack.com/products/dac-2-i2c-unit-gp8413)
+ * [x] [M5 Single-phase DC/AC SSR Unit](https://shop.m5stack.com/products/single-phase-ac-ssr-unit-cdg1-1da-10a)
  * [ ] [(Planned)](https://github.com/knifter/DualPID/issues/72) [M5 H-bridge Unit v1.1](https://shop.m5stack.com/collections/m5-sensor/products/h-bridge-unit-v1-1-stm32f030)
- * [ ] [Single-phase DC SSR Unit (RS485)](https://shop.m5stack.com/collections/m5-sensor/products/single-phase-dc-ssr-unit-cdg1-1dd-10a)
+ * [ ] [Single-phase DC SSR Unit (over RS485)](https://shop.m5stack.com/collections/m5-sensor/products/single-phase-dc-ssr-unit-cdg1-1dd-10a)
  * [ ] [M5 Solid State Relay Unit](https://shop.m5stack.com/products/solid-state-relay-unit-bt136s)
- * [ ] [M5 Single-phase AC SSR Unit](https://shop.m5stack.com/products/single-phase-ac-ssr-unit-cdg1-1da-10a)
 
 ### Ideas which could be added/supported/implemented:
  * [x] [RTC Module](https://shop.m5stack.com/products/real-time-clock-rtc-unit-hym8563)
@@ -85,8 +85,8 @@ Start with [M5Stack Cushion, mandatory lab equipment](https://shop.m5stack.com/c
  * PID Library: [lib-FPID](https://github.com/knifter/FPID)
  * TwoWireDevice: I2C Device library wrapper: [lib-TwoWireDevice](https://github.com/knifter/lib-TwoWireDevice)
  * Various TwoWireSensor Libraries
- * Soogh: LVGL Layer: [lib-soogh](https://github.com/knifter/lib-soogh)
-   * Uses [LVGL (8.3)](https://github.com/lvgl)
+ * Soogh: GUI Layer: [lib-soogh](https://github.com/knifter/lib-soogh)
+   * Uses [LVGL9](https://github.com/lvgl)
    * Uses [LovyanGFX](https://github.com/lovyan03/LovyanGFX)
  * Tools library [lib-tools](https://github.com/knifter/lib-Tools)
 
