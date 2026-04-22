@@ -69,7 +69,8 @@ bool PIDLoop::begin()
     //  if configured and works mode can go up to SENSOR
     switch(_settings.input_drv)
     {
-        default: _inputdrv                        = new NoneInputDriver(); break;
+        default:
+        case INPUT_DRIVER_NONE:         _inputdrv = new NoneInputDriver(); break;
         case INPUT_DRIVER_SHT31_TEMP:   _inputdrv = new SHT31TDriver(); break;
         case INPUT_DRIVER_SHT31_RH:     _inputdrv = new SHT31RHDriver(); break;
         case INPUT_DRIVER_M5KMETER:     _inputdrv = new M5KMeterDriver(); break;
@@ -94,7 +95,7 @@ bool PIDLoop::begin()
     // Configure OutputDriver
     switch(_settings.output_drv)
     {
-        // TODO: default: _outputdrv = new NoneOutputDriver(); break;
+        default:
         case OUTPUT_DRIVER_NONE:                _outputdrv  = new NoneOutputDriver(); break;
         case OUTPUT_DRIVER_SLOWPWM_IO:          _outputdrv  = new SlowPWMDriver(); break;
         case OUTPUT_DRIVER_FASTPWM_IO:          _outputdrv  = new FastPWMDriver(); break;
