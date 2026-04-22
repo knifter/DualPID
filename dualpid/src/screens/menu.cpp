@@ -110,14 +110,6 @@ SelectorField::item_t output_fastpwm_frequencies [] {
 	{0, 0, 0}
 	};
 
-SelectorField::item_t output_unitssr_addresses [] {
-	{0,    "def",  "Default (0x25)"},
-	{0x25, "0x25", "0x25"},
-	{0x26, "0x26", "0x26"},
-	{0x27, "0x27", "0x27"},
-	{0, 0, 0}
-	};
-
 SelectorField::item_t output_unitacssr_addresses [] {
 	{0,    "def",  "Default (0x50)"},
 	{0x50, "0x50", "0x50"},
@@ -238,10 +230,6 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
                     sub->addSelector("Frequency", &set.output.fastpwm.frequency, output_fastpwm_frequencies)->onChange(set_need_reboot);
                     break;
                 case OUTPUT_DRIVER_SLOWPWM_M5SSR:
-                    sub->addSelector("I2C Address", &set.output.unitssr.i2c_addr, output_unitssr_addresses)->onChange(set_need_reboot);
-                    sub->addSelector("Windowtime", &set.output.unitssr.windowtime, output_slowpwm_windowtimes)->onChange(set_need_reboot);
-                    break;
-                case OUTPUT_DRIVER_SLOWPWM_M5ACSSR:
                     sub->addSelector("I2C Address", &set.output.unitacssr.i2c_addr, output_unitacssr_addresses)->onChange(set_need_reboot);
                     sub->addSelector("Windowtime", &set.output.unitacssr.windowtime, output_slowpwm_windowtimes)->onChange(set_need_reboot);
                     break;

@@ -101,7 +101,6 @@ bool PIDLoop::begin()
         case OUTPUT_DRIVER_FASTPWM_IO:          _outputdrv  = new FastPWMDriver(); break;
         case OUTPUT_DRIVER_GP8413:              _outputdrv  = new GP8413Driver(); break;
         case OUTPUT_DRIVER_SLOWPWM_M5SSR:       _outputdrv  = new UnitSSRDriver(); break;
-        case OUTPUT_DRIVER_SLOWPWM_M5ACSSR:     _outputdrv  = new UnitACSSRDriver(); break;
         case OUTPUT_DRIVER_SLOWPWM_M5HBRIDGE:   _outputdrv  = new M5UnitHbridgeDriver(); break;
     };
 

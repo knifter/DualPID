@@ -166,13 +166,13 @@ void GP8413Driver::set(float percent)
 };
 #endif // OUTPUTDRV_GP8413_ENABLED
 
-#ifdef OUTPUTDRV_UNITSSR_ENABLED
+#ifdef OUTPUTDRV_M5UNIT_SSR_ENABLED
 bool UnitSSRDriver::begin(const output_driver_config_t &cfg, const int32_t channel_id)
 {
-    uint8_t addr = cfg.unitssr.i2c_addr ? (uint8_t)cfg.unitssr.i2c_addr : UNITSSR_ADDRESS_DEFAULT;
+    uint8_t addr = cfg.unitacssr.i2c_addr ? (uint8_t)cfg.unitacssr.i2c_addr : M5UNITSSR_ADDRESS_DEFAULT;
     if(!_ssr.begin(addr))
     {
-        ERROR("UnitSSR not found at 0x%02x", addr);
+        ERROR("M5Unit-SSR not found at 0x%02x", addr);
         return false;
     };
     return SlowPWMBase::begin(cfg, channel_id);
@@ -180,35 +180,14 @@ bool UnitSSRDriver::begin(const output_driver_config_t &cfg, const int32_t chann
 
 void UnitSSRDriver::off()
 {
-    _ssr.setRelay(false);
+    _ssr.setRelay(_inverted);
     SlowPWMBase::off();
 };
 
 void UnitSSRDriver::_on()  { _ssr.setRelay(!_inverted); };
 void UnitSSRDriver::_off() { _ssr.setRelay(_inverted); };
-#endif // OUTPUTDRV_UNITSSR_ENABLED
 
-#ifdef OUTPUTDRV_UNITACSSR_ENABLED
-bool UnitACSSRDriver::begin(const output_driver_config_t &cfg, const int32_t channel_id)
-{
-    uint8_t addr = cfg.unitacssr.i2c_addr ? (uint8_t)cfg.unitacssr.i2c_addr : UNITACSSR_ADDRESS_DEFAULT;
-    if(!_ssr.begin(addr))
-    {
-        ERROR("UnitACSSR not found at 0x%02x", addr);
-        return false;
-    };
-    return SlowPWMBase::begin(cfg, channel_id);
-};
-
-void UnitACSSRDriver::off()
-{
-    _ssr.setRelay(false);
-    SlowPWMBase::off();
-};
-
-void UnitACSSRDriver::_on()  { _ssr.setRelay(true); };
-void UnitACSSRDriver::_off() { _ssr.setRelay(false); };
-#endif // OUTPUTDRV_UNITACSSR_ENABLED
+#endif // OUTPUTDRV_M5UNIT_SSR_ENABLED
 
 #ifdef OUTPUTDRV_M5UNIT_HBRIDGE_ENABLED
 #include <M5UnitHbridge.h>
