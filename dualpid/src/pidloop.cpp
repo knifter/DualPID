@@ -297,7 +297,7 @@ void PIDLoop::do_input()
 	time_t now = millis();
 	if(_next_input > now)
         return;
-    _next_input = now + settings.sensor_loop_ms; // FIXME: rather absolute dT
+    _next_input += settings.sensor_loop_ms;
 
     // Read sensors and apply averaging/filter
     if(!_inputdrv_ok)
