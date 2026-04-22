@@ -210,3 +210,28 @@ void UnitACSSRDriver::_on()  { _ssr.setRelay(true); };
 void UnitACSSRDriver::_off() { _ssr.setRelay(false); };
 #endif // OUTPUTDRV_UNITACSSR_ENABLED
 
+#ifdef OUTPUTDRV_M5UNIT_HBRIDGE_ENABLED
+#include <M5UnitHbridge.h>
+bool M5UnitHbridgeDriver::begin(const output_driver_config_t &cfg, const int32_t channel_id)
+{
+    uint8_t addr = cfg.m5unit_hbridge.i2c_addr ? (uint8_t)cfg.m5unit_hbridge.i2c_addr : M5UNIT_HBRIDGE_ADDRESS_DEFAULT;
+    if(!_hbridge.begin(addr))
+    {
+        ERROR("M5UnitHBridge not found at 0x%02x", addr);
+        return false;
+    };
+    _hbridge.setDirection(M5UnitHBridge::FORWARD);
+    _hbridge.setSpeed8(0);
+    return SlowPWMBase::begin(cfg, channel_id);
+};
+
+void M5UnitHbridgeDriver::off()
+{
+    _hbridge.setSpeed8(0);
+    SlowPWMBase::off();
+};
+
+void M5UnitHbridgeDriver::_on()  { _hbridge.setSpeed8(_inverted ? 0   : 255); };
+void M5UnitHbridgeDriver::_off() { _hbridge.setSpeed8(_inverted ? 255 : 0  ); };
+#endif // OUTPUTDRV_M5UNIT_HBRIDGE_ENABLED
+

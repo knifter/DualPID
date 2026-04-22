@@ -26,6 +26,7 @@ typedef enum
 	{OUTPUT_DRIVER_NONE, 		"none",   "no output"}, 	\
 	{OUTPUT_DRIVER_SLOWPWM, 	"sPWM",   "SlowPWM-IO"}, 		\
 	{OUTPUT_DRIVER_FASTPWM, 	"PWM",    "FastPWM-IO"},		\
+	{OUTPUT_DRIVER_SLOWPWM_M5HBRIDGE, 	"sHBG", 	"SlowPWM-HBridge"},	\
 	{OUTPUT_DRIVER_GP8413,		"DAC",	  "GP8413"},		\
 	{OUTPUT_DRIVER_UNITSSR,		"UnitSSR", "Unit SSR"},		\
 	{OUTPUT_DRIVER_UNITACSSR,	"ACSSR",   "Unit ACSSR"}
@@ -59,6 +60,12 @@ typedef struct
 			int32_t _unused;
 			int32_t windowtime;
 		} unitacssr;
+		struct
+		{
+			int32_t i2c_addr;	// 0 = use default (0x20)
+			int32_t _unused;
+			int32_t windowtime;
+		} m5unit_hbridge;
 	};
 } output_driver_config_t;
 
@@ -197,5 +204,21 @@ class UnitACSSRDriver : public SlowPWMBase
 		UnitACSSR _ssr;
 };
 #endif // OUTPUTDRV_UNITACSSR_ENABLED
+
+#ifdef OUTPUTDRV_M5UNIT_HBRIDGE_ENABLED
+#include <M5UnitHbridge.h>
+class M5UnitHbridgeDriver : public SlowPWMBase
+{
+	public:
+		bool begin(const output_driver_config_t &cfg, const int32_t channel_id);
+		void off();
+
+	private:
+		void _on();
+		void _off();
+
+		M5UnitHBridge _hbridge;
+};
+#endif // OUTPUTDRV_M5UNIT_HBRIDGE_ENABLED
 
 #endif // __OUTPUT_H

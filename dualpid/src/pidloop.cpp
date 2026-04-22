@@ -96,7 +96,6 @@ bool PIDLoop::begin()
     {
         // TODO: default: _outputdrv = new NoneOutputDriver(); break;
         case OUTPUT_DRIVER_NONE:                _outputdrv  = new NoneOutputDriver(); break;
-        case OUTPUT_DRIVER_NONE:    _outputdrv = nullptr; break;
         case OUTPUT_DRIVER_SLOWPWM_IO:          _outputdrv  = new SlowPWMDriver(); break;
         case OUTPUT_DRIVER_FASTPWM_IO:          _outputdrv  = new FastPWMDriver(); break;
         case OUTPUT_DRIVER_GP8413:              _outputdrv  = new GP8413Driver(); break;
