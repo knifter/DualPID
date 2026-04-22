@@ -87,6 +87,15 @@ class OutputDriver
 	    OutputDriver& operator=(OutputDriver const&) = delete;
 };
 
+class NoneOutputDriver : public OutputDriver
+{
+	public:
+		NoneOutputDriver() : OutputDriver() {};
+
+		void off() override {};
+		void set(float percent) override {};
+};
+
 class SlowPWMBase : public OutputDriver
 {
 	public:

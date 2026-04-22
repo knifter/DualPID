@@ -69,7 +69,7 @@ bool PIDLoop::begin()
     //  if configured and works mode can go up to SENSOR
     switch(_settings.input_drv)
     {
-        default: _inputdrv = new NoneInputDriver(); break;
+        default: _inputdrv                        = new NoneInputDriver(); break;
         case INPUT_DRIVER_SHT31_TEMP:   _inputdrv = new SHT31TDriver(); break;
         case INPUT_DRIVER_SHT31_RH:     _inputdrv = new SHT31RHDriver(); break;
         case INPUT_DRIVER_M5KMETER:     _inputdrv = new M5KMeterDriver(); break;
@@ -95,12 +95,14 @@ bool PIDLoop::begin()
     switch(_settings.output_drv)
     {
         // TODO: default: _outputdrv = new NoneOutputDriver(); break;
+        case OUTPUT_DRIVER_NONE:                _outputdrv  = new NoneOutputDriver(); break;
         case OUTPUT_DRIVER_NONE:    _outputdrv = nullptr; break;
-        case OUTPUT_DRIVER_SLOWPWM: _outputdrv = new SlowPWMDriver(); break;
-        case OUTPUT_DRIVER_FASTPWM: _outputdrv = new FastPWMDriver(); break;
-        case OUTPUT_DRIVER_GP8413:  _outputdrv = new GP8413Driver(); break;
-        case OUTPUT_DRIVER_UNITSSR:   _outputdrv = new UnitSSRDriver(); break;
-        case OUTPUT_DRIVER_UNITACSSR: _outputdrv = new UnitACSSRDriver(); break;
+        case OUTPUT_DRIVER_SLOWPWM_IO:          _outputdrv  = new SlowPWMDriver(); break;
+        case OUTPUT_DRIVER_FASTPWM_IO:          _outputdrv  = new FastPWMDriver(); break;
+        case OUTPUT_DRIVER_GP8413:              _outputdrv  = new GP8413Driver(); break;
+        case OUTPUT_DRIVER_SLOWPWM_M5SSR:       _outputdrv  = new UnitSSRDriver(); break;
+        case OUTPUT_DRIVER_SLOWPWM_M5ACSSR:     _outputdrv  = new UnitACSSRDriver(); break;
+        case OUTPUT_DRIVER_SLOWPWM_M5HBRIDGE:   _outputdrv  = new M5UnitHbridgeDriver(); break;
     };
 
     if(_settings.output_drv != OUTPUT_DRIVER_NONE)
