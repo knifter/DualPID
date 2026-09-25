@@ -4,3 +4,4 @@ dualpid/.vscode/settings.json
 dualpid/CLAUDE.md
 dualpid/.claude/settings.local.json
 dualpid/include/_version.h
+dualpid/.vscode/extensions.json
