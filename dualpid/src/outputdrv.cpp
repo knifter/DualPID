@@ -190,7 +190,7 @@ void UnitSSRDriver::_off() { _ssr.setRelay(_inverted); };
 #endif // OUTPUTDRV_M5UNIT_SSR_ENABLED
 
 #ifdef OUTPUTDRV_M5UNIT_HBRIDGE_ENABLED
-#include <M5UnitHbridge.h>
+#include <M5UnitHBridge.h>
 bool M5UnitHbridgeDriver::begin(const output_driver_config_t &cfg, const int32_t channel_id)
 {
     uint8_t addr = cfg.m5unit_hbridge.i2c_addr ? (uint8_t)cfg.m5unit_hbridge.i2c_addr : M5UNIT_HBRIDGE_ADDRESS_DEFAULT;

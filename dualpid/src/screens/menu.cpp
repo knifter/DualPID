@@ -209,6 +209,7 @@ MenuScreen::MenuScreen(SooghGUI& g) : Screen(g)
             sub->addSeparator("Input");
             sub->addSelector("Sensor", &set.input_drv, input_drivers)->onChange(set_need_reboot);
             sub->addSpinbox("Input Filter", &set.input_filter, 0, 1, 2);
+            sub->addSpinbox("Input Offset", &set.input_offset, -99, 99, 2);
             sub->addSeparator("PID");
             sub->addSelector("Looptime", &set.looptime, pid_loop_times);
             sub->addSelector("Lock Time", &set.lock_time, lock_times);
