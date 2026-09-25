@@ -27,9 +27,8 @@ BootScreen::BootScreen(SooghGUI& g) : Screen(g)
 void BootScreen::load()
 {
 	Screen::load();
-    _start = 0;
-    // _start = millis();
-    // if(expert_mode)
+    _start = millis();
+    // if(settings.expert_mode)
     //     _start = 0;
 };
 

@@ -20,7 +20,7 @@
     // #if GIT_DIRTY
     //     #pragma message "Compiling main branch release from dirty git checkout!"
     // #endif
-    #define VERSION_STR           VERSION_MAJOR_STR "." VERSION_MINOR_STR "." VERSION_DIRTY_STR
+    #define VERSION_STR           VERSION_STR_AUTO
 #else
     #define VERSION_PATCH         GIT_REVISION
     #define VERSION_STR           GIT_BRANCH "-" VERSION_PATCH VERSION_DIRTY_STR
