@@ -166,14 +166,14 @@ bool cmd_pidx_setpoint(size_t n, const char* tokens[])
 {
 	// Determine channel nummer from command
 	uint32_t channel;
-	if(1 != sscanf(tokens[0], "pid%u.", &channel))
+	if(1 != sscanf(tokens[0], "pid%" PRIu32 ".", &channel))
 	{
 		REPLY("Could not determine channel from '%s'", tokens[0]);
 		return false;
 	};
 	if(channel < 1 || channel > NUMBER_OF_CHANNELS)
 	{
-		REPLY("Invalid channel: %d, use 1..%d", channel, NUMBER_OF_CHANNELS);
+		REPLY("Invalid channel: %" PRIu32 ", use 1..%d", channel, NUMBER_OF_CHANNELS);
 		return false;
 	};
 	PIDLoop* pidloop = pids[channel - 1];

@@ -5,7 +5,6 @@
 #include "settings.h"
 #include "pidloop.h"
 #include "screens.h"
-#include "inputdrv.h"
 #include "rtc.h"
 #include "cli.h"
 

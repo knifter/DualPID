@@ -84,10 +84,10 @@ bool PIDLoop::begin()
         if(!_inputdrv->begin())
         {
             gui.showMessage("WARNING:", "Channel InputDriver error.");
-            ERROR("Channel %d input.begin() failed.", _channel_id);
+            ERROR("Channel %lu input.begin() failed.", _channel_id);
             _inputdrv_ok = false;
         }else{
-            DBG("Channel %d: input(%d).begin() == ok", _channel_id, _settings.input_drv);
+            DBG("Channel %lu: input(%ld).begin() == ok", _channel_id, _settings.input_drv);
             _inputdrv_ok = true;
         };
     };
@@ -109,10 +109,10 @@ bool PIDLoop::begin()
         if(!_outputdrv->begin(_settings.output, _channel_id))
         {
             gui.showMessage("WARNING:", "Channel OutputDriver error.");
-            ERROR("Channel %d output.begin() failed.", _channel_id);
+            ERROR("Channel %lu output.begin() failed.", _channel_id);
             _outputdrv_ok = false;
         }else{
-            DBG("Channel %d output.begin() == ok", _channel_id);
+            DBG("Channel %lu output.begin() == ok", _channel_id);
             _outputdrv_ok = true;
         };
     };
@@ -132,7 +132,7 @@ bool PIDLoop::begin()
     };
 
     _pid.setOutputLimits(_settings.min_output, _settings.max_output);
-    DBG("ch%d: Output min:%.0f%% max:%.0f%%", _channel_id, _settings.min_output, _settings.max_output);
+    DBG("ch%lu: Output min:%.0f%% max:%.0f%%", _channel_id, _settings.min_output, _settings.max_output);
     _output_value = NAN;
     _pid.alignOutput();
 
@@ -146,7 +146,7 @@ bool PIDLoop::begin()
     {
         initmode = CONTROL_MODE_INACTIVE;
     };
-    DBG("ch%d: Init with mode %s, output = %.0f%%", _channel_id, control_mode2str(initmode), _output_value);
+    DBG("ch%lu: Init with mode %s, output = %.0f%%", _channel_id, control_mode2str(initmode), _output_value);
     set_mode(initmode);
     // sync_mode will set it active when _settings have stored so
 
@@ -351,7 +351,7 @@ void PIDLoop::do_pid()
 
     // always print status
 #ifdef PIDLOOP_STATUS
-    Serial.printf("ST%u:%.3f, %1d, %.3f, %.3f, %.3f\n", _channel_id, dt, _status, _input_value, sp, _output_value);
+    Serial.printf("ST%lu:%.3f, %1d, %.3f, %.3f, %.3f\n", _channel_id, dt, _status, _input_value, sp, _output_value);
 #endif
     // DBG("%lu: PID = %s: Input = %.2f, Setpoint = %.2f, Output = %.2f", 
     //     now, res?"ok":"sat", _input_value, _settings.fpid.setpoint, _output_value);

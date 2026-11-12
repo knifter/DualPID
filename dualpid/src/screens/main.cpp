@@ -7,7 +7,6 @@
 
 #include "config.h"
 #include "inputdrv.h"
-#include "tools-log.h"
 #include "globals.h"
 #include "rtc.h"
 
@@ -31,9 +30,9 @@ class PidPanel
 		lv_style_t style_indic;
         PIDLoop::status_t current_status;
 
-		const void update();
-		const void setSelected(bool);
-		const void setState(PIDLoop::status_t s);
+		void update();
+		void setSelected(bool);
+		void setState(PIDLoop::status_t s);
 };
 
 PidPanel::PidPanel(lv_obj_t* parent, const uint8_t num_in, PIDLoop& pid_in)
@@ -109,7 +108,7 @@ PidPanel::PidPanel(lv_obj_t* parent, const uint8_t num_in, PIDLoop& pid_in)
     // current_status => disabled
 }; // PidPanel()
 
-const void PidPanel::setState(PIDLoop::status_t status)
+void PidPanel::setState(PIDLoop::status_t status)
 {
     // Only update widget styles if status changed
     if(current_status == status)
@@ -245,7 +244,7 @@ const void PidPanel::setState(PIDLoop::status_t status)
     };
 
 };
-const void PidPanel::update()
+void PidPanel::update()
 { 
 	// panel status/color
 	setState(pid.status());
@@ -258,7 +257,7 @@ const void PidPanel::update()
             lv_label_set_text(lbl_sp, "-");
             break;
 		case PIDLoop::STATUS_FIXED:
-            lv_label_set_text_fmt(lbl_sp, "out = %u%%", pid._settings.fixed_output_value);
+            lv_label_set_text_fmt(lbl_sp, "out = %ld%%", pid._settings.fixed_output_value);
 			break;
         default:
             lv_label_set_text_fmt(lbl_sp, "sp = %0.*f %s", prec, pid._settings.fpid.setpoint, unit);
@@ -275,7 +274,7 @@ const void PidPanel::update()
 	lv_bar_set_value(bar_output, p, LV_ANIM_ON); 
 };
 
-const void PidPanel::setSelected(bool select) {    lv_obj_set_style_border_color(box, select ? COLOR_BLACK : COLOR_WHITE, 0);};
+void PidPanel::setSelected(bool select) {    lv_obj_set_style_border_color(box, select ? COLOR_BLACK : COLOR_WHITE, 0);};
 
 /*********************************************************************************************************************************/
 class GraphPanel
@@ -331,8 +330,8 @@ GraphPanel::GraphPanel(lv_obj_t* parent)
     ser1 = lv_chart_add_series(chart, color_ch1, LV_CHART_AXIS_PRIMARY_Y);
     ser2 = lv_chart_add_series(chart, color_ch2, LV_CHART_AXIS_SECONDARY_Y);
 
-	const int32_t chart_w = DISPLAY_WIDTH - 55;
-	const int32_t chart_h = DISPLAY_HEIGHT - 80 - 20;
+	constexpr int32_t chart_w = DISPLAY_WIDTH - 55;
+	constexpr int32_t chart_h = DISPLAY_HEIGHT - 80 - 20;
 
 	// Primary Y scale (left)
 	scale_y1 = lv_scale_create(box);

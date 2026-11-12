@@ -3,13 +3,11 @@
 
 #include <FPID.h>
 
-#include "config.h"
 #include "inputdrv.h"
-#include "driver/gpio.h"
 #include "tools-nocopy.h"
 #include "outputdrv.h"
 
-class PIDLoop: private NonCopyable
+class PIDLoop: private noncopyable
 {
     public:
         typedef enum
@@ -106,7 +104,7 @@ class PIDLoop: private NonCopyable
 
         // OUTPUT
         OutputDriver* _outputdrv;
-        bool _outputdrv_ok;
+        bool _outputdrv_ok;    
 };
 
 #endif // __PIDLOOP_H

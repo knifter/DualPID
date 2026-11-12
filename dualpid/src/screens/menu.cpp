@@ -6,7 +6,6 @@
 #include "gui.h"
 
 #include "config.h"
-#include "tools-log.h"
 #include "globals.h"
 #include "soogh-debug.h"
 #include "inputdrv.h"
@@ -15,7 +14,7 @@
 
 // Temporary storage to convert from selector:float to int
 double tmp_mday, tmp_year, tmp_hour, tmp_min;
-int tmp_mon;
+int32_t tmp_mon;
 
 // C-style callbacks
 void datetime_open_cb(MenuItem* item, void* data);

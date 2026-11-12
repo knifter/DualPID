@@ -22,7 +22,7 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
     switch(data_version)
     {
         default:
-            ERROR("Unknown data version: %d", data_version);
+            ERROR("Unknown data version: %lu", data_version);
             return false;
         case 0: // empty blob
         case 1: // 
@@ -60,7 +60,8 @@ bool SettingsManager::set_defaults_since(const uint32_t data_version)
 
             // Channel 2 has the same defaults
             memcpy(&(settings->pid2), &(settings->pid1), sizeof(PIDLoop::settings_t));
-
+            
+            [[fallthrough]];
         // End with the current version:
         case 6:
             _data_version = 6;
@@ -75,7 +76,7 @@ bool SettingsManager::read_blob(void* blob, const size_t blob_size, const uint32
     switch(blob_version)
     {
         default:
-            ERROR("Unknown blob version: %d", blob_version);
+            ERROR("Unknown blob version: %lu", blob_version);
             return false;
 
         // old, non convertible settings

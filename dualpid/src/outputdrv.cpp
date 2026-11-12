@@ -15,7 +15,7 @@ bool SlowPWMBase::begin(const output_driver_config_t &cfg, const int32_t channel
 	_window_len = cfg.slowpwm.windowtime;
 	_state = LOW;
 
-	DBG("ch%d: SlowPWM window %d ms", channel_id, _window_len);
+	DBG("ch%ld: SlowPWM window %lu ms", channel_id, _window_len);
 	return OutputDriver::begin(cfg, channel_id);
 };
 
@@ -59,7 +59,7 @@ void SlowPWMBase::loop()
 bool SlowPWMDriver::begin(const output_driver_config_t &cfg, const int32_t channel_id)
 {
     _pin_p = static_cast<gpio_num_t>(cfg.slowpwm.pin_p);
-    DBG("ch%d SlowPWM (IO) on gpio_num_%u", channel_id, _pin_p);
+    DBG("ch%ld SlowPWM (IO) on gpio_num_%u", channel_id, _pin_p);
 
     if(_pin_p == GPIO_NUM_NC)
     {
@@ -105,17 +105,22 @@ bool FastPWMDriver::begin(const output_driver_config_t &cfg, const int32_t chann
     pinMode(_pin_p, OUTPUT);
     digitalWrite(_pin_p, LOW);
 
-    uint32_t freq = ledcSetup(channel_id, cfg.fastpwm.frequency, FASTPWM_BITRES);
-    ledcAttachPin(_pin_p, _channel_id);
-    ledcWrite(_channel_id, 0);
-    DBG("ch%d: FastPWM Configured on gpio_num_%u, actual frequency %u Hz", _channel_id, _pin_p, freq);
+    // Arduino-ESP32 3.x (IDF5) LEDC API: pin-based. Keep explicit channel = channel_id
+    // so each PID channel lands on the same LEDC channel/timer as before.
+    if(!ledcAttachChannel(_pin_p, cfg.fastpwm.frequency, FASTPWM_BITRES, _channel_id))
+    {
+        ERROR("ch%lu: FastPWM ledcAttachChannel failed on gpio_num_%u", _channel_id, _pin_p);
+        return false;
+    };
+    ledcWrite(_pin_p, 0);
+    DBG("ch%lu: FastPWM Configured on gpio_num_%u, actual frequency %lu Hz", _channel_id, _pin_p, ledcReadFreq(_pin_p));
 
 	return OutputDriver::begin(cfg, channel_id);
 };
 
 void FastPWMDriver::off()
 {
-    ledcWrite(_channel_id, _inverted ? (1<<FASTPWM_BITRES) : 0);
+    ledcWrite(_pin_p, _inverted ? (1<<FASTPWM_BITRES) : 0);
     return;
 };
 
@@ -126,7 +131,7 @@ void FastPWMDriver::set(float percent)
 
     uint32_t pwm_val = percent * (1<<FASTPWM_BITRES) / 100;
     // DBG("PWM set %u / %u", pwm_val, (1<<FASTPWM_BITRES));
-    ledcWrite(_channel_id, pwm_val);
+    ledcWrite(_pin_p, pwm_val);
     return;
 };
 
