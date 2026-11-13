@@ -383,8 +383,9 @@ void GraphPanel::appendVals(const float val1, const float val2)
 	if(settings.graph_delta != last_graph_delta)
 		updateXLabels();
 
-	autoScale(LV_CHART_AXIS_PRIMARY_Y, settings.pid1.fpid.setpoint);
-	autoScale(LV_CHART_AXIS_SECONDARY_Y, settings.pid2.fpid.setpoint);
+	// Only include the setpoint in the scale when the channel uses it (same condition as the menu Setpoint)
+	autoScale(LV_CHART_AXIS_PRIMARY_Y, pids[0]->mode() > PIDLoop::CONTROL_MODE_SENSOR ? settings.pid1.fpid.setpoint : NAN);
+	autoScale(LV_CHART_AXIS_SECONDARY_Y, pids[1]->mode() > PIDLoop::CONTROL_MODE_SENSOR ? settings.pid2.fpid.setpoint : NAN);
 };
 
 void GraphPanel::setScaleY(const lv_chart_axis_t axis, const float miny, const float maxy)
@@ -399,8 +400,13 @@ void GraphPanel::setScaleY(const lv_chart_axis_t axis, const float miny, const f
 
 void GraphPanel::autoScale(const lv_chart_axis_t axis, const float inc_sp)
 {
-	float minyM = inc_sp * GRAPH_MULTIPLIER;
-	float maxyM = inc_sp * GRAPH_MULTIPLIER;
+	float minyM = INFINITY;
+	float maxyM = -INFINITY;
+	if(!isnan(inc_sp))
+	{
+		minyM = inc_sp * GRAPH_MULTIPLIER;
+		maxyM = inc_sp * GRAPH_MULTIPLIER;
+	};
 
 	// note: instead of dividing all the points, we multiply the others with GRAPH_MULTIPLIER and then divide once
 
@@ -418,6 +424,10 @@ void GraphPanel::autoScale(const lv_chart_axis_t axis, const float inc_sp)
 		minyM = min(minyM, point);
 		maxyM = max(maxyM, point);
 	};
+	// No setpoint and no valid points (yet): leave the range as it is
+	if(minyM > maxyM)
+		return;
+
 	minyM = floor(minyM/(GRAPH_SCALE_ROUND*GRAPH_MULTIPLIER)) *(GRAPH_SCALE_ROUND*GRAPH_MULTIPLIER);
 	maxyM = ceil(maxyM/(GRAPH_SCALE_ROUND*GRAPH_MULTIPLIER)) *(GRAPH_SCALE_ROUND*GRAPH_MULTIPLIER);
 
