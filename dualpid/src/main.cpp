@@ -18,8 +18,8 @@ void setup()
 	Serial.begin(115200);
 
     // Init IO
-	digitalWrite(PIN_SPEAKER, LOW);
 	pinMode(PIN_SPEAKER, OUTPUT);
+	digitalWrite(PIN_SPEAKER, LOW);
 
 	pinMode(PIN_BTN_A, INPUT);
 	pinMode(PIN_BTN_B, INPUT);
