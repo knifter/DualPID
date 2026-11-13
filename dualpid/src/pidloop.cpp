@@ -97,6 +97,19 @@ bool PIDLoop::begin()
         case INPUT_DRIVER_SPRINTIR:     _inputdrv = new SprintIR20Driver(); break;
 #endif
     };
+    // Keep the stored setpoint within the range of the (possibly changed) input driver type
+    if(_settings.input_drv != INPUT_DRIVER_NONE)
+    {
+        float sp_min = _inputdrv->setpoint_min();
+        float sp_max = _inputdrv->setpoint_max();
+        float sp = _settings.fpid.setpoint;
+        if(sp < sp_min || sp > sp_max)
+        {
+            _settings.fpid.setpoint = constrain(sp, sp_min, sp_max);
+            DBG("Channel %lu: setpoint %f out of range %f..%f, clamped to %f", _channel_id, sp, sp_min, sp_max, _settings.fpid.setpoint);
+        };
+    };
+
     if(_settings.input_drv != INPUT_DRIVER_NONE)
     {
         if(!_inputdrv->begin())
