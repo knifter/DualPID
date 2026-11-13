@@ -71,13 +71,31 @@ bool PIDLoop::begin()
     {
         default:
         case INPUT_DRIVER_NONE:         _inputdrv = new NoneInputDriver(); break;
+#ifdef INPUTDRV_SHT31_ENABLED
         case INPUT_DRIVER_SHT31_TEMP:   _inputdrv = new SHT31TDriver(); break;
         case INPUT_DRIVER_SHT31_RH:     _inputdrv = new SHT31RHDriver(); break;
+#endif
+#ifdef INPUTDRV_BME280_ENABLED
+        case INPUT_DRIVER_BME280_TEMP:      _inputdrv = new BME280TDriver(); break;
+        case INPUT_DRIVER_BME280_RH:        _inputdrv = new BME280RHDriver(); break;
+        case INPUT_DRIVER_BME280_PRESSURE:  _inputdrv = new BME280PDriver(); break;
+#endif
+
+#ifdef INPUTDRV_M5KMETER_ENABLED
         case INPUT_DRIVER_M5KMETER:     _inputdrv = new M5KMeterDriver(); break;
+#endif
+#ifdef INPUTDRV_MCP9600_ENABLED
         case INPUT_DRIVER_MCP9600:      _inputdrv = new MCP9600Driver(); break;
+#endif
+#ifdef INPUTDRV_MAX31865_ENABLED
         case INPUT_DRIVER_MAX31865:     _inputdrv = new MAX31865Driver(); break;
+#endif
+#ifdef INPUTDRV_MLX90614_ENABLED
         case INPUT_DRIVER_MLX90614:     _inputdrv = new MLX90614Driver(); break;
+#endif
+#ifdef INPUTDRV_SPRINTIR_ENABLED
         case INPUT_DRIVER_SPRINTIR:     _inputdrv = new SprintIR20Driver(); break;
+#endif
     };
     if(_settings.input_drv != INPUT_DRIVER_NONE)
     {
@@ -99,9 +117,15 @@ bool PIDLoop::begin()
         case OUTPUT_DRIVER_NONE:                _outputdrv  = new NoneOutputDriver(); break;
         case OUTPUT_DRIVER_SLOWPWM_IO:          _outputdrv  = new SlowPWMDriver(); break;
         case OUTPUT_DRIVER_FASTPWM_IO:          _outputdrv  = new FastPWMDriver(); break;
+#ifdef OUTPUTDRV_GP8413_ENABLED
         case OUTPUT_DRIVER_GP8413:              _outputdrv  = new GP8413Driver(); break;
+#endif
+#ifdef OUTPUTDRV_M5UNIT_SSR_ENABLED
         case OUTPUT_DRIVER_SLOWPWM_M5SSR:       _outputdrv  = new UnitSSRDriver(); break;
+#endif
+#ifdef OUTPUTDRV_M5UNIT_HBRIDGE_ENABLED
         case OUTPUT_DRIVER_SLOWPWM_M5HBRIDGE:   _outputdrv  = new M5UnitHbridgeDriver(); break;
+#endif
     };
 
     if(_settings.output_drv != OUTPUT_DRIVER_NONE)

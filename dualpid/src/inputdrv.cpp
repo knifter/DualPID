@@ -1,4 +1,5 @@
 #include "inputdrv.h"
+#include "BME280.h"
 
 #include <SHT3x.h>
 
@@ -12,6 +13,7 @@ const char* InputDriver::name()
 		case TYPE_TEMPERATURE: 	return "Temperature";
 		case TYPE_RH: 			return "Humidity";
 		case TYPE_CO2: 			return "CO2 Content";
+		case TYPE_PRESSURE: 	return "Pressure";
 		default: 				return "<none>";
 	};
 };
@@ -22,6 +24,7 @@ const char* InputDriver::unit_text()
 		case TYPE_TEMPERATURE: 	return "\xc2\xb0""C";
 		case TYPE_RH: 			return "%RH";
 		case TYPE_CO2: 			return "%";
+		case TYPE_PRESSURE: 	return "hPa";
 		default: 				return "<none>";
 	};
 };
@@ -30,6 +33,7 @@ float InputDriver::setpoint_min()
 	switch(data_type())
 	{
 		case TYPE_TEMPERATURE: 	return -20;
+		case TYPE_PRESSURE: 	return 300;		// BME280 range 300..1100 hPa
 		// case TYPE_RH: 			return 0;
 		// case TYPE_CO2: 			return 0;
 		default: 				return 0;
@@ -41,6 +45,7 @@ float InputDriver::setpoint_max()
 	switch(data_type())
 	{
 		case TYPE_TEMPERATURE: 	return 60;
+		case TYPE_PRESSURE: 	return 1100;
 		// case TYPE_RH: 			return 100;
 		// case TYPE_CO2: 			return 100;
 		default: 				return 100;
@@ -53,6 +58,7 @@ int InputDriver::precision()
 		// case TYPE_TEMPERATURE: 	return 2;
 		case TYPE_RH: 			return 0;
 		case TYPE_CO2: 			return 3;
+		case TYPE_PRESSURE: 	return 1;
 		default: 				return 2;
 	};			
 };
@@ -63,6 +69,7 @@ lv_color_t InputDriver::color1()
 		case TYPE_TEMPERATURE: 	return COLOR_RED;
 		case TYPE_RH: 			return COLOR_BLUE;
 		case TYPE_CO2: 			return COLOR_YELLOW;
+		case TYPE_PRESSURE: 	return COLOR_PURPLE;
 		default: 				return COLOR_BLACK;
 	};			
 };
@@ -109,6 +116,51 @@ float SHT31RHDriver::read()
 		return NAN;
 	return m->humidity;
 };
+
+#ifdef INPUTDRV_BME280_ENABLED
+// BME280
+BME280 sensor_bme280(Wire);
+bool BME280Driver::begin()
+{
+	if(!sensor_bme280.begin(BME280_ADDRESS_DEFAULT) && !sensor_bme280.begin(BME280_ADDRESS_ALT))
+		return false;
+
+	sensor_bme280.setMode(BME280::Mode_t::NORMAL);
+	sensor_bme280.setOversampling(
+		BME280::Oversampling_t::X2,
+		BME280::Oversampling_t::X1,
+		BME280::Oversampling_t::X4);
+	sensor_bme280.setStandby(BME280::Standby_t::MS_125);
+	sensor_bme280.setFilter(BME280::Filter_t::X2);
+	return InputDriver::begin();
+};
+BME280::measurement_t* BME280Driver::measure()
+{
+	// NORMAL mode: the sensor measures continuously, this just reads the latest values
+	return sensor_bme280.newMeasurement();
+};
+float BME280TDriver::read()
+{
+	BME280::measurement_t* m = measure();
+	if(m->error)
+		return NAN;
+	return m->temperature;
+};
+float BME280RHDriver::read()
+{
+	BME280::measurement_t* m = measure();
+	if(m->error)
+		return NAN;
+	return m->humidity;
+};
+float BME280PDriver::read()
+{
+	BME280::measurement_t* m = measure();
+	if(m->error)
+		return NAN;
+	return m->pressure / 100.0f;		// Pa -> hPa
+};
+#endif // INPUTDRV_BME280_ENABLED
 
 // M5_KMeter
 bool M5KMeterDriver::begin()

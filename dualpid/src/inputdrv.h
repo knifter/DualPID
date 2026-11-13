@@ -14,18 +14,26 @@ typedef enum
     INPUT_DRIVER_MCP9600,
     INPUT_DRIVER_MAX31865,
     INPUT_DRIVER_MLX90614,
+    INPUT_DRIVER_BME280_TEMP,
 
     // 200 = HR
     INPUT_DRIVER_SHT31_RH = 200,
+    INPUT_DRIVER_BME280_RH,
 
     // 300 = CO2
     INPUT_DRIVER_SPRINTIR = 300,
+
+    // 400 = Pressure
+    INPUT_DRIVER_BME280_PRESSURE = 400,
 } input_driver_t;
 
 #define INPUT_DRIVER_MENULIST \
     {INPUT_DRIVER_NONE, "none", "No sensor"},                 \
     {INPUT_DRIVER_SHT31_TEMP, "sht-t", "SHT31 Temperature"},  \
     {INPUT_DRIVER_SHT31_RH, "sht-rh", "SHT31 Humidity"},      \
+    {INPUT_DRIVER_BME280_TEMP, "bme-t", "BME280 Temperature"},  \
+    {INPUT_DRIVER_BME280_RH, "bme-rh", "BME280 Humidity"},      \
+    {INPUT_DRIVER_BME280_PRESSURE, "bme-p", "BME280 Pressure"}, \
     {INPUT_DRIVER_M5KMETER, "kmeter", "M5-KMeter"},           \
     {INPUT_DRIVER_MCP9600, "mcp9600", "MCP9600"},             \
     {INPUT_DRIVER_MAX31865, "max31865", "MAX31865"},          \
@@ -40,6 +48,7 @@ class InputDriver
 			TYPE_TEMPERATURE,
 			TYPE_RH,
 			TYPE_CO2,
+			TYPE_PRESSURE,
 		} data_type_t;
 
 		InputDriver() {};
@@ -90,6 +99,39 @@ class SHT31RHDriver : public InputDriver
 		data_type_t data_type() { return TYPE_RH; };
 };
 #endif // INPUTDRV_SHT31_ENABLED
+
+#ifdef INPUTDRV_BME280_ENABLED
+#include <BME280.h>
+// One shared sensor, each channel reads its own value from it
+class BME280Driver : public InputDriver
+{
+	public:
+		BME280Driver() : InputDriver() {};
+
+		bool begin();
+
+	protected:
+		BME280::measurement_t* measure();
+};
+class BME280TDriver : public BME280Driver
+{
+	public:
+		float read();
+		data_type_t data_type() { return TYPE_TEMPERATURE; };
+};
+class BME280RHDriver : public BME280Driver
+{
+	public:
+		float read();
+		data_type_t data_type() { return TYPE_RH; };
+};
+class BME280PDriver : public BME280Driver
+{
+	public:
+		float read();
+		data_type_t data_type() { return TYPE_PRESSURE; };
+};
+#endif // INPUTDRV_BME280_ENABLED
 
 #ifdef INPUTDRV_M5KMETER_ENABLED
 #include <M5_KMeter.h>
