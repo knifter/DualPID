@@ -481,10 +481,10 @@ void MainScreen::loop()
 		return;
 	_next_update = now + MAIN_LOOP_MS;
 
-	if(setman.isDirty())
-		lv_obj_clear_flag(border, LV_OBJ_FLAG_HIDDEN);
-	else
-		lv_obj_add_flag(border, LV_OBJ_FLAG_HIDDEN);
+	// update dirty 'border', only when != dirty
+	bool dirty = setman.isDirty();
+	if(lv_obj_has_flag(border, LV_OBJ_FLAG_HIDDEN) == dirty)
+		lv_obj_update_flag(border, LV_OBJ_FLAG_HIDDEN, !dirty);
 
 	pw1->update();
 	pw2->update();
