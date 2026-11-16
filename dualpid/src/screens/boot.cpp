@@ -9,16 +9,22 @@
 #include "tools-log.h"
 #include "globals.h"
 
+#include <esp_mac.h>
+
 /*** BOOT ************************************************************************************/
 BootScreen::BootScreen(SooghGUI& g) : Screen(g)
 {
     _start = millis();
 
 	lv_obj_t *label = lv_label_create(_screen);
-    lv_obj_set_size(label, LV_PCT(100), 50);
+    lv_obj_set_size(label, LV_PCT(100), LV_SIZE_CONTENT);
 	lv_obj_center(label);
     lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
-    lv_label_set_text_fmt(label, "DualPID %s", VERSION_STR);
+
+    uint8_t mac[6];
+    esp_efuse_mac_get_default(mac);
+    lv_label_set_text_fmt(label, "DualPID %s\n%02x-%02x-%02x-%02x-%02x-%02x", VERSION_STR,
+        mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 
     if(settings.expert_mode)
         lv_obj_set_style_text_color(label, COLOR_DEEP_ORANGE, 0);

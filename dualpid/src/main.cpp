@@ -10,12 +10,19 @@
 
 #include "tools-log.h"
 
+#include <esp_mac.h>
+
 void halt(const char*);
 uint32_t scan_keys();
 
 void setup()
 {
 	Serial.begin(115200);
+
+	// Factory base MAC from eFuse: the only unique ID on the ESP32
+	uint8_t mac[6];
+	esp_efuse_mac_get_default(mac);
+	DBG("Device Base MAC: %02x-%02x-%02x-%02x-%02x-%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 
     // Init IO
 	pinMode(PIN_SPEAKER, OUTPUT);
