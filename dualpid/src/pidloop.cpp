@@ -344,7 +344,7 @@ void PIDLoop::do_input()
         return;
     };
 
-    double read = _inputdrv->read();
+    double read = _inputdrv->read() + _settings.input_offset;
 
     // reset filter if previous was NaN
     if(isnan(_input_value))

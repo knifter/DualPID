@@ -56,9 +56,11 @@ class PIDLoop: private noncopyable
             int32_t _reserved; // left from previous double lock_window
             int32_t lock_time;
             double input_filter;
+            double input_offset;
             int32_t input_drv;
             // input_driver_config_t input_cfg;
             int32_t fixed_output_value;
+            double temp_offset_c;
         } settings_t;
 
         PIDLoop(uint32_t id, PIDLoop::settings_t& s);

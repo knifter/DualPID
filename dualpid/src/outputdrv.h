@@ -185,7 +185,7 @@ class UnitSSRDriver : public SlowPWMBase
 #endif // OUTPUTDRV_M5UNIT_SSR_ENABLED
 
 #ifdef OUTPUTDRV_M5UNIT_HBRIDGE_ENABLED
-#include <M5UnitHbridge.h>
+#include <M5UnitHBridge.h>
 class M5UnitHbridgeDriver : public SlowPWMBase
 {
 	public:
