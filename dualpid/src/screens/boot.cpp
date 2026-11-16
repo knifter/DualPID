@@ -34,6 +34,7 @@ void BootScreen::load()
 {
 	Screen::load();
     _start = millis();
+    _hold = false;  // also when MAIN pops back to us: drop the hold that pushed MAIN
     // if(settings.expert_mode)
     //     _start = 0;
 };
@@ -41,7 +42,7 @@ void BootScreen::load()
 void BootScreen::loop()
 {
     uint32_t now = millis();
-    if((now - _start) > BOOTSCREEN_TIMEOUT_MS)
+    if(!_hold && (now - _start) > BOOTSCREEN_TIMEOUT_MS)
     {
         gui.pushScreenType(ScreenType::MAIN);
     };
@@ -52,10 +53,19 @@ bool BootScreen::handle(soogh_event_t e)
 {
 	switch(e)
 	{
+		// All keys up (always the last event of any press): skip the remaining delay
+		case KEY_RELEASED:
+			if(_hold)
+				gui.pushScreenType(ScreenType::MAIN);
+			return true;
+		// Key down (SHORT arrives ~50ms after press) keeps the boot screen up until KEY_RELEASED
 		case KEY_A_SHORT:
 		case KEY_B_SHORT:
 		case KEY_C_SHORT:
-            gui.pushScreenType(ScreenType::MAIN);
+		case KEY_A_PRESSED:
+		case KEY_B_PRESSED:
+		case KEY_C_PRESSED:
+			_hold = true;
 			return true;
 		default:
 			return false;

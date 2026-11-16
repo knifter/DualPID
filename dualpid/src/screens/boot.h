@@ -21,6 +21,7 @@ class BootScreen : public Screen
 
     private:
         uint32_t    _start = 0;
+        bool        _hold = false;  // a key is down: suspend the timeout until it is released
 };
 
 #endif // __SCREENS_BOOT_H
