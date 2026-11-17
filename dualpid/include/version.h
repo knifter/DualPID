@@ -5,7 +5,7 @@
 #include "_version.h"
 
 #define VERSION_MAJOR           2
-#define VERSION_MINOR           6
+#define VERSION_MINOR           7
 
 #define _STRINGIFY(x)           #x
 #define STRINGIFY(x)            _STRINGIFY(x)
